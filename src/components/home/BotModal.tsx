@@ -1,5 +1,5 @@
 import React from "react";
-import RobotIcon from "../icons/RobotIcon";
+import RobotIcon from "@/src/icons/RobotIcon";
 
 function BotModal(props: { fill: string }) {
   return (

@@ -1,14 +1,12 @@
-import React, { useRef, useEffect } from "react";
-import BriefcaseIcon from "../icons/BriefcaseIcon";
-import BotModal from "./BotModal";
+import React, { useRef, useEffect, useContext } from "react";
+import ThemeContext from "../ThemeContextProvider";
 import ChatModal from "./ChatModal";
-import ConfigModal from "./ConfigModal";
 import GameModal from "./GameModal";
-import SecurityModal from "./SecurityModal";
 import WorkModal from "./WorkModal";
 
-const Parallax_2 = (props: { fillColor: string }) => {
+const Parallax_2 = () => {
   const parallaxRef = useRef<HTMLDivElement>(null);
+  const { isDarkTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,17 +33,17 @@ const Parallax_2 = (props: { fillColor: string }) => {
     <div className="parallax-container absolute mt-48 w-full" ref={parallaxRef}>
       <div className="parallax-layer" data-speed="0.2">
         <div className="animate-up-down layer1 absolute right-36 mt-60">
-          <ChatModal fill={props.fillColor} />
+          <ChatModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
         </div>
       </div>
       <div className="parallax-layer" data-speed="0.65">
         <div className="animate-up-down layer2 absolute right-36 mr-24 -mt-36">
-          <GameModal fill={props.fillColor} />
+          <GameModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
         </div>
       </div>
       <div className="parallax-layer" data-speed="0.3">
         <div className="animate-up-down layer3 absolute left-36">
-          <WorkModal fill={props.fillColor} />
+          <WorkModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
         </div>
       </div>
     </div>

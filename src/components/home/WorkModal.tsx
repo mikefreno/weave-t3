@@ -1,5 +1,5 @@
 import React from "react";
-import BriefcaseIcon from "../icons/BriefcaseIcon";
+import BriefcaseIcon from "@/src/icons/BriefcaseIcon";
 
 function WorkModal(props: { fill: string }) {
   return (

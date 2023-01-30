@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import GitHub from "@/src/icons/GitHub";
 import LinkedIn from "@/src/icons/LinkedIn";
 import Envelope from "@/src/icons/Envelope";
+import ThemeContext from "../ThemeContextProvider";
 
-function Footer(props: { fillColor: string }) {
+function Footer() {
   const currentYear = new Date().getFullYear().toString();
+  const { isDarkTheme } = useContext(ThemeContext);
+
   let copyright_tag = "2023";
   if (currentYear != "2023") {
     copyright_tag += ` - ${currentYear}`;
@@ -23,7 +26,7 @@ function Footer(props: { fillColor: string }) {
               <GitHub
                 height={16}
                 width={16}
-                fill={props.fillColor}
+                fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`}
                 stroke={undefined}
               />
             </span>
@@ -35,7 +38,11 @@ function Footer(props: { fillColor: string }) {
             className="hvr-grow rounded-full border-[#171717] dark:border-[#E2E2E2]"
           >
             <span className="m-auto">
-              <Envelope height={16} width={16} fill={props.fillColor} />
+              <Envelope
+                height={16}
+                width={16}
+                fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`}
+              />
             </span>
           </a>
         </li>
@@ -49,7 +56,7 @@ function Footer(props: { fillColor: string }) {
               <LinkedIn
                 height={16}
                 width={16}
-                fill={props.fillColor}
+                fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`}
                 stroke={undefined}
               />
             </span>

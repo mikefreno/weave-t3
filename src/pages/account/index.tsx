@@ -1,10 +1,10 @@
 import React from "react";
-import Navbar from "@/src/components/Navbar";
+import Navbar from "@/src/components/home/Navbar";
 
 function index() {
   return (
     <div>
-      <Navbar isDarkTheme={false} darkModeToggle={undefined} />
+      <Navbar />
       index
     </div>
   );

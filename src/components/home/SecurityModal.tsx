@@ -1,5 +1,5 @@
 import React from "react";
-import ShieldIcon from "../icons/ShieldIcon";
+import ShieldIcon from "@/src/icons/ShieldIcon";
 
 function SecurityModal(props: { fill: string }) {
   return (

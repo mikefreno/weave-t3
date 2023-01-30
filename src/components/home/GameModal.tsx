@@ -1,5 +1,5 @@
 import React from "react";
-import GamepadIcon from "../icons/GamepadIcon";
+import GamepadIcon from "@/src/icons/GamepadIcon";
 
 function GameModal(props: { fill: string }) {
   return (

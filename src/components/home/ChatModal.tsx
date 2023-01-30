@@ -1,5 +1,5 @@
 import React from "react";
-import CommentsIcon from "../icons/CommentsIcon";
+import CommentsIcon from "@/src/icons/CommentsIcon";
 
 function ChatModal(props: { fill: string }) {
   return (

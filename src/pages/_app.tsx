@@ -5,8 +5,8 @@ import { createTheme, NextUIProvider } from "@nextui-org/react";
 
 import { api } from "../utils/api";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-
 import "@/src/styles/globals.css";
+import { ThemeContextProvider } from "../components/ThemeContextProvider";
 
 const lightTheme = createTheme({
   type: "light",
@@ -33,7 +33,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }}
       >
         <NextUIProvider>
-          <Component {...pageProps} />
+          <ThemeContextProvider>
+            <Component {...pageProps} />
+          </ThemeContextProvider>
         </NextUIProvider>
       </NextThemesProvider>
     </SessionProvider>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import Logo from "@/public/Logo - solid.png";
 import { Nunito, Raleway } from "@next/font/google";
@@ -11,11 +11,13 @@ import { Switch, Button } from "@nextui-org/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
+import ThemeContext from "../ThemeContextProvider";
 
-const railway_100 = Raleway({ weight: "100", subsets: ["latin"] });
+const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
 
-function Navbar(props: { isDarkTheme: boolean; darkModeToggle: any }) {
+function Navbar() {
+  const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showingLoginModal, setShowingLoginModal] = useState(false);
   const pathname = usePathname();
@@ -44,12 +46,11 @@ function Navbar(props: { isDarkTheme: boolean; darkModeToggle: any }) {
     menuToggle();
     loginToggle();
   }
-  const { isDarkTheme, darkModeToggle } = props;
   return (
     <div>
       <nav className="fixed z-50 flex w-screen p-2 backdrop-blur">
         <div
-          className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_100.className} flex flex-1`}
+          className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_300.className} flex flex-1`}
         >
           <Link href={"/"} className="flex">
             <Image src={Logo} alt="logo" width={40} height={40} />
@@ -69,7 +70,7 @@ function Navbar(props: { isDarkTheme: boolean; darkModeToggle: any }) {
                 color="secondary"
                 iconOn={<MoonIcon />}
                 iconOff={<SunIcon />}
-                onChange={darkModeToggle}
+                onChange={switchDarkTheme}
                 className="my-auto"
               />
               <li className="mx-2 my-auto">
@@ -140,7 +141,7 @@ function Navbar(props: { isDarkTheme: boolean; darkModeToggle: any }) {
               color="secondary"
               iconOn={<MoonIcon />}
               iconOff={<SunIcon />}
-              onChange={darkModeToggle}
+              onChange={switchDarkTheme}
               className="my-auto mr-2"
             />
             {isDarkTheme ? (

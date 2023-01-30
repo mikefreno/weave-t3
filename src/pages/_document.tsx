@@ -5,10 +5,8 @@ export default function Document() {
     <Html lang="en" className="bg-[#262626] " id="html">
       <Head />
       <body className="bgColorGradient" id="body">
-        <div id="bottomGradient" className="bottomGradient">
-          <Main />
-          <NextScript />
-        </div>
+        <Main />
+        <NextScript />
       </body>
     </Html>
   );
