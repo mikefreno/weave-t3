@@ -1,20 +1,22 @@
 import { NextPage } from "next";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
-import Navbar from "@/src/components/home/Navbar";
+import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/home/Footer";
 import Logo from "@/public/Logo - solid.png";
 import DownloadButton from "@/src/components/home/DownloadButton";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import Head from "next/head";
 import Parallax from "@/src/components/home/Parallax";
 import Parallax_2 from "@/src/components/home/Parallax_2";
 import ThemeContext from "../components/ThemeContextProvider";
+import ModalsForSmallScreens from "../components/home/ModalsForSmallScreens";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const { isDarkTheme } = useContext(ThemeContext);
+
   return (
     <>
       <div
@@ -33,7 +35,7 @@ export default function Home() {
               isDarkTheme ? "topGradient" : "topGradientLight"
             } h-screen`}
           >
-            <div className="z-50 pt-24">
+            <div className="hidden pt-24 md:block">
               <Parallax_2 />
             </div>
             <div className="flex justify-center pt-28">
@@ -46,7 +48,7 @@ export default function Home() {
             <div className="-z-10 my-24 flex justify-center">
               <DownloadButton />
             </div>
-            <div className="mt-8 text-center tracking-widest text-[#171717] dark:text-[#E2E2E2]">
+            <div className="mx-8 mt-8 text-center tracking-widest text-[#171717] dark:text-[#E2E2E2]">
               <h2 className="text-4xl">For work, gaming or just chatting.</h2>
               <h4 className="text-md">
                 For each use case Weave provides seamless features to focus on
@@ -59,10 +61,15 @@ export default function Home() {
               </span>
             </div>
           </div>
-          <Parallax />
+          <div className="hidden md:block">
+            <Parallax />
+          </div>
+          <div className="md:hidden">
+            <ModalsForSmallScreens />
+          </div>
           <div
             id="spacer"
-            className="z-0 mx-36 mt-36 h-screen rounded-[3rem] bg-[url('/work.jpg')] bg-cover"
+            className="z-0 mx-4 mb-36 mt-36 h-screen rounded-md bg-[url('/work.jpg')] bg-cover bg-center sm:mb-0 md:mx-12 lg:mx-24 lg:rounded-[3rem] xl:mx-36"
           ></div>
         </div>
         <div className="mx-12 mb-4 mt-12 border-b border-[#171717] dark:border-[#E2E2E2]" />

@@ -53,7 +53,10 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
       return !isDarkTheme;
     });
   }
-  const context = { isDarkTheme: isDarkTheme, switchDarkTheme: changeDarkMode };
+  const context = {
+    isDarkTheme: isDarkTheme,
+    switchDarkTheme: changeDarkMode,
+  };
 
   return (
     <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>

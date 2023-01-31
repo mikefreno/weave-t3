@@ -63,11 +63,9 @@
 }
 .LineA {
   transform: translate(20px, -14px) rotate(45deg);
-  stroke: #171717;
 }
 .LineB {
   transform: translate(-50px, 48px) rotate(-45deg);
-  stroke: #171717;
 }
 .fade-in {
   opacity: 0;
@@ -180,7 +178,7 @@ ul.icons li a:active {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-7px);
   }
   100% {
     transform: translateY(0);
@@ -194,8 +192,32 @@ ul.icons li a:active {
   animation-delay: 0s;
 }
 .layer2 {
-  animation-delay: 0.5s;
+  animation-delay: 0.75s;
 }
 .layer3 {
-  animation-delay: 0.75s;
+  animation-delay: 1.5s;
+}
+.darkBorder {
+  background: rgb(76, 29, 149);
+  background: linear-gradient(
+    153deg,
+    rgba(76, 29, 149, 0.8) 10%,
+    rgba(24, 24, 27, 0.5) 25%,
+    rgba(212, 212, 216, 0) 45%
+  );
+}
+.lightBorder {
+  background: rgb(76, 29, 149);
+  background: linear-gradient(
+    153deg,
+    rgba(76, 29, 149, 0.8) 10%,
+    rgba(212, 212, 216, 0) 25%,
+    rgba(212, 212, 216, 0) 45%
+  );
+}
+.transparentZinc800 {
+  background: rgba(39, 39, 42, 0.75);
+}
+.transparentZinc300 {
+  background: rgba(212, 212, 216, 0.75);
 }

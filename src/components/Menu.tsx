@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Nunito, Raleway } from "@next/font/google";
-import LoginModal from "./loginModal";
 import { Button } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 
@@ -10,7 +9,12 @@ const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 function Menu({ openLogin }: any) {
   const pathname = usePathname();
   return (
-    <div id="menu" className="fade-in absolute right-4 top-2 mr-2 md:hidden">
+    <div
+      id="menu"
+      className={`fade-in absolute right-4 top-2 mr-2 ${
+        pathname == "/app" ? "" : "md:hidden"
+      }`}
+    >
       <div
         className={`${nunito_200} rounded-lg border-2 border-gray-300 bg-zinc-200 p-4 shadow-xl dark:bg-zinc-800`}
       >
@@ -57,13 +61,17 @@ function Menu({ openLogin }: any) {
               Login / Register
             </button>
           </li>
-          <li className="mt-4 text-lg">
-            <Button shadow color="gradient" auto>
-              <Link href={"/app"} className="text-zinc-300">
-                Web App
-              </Link>
-            </Button>
-          </li>
+          {
+            <li
+              className={`mt-4 text-lg ${pathname == "/app" ? "hidden" : null}`}
+            >
+              <Button shadow color="gradient" auto>
+                <Link href={"/app"} className="text-zinc-300">
+                  Web App
+                </Link>
+              </Button>
+            </li>
+          }
         </ul>
       </div>
     </div>

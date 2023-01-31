@@ -4,14 +4,14 @@ import Logo from "@/public/Logo - solid.png";
 import { Nunito, Raleway } from "@next/font/google";
 import MenuBars from "@/src/icons/MenuBars";
 import Menu from "./Menu";
-import LoginModal from "./loginModal";
+import LoginModal from "./home/loginModal";
 import { SunIcon } from "@/src/icons/SunIcon";
 import { MoonIcon } from "@/src/icons/MoonIcon";
 import { Switch, Button } from "@nextui-org/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
-import ThemeContext from "../ThemeContextProvider";
+import ThemeContext from "./ThemeContextProvider";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
@@ -49,18 +49,20 @@ function Navbar() {
   return (
     <div>
       <nav className="fixed z-50 flex w-screen p-2 backdrop-blur">
-        <div
-          className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_300.className} flex flex-1`}
-        >
-          <Link href={"/"} className="flex">
-            <Image src={Logo} alt="logo" width={40} height={40} />
-            <span className="mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">
-              Weave
-            </span>
-          </Link>
-        </div>
+        {pathname == "/app" ? null : (
+          <div
+            className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_300.className} flex flex-1`}
+          >
+            <Link href={"/"} className="flex">
+              <Image src={Logo} alt="logo" width={40} height={40} />
+              <span className="mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">
+                Weave
+              </span>
+            </Link>
+          </div>
+        )}
         <div className="my-auto flex justify-end" style={{ flex: 3 }}>
-          <div className="hidden md:block">
+          <div className={pathname == "/app" ? "hidden" : "hidden md:block"}>
             <ul className="flex text-sm text-[#171717] dark:text-[#E2E2E2]">
               <Switch
                 checked={isDarkTheme}
@@ -131,7 +133,7 @@ function Navbar() {
             </ul>
           </div>
         </div>
-        <div className="my-2 md:hidden">
+        <div className={pathname == "/app" ? "my-2" : "my-2 md:hidden"}>
           <div className="z-10 my-auto flex justify-end px-4 text-lg">
             <Switch
               checked={isDarkTheme}
