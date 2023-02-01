@@ -6,11 +6,16 @@ import { usePathname } from "next/navigation";
 
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
-function Menu({ openLogin }: any) {
+function Menu(props: {
+  openLogin: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  menuRef: React.LegacyRef<HTMLDivElement> | undefined;
+}) {
   const pathname = usePathname();
+
   return (
     <div
       id="menu"
+      ref={props.menuRef}
       className={`fade-in absolute right-4 top-2 mr-2 ${
         pathname == "/app" ? "" : "md:hidden"
       }`}
@@ -55,8 +60,8 @@ function Menu({ openLogin }: any) {
           </li>
           <li className="mb-2 text-lg">
             <button
-              onClick={openLogin}
-              className="border-[#171717] hover:border-b-2"
+              onClick={props.openLogin}
+              className="border-zinc-800 hover:border-b-2 dark:border-zinc-300"
             >
               Login / Register
             </button>

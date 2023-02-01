@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Logo from "@/public/Logo - solid.png";
+import LightLogo from "@/public/Logo - light.png";
+import DarkLogo from "@/public/Logo - dark.png";
 import { Nunito, Raleway } from "@next/font/google";
 import MenuBars from "@/src/icons/MenuBars";
 import Menu from "./Menu";
-import LoginModal from "./home/loginModal";
+import LoginModal from "./loginModal";
 import { SunIcon } from "@/src/icons/SunIcon";
 import { MoonIcon } from "@/src/icons/MoonIcon";
 import { Switch, Button } from "@nextui-org/react";
@@ -12,6 +13,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
+import useOnClickOutside from "./ClickOutsideHook";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
@@ -22,9 +24,42 @@ function Navbar() {
   const [showingLoginModal, setShowingLoginModal] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
+  const menuRef = useRef();
+  const closeRef = useRef();
+  const loginRef = useRef();
+  const loginButtonRef = useRef();
+  const switchRef = useRef();
+
+  useEffect(() => {
+    if (pathname == "/app") {
+      if (showingLoginModal) {
+        document.getElementById("app-body")?.classList.add("modal-open");
+      } else {
+        document.getElementById("app-body")?.classList.remove("modal-open");
+      }
+    } else if (pathname == "/") {
+      if (showingLoginModal) {
+        document.getElementById("main")?.classList.add("modal-open");
+      } else {
+        document.getElementById("main")?.classList.remove("modal-open");
+      }
+    }
+  }, [showingLoginModal]);
+
+  useOnClickOutside([menuRef, closeRef, switchRef], () => {
+    setMenuOpen(false);
+  });
+
+  useOnClickOutside([loginRef, loginButtonRef, switchRef], () => {
+    setShowingLoginModal(false);
+  });
+
+  useEffect(() => {
+    rotateBars();
+  }, [menuOpen]);
 
   function rotateBars() {
-    if (!menuOpen) {
+    if (menuOpen) {
       document.getElementById("LineA")?.classList.add("LineA");
       document.getElementById("LineB")?.classList.add("LineB");
     } else {
@@ -41,20 +76,33 @@ function Navbar() {
   }
   function loginToggle() {
     setShowingLoginModal(!showingLoginModal);
+    if (menuOpen) {
+      menuToggle();
+    }
   }
   function openLoginRegisterModal() {
-    menuToggle();
     loginToggle();
   }
+
   return (
-    <div>
-      <nav className="fixed z-50 flex w-screen p-2 backdrop-blur">
+    <div className="stopIT">
+      <nav
+        className={`fixed z-50 flex w-screen p-2 ${
+          pathname !== "/app" ? "backdrop-blur" : null
+        }`}
+      >
         {pathname == "/app" ? null : (
           <div
             className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_300.className} flex flex-1`}
           >
             <Link href={"/"} className="flex">
-              <Image src={Logo} alt="logo" width={40} height={40} />
+              <Image
+                src={isDarkTheme ? DarkLogo : LightLogo}
+                alt="logo"
+                width={40}
+                height={40}
+                className="logoSpinner"
+              />
               <span className="mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">
                 Weave
               </span>
@@ -64,17 +112,19 @@ function Navbar() {
         <div className="my-auto flex justify-end" style={{ flex: 3 }}>
           <div className={pathname == "/app" ? "hidden" : "hidden md:block"}>
             <ul className="flex text-sm text-[#171717] dark:text-[#E2E2E2]">
-              <Switch
-                checked={isDarkTheme}
-                shadow
-                bordered
-                size="md"
-                color="secondary"
-                iconOn={<MoonIcon />}
-                iconOff={<SunIcon />}
-                onChange={switchDarkTheme}
-                className="my-auto"
-              />
+              <span ref={switchRef}>
+                <Switch
+                  checked={isDarkTheme}
+                  shadow
+                  bordered
+                  size="md"
+                  color="secondary"
+                  iconOn={<MoonIcon />}
+                  iconOff={<SunIcon />}
+                  onChange={switchDarkTheme}
+                  className="my-auto"
+                />
+              </span>
               <li className="mx-2 my-auto">
                 {pathname == "/" ? (
                   <Link
@@ -118,6 +168,7 @@ function Navbar() {
                   <button
                     className="border-[#171717] text-[#171717] hover:border-b-2 dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
                     onClick={loginToggle}
+                    ref={loginButtonRef}
                   >
                     Login / Register
                   </button>
@@ -134,7 +185,10 @@ function Navbar() {
           </div>
         </div>
         <div className={pathname == "/app" ? "my-2" : "my-2 md:hidden"}>
-          <div className="z-10 my-auto flex justify-end px-4 text-lg">
+          <div
+            className="z-10 my-auto flex justify-end px-4 text-lg"
+            ref={switchRef}
+          >
             <Switch
               checked={isDarkTheme}
               shadow
@@ -147,19 +201,23 @@ function Navbar() {
               className="my-auto mr-2"
             />
             {isDarkTheme ? (
-              <button onClick={menuToggle} className="my-auto">
+              <button onClick={menuToggle} className="my-auto" ref={closeRef}>
                 <MenuBars stroke="white" />
               </button>
             ) : (
-              <button onClick={menuToggle} className="my-auto">
+              <button onClick={menuToggle} className="my-auto" ref={closeRef}>
                 <MenuBars stroke="black" />
               </button>
             )}
           </div>
         </div>
-        {menuOpen ? <Menu openLogin={openLoginRegisterModal} /> : null}
+        {menuOpen ? (
+          <Menu openLogin={openLoginRegisterModal} menuRef={menuRef} />
+        ) : null}
       </nav>
-      {showingLoginModal ? <LoginModal onClose={loginToggle} /> : null}
+      {showingLoginModal ? (
+        <LoginModal onClose={loginToggle} loginRef={loginRef} />
+      ) : null}
     </div>
   );
 }

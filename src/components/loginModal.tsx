@@ -1,13 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import Xmark from "@/src/icons/Xmark";
 import CheckMark from "@/src/icons/checkMark";
 import { Input, Button, Loading, Popover } from "@nextui-org/react";
 import Image from "next/image";
-import Logo from "@/public/Logo - solid.png";
+import LightLogo from "@/public/Logo - light.png";
+import DarkLogo from "@/public/Logo - dark.png";
 import Email from "next-auth/providers/email";
 import { useSession, signIn, signOut } from "next-auth/react";
+import ThemeContext from "./ThemeContextProvider";
 
-function LoginModal({ onClose }: any) {
+function LoginModal(props: { onClose; loginRef }) {
   const [modalState, setModalState] = useState("login");
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
   const [registerButtonLoading, setRegisterButtonLoading] = useState(false);
@@ -17,6 +19,7 @@ function LoginModal({ onClose }: any) {
     null
   );
   const [registerErrorReport, setRegisterErrorReport] = useState("");
+  const { isDarkTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     const handleFocus = (event: FocusEvent) => {
@@ -136,7 +139,7 @@ function LoginModal({ onClose }: any) {
   }
   if (modalState == "login") {
     return (
-      <div className="flex justify-center">
+      <div ref={props.loginRef} className="flex justify-center">
         <div
           className="fade-in dark:text- fixed z-50 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200  p-4 text-zinc-800
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3"
@@ -144,11 +147,19 @@ function LoginModal({ onClose }: any) {
           <div className="-mb-6 pl-2 text-2xl">
             <span className="border-b-2 border-zinc-800">Login</span>
           </div>
-          <button className="absolute right-4 -mt-4 w-10" onClick={onClose}>
+          <button
+            className="absolute right-4 -mt-4 w-10"
+            onClick={props.onClose}
+          >
             <Xmark className="text-zinc-800 dark:text-zinc-200" />
           </button>
           <div className="-mb-12 flex justify-center">
-            <Image src={Logo} alt="logo" width={80} height={80} />
+            <Image
+              src={isDarkTheme ? DarkLogo : LightLogo}
+              alt="logo"
+              width={80}
+              height={80}
+            />
           </div>
           <div className="mt-12">
             <form onSubmit={loginCall} className="flex flex-col px-2">
@@ -182,7 +193,7 @@ function LoginModal({ onClose }: any) {
     );
   } else {
     return (
-      <div className="flex justify-center">
+      <div ref={props.loginRef} className="flex justify-center">
         <div
           className="fade-in dark:text- fixed z-50 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200  p-4 text-zinc-800
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3"
@@ -190,11 +201,19 @@ function LoginModal({ onClose }: any) {
           <div className="-mb-6 pl-2 text-2xl">
             <span className="border-b-2 border-zinc-800">Register</span>
           </div>
-          <button className="absolute right-4 -mt-4 w-10" onClick={onClose}>
+          <button
+            className="absolute right-4 -mt-4 w-10"
+            onClick={props.onClose}
+          >
             <Xmark className="text-zinc-800 dark:text-zinc-200" />
           </button>
           <div className="-mb-12 flex justify-center">
-            <Image src={Logo} alt="logo" width={80} height={80} />
+            <Image
+              src={isDarkTheme ? LightLogo : DarkLogo}
+              alt="logo"
+              width={80}
+              height={80}
+            />
           </div>
           <div className="mt-12">
             <form onSubmit={registerCall} className="flex flex-col px-2">

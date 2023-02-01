@@ -201,18 +201,18 @@ ul.icons li a:active {
   background: rgb(76, 29, 149);
   background: linear-gradient(
     153deg,
-    rgba(76, 29, 149, 0.8) 10%,
-    rgba(24, 24, 27, 0.5) 25%,
-    rgba(212, 212, 216, 0) 45%
+    rgba(76, 29, 149, 0.8) 15%,
+    rgba(24, 24, 27, 0.5) 35%,
+    rgba(212, 212, 216, 0) 55%
   );
 }
 .lightBorder {
   background: rgb(76, 29, 149);
   background: linear-gradient(
     153deg,
-    rgba(76, 29, 149, 0.8) 10%,
-    rgba(212, 212, 216, 0) 25%,
-    rgba(212, 212, 216, 0) 45%
+    rgba(76, 29, 149, 0.8) 15%,
+    rgba(212, 212, 216, 0) 35%,
+    rgba(212, 212, 216, 0) 55%
   );
 }
 .transparentZinc800 {
@@ -220,4 +220,57 @@ ul.icons li a:active {
 }
 .transparentZinc300 {
   background: rgba(212, 212, 216, 0.75);
+}
+.borderRadiusTransform {
+  border-radius: 50px;
+  transition: border-radius ease 0.4s;
+}
+.borderRadiusTransform:hover {
+  border-radius: 15px;
+}
+@keyframes spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.logoSpinner:hover {
+  animation: spinner 1.5s ease;
+}
+@keyframes shaker {
+  0% {
+    transform: rotate(0deg);
+  }
+  33% {
+    transform: rotate(15deg);
+  }
+  66% {
+    transform: rotate(-15deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.shaker:hover {
+  animation: shaker 0.5s ease;
+}
+.scollDisabled {
+  overflow: hidden;
+}
+.modal-open {
+  filter: blur(3px);
+  transition: filter 0.3s ease-in-out;
+}
+.modal-offset {
+  margin-top: -100vh;
+}
+.stopIT {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useTheme as useNextTheme } from "next-themes";
 import { useTheme } from "@nextui-org/react";
+import { usePathname } from "next/navigation";
 
 const ThemeContext = createContext({
   isDarkTheme: false,
@@ -15,6 +16,7 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
   const [isDarkTheme, setDarkTheme] = useState(false);
   const { setTheme } = useNextTheme();
   const { isDark, type } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => {
     setDarkTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -28,7 +30,12 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!isDarkTheme) {
       document.getElementById("html")?.classList.remove("dark");
-      document.getElementById("html")?.setAttribute("class", "bg-zinc-300");
+      document
+        .getElementById("html")
+        ?.setAttribute(
+          "class",
+          `bg-zinc-300 ${pathname === "/app" ? "scollDisabled" : ""}`
+        );
       document
         .getElementById("body")
         ?.setAttribute("class", "bgColorGradientLight");
@@ -39,7 +46,10 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
     } else {
       document
         .getElementById("html")
-        ?.setAttribute("class", "dark bg-[#262626]");
+        ?.setAttribute(
+          "class",
+          `dark bg-zinc-800 ${pathname === "/app" ? "scollDisabled" : ""}`
+        );
       document
         .getElementById("bottomGradient")
         ?.setAttribute("class", "bottomGradient");
