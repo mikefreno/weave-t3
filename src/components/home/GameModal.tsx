@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import GamepadIcon from "@/src/icons/GamepadIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-function GameModal(props: { fill: string }) {
+const GameModal = (props: { fill: string }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -34,6 +34,6 @@ function GameModal(props: { fill: string }) {
       </div>
     </div>
   );
-}
+};
 
 export default GameModal;

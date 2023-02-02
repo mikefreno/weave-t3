@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import CommandLineIcon from "@/src/icons/CommandLineIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-function ConfigModal(props: { fill: string }) {
+const ConfigModal = (props: { fill: string }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -32,6 +32,6 @@ function ConfigModal(props: { fill: string }) {
       </div>
     </div>
   );
-}
+};
 
 export default ConfigModal;

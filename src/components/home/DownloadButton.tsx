@@ -4,7 +4,7 @@ import { Button, Tooltip } from "@nextui-org/react";
 import { userAgent } from "next/server";
 import React, { useEffect, useState } from "react";
 
-function DownloadButton() {
+const DownloadButton = () => {
   const [os, setOS] = useState("");
 
   useEffect(() => {
@@ -35,6 +35,6 @@ function DownloadButton() {
       </Tooltip>
     </>
   );
-}
+};
 
 export default DownloadButton;

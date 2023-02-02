@@ -9,10 +9,10 @@ import Email from "next-auth/providers/email";
 import { useSession, signIn, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 
-function LoginModal(props: {
+const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
   loginRef: React.LegacyRef<HTMLDivElement> | undefined;
-}) {
+}) => {
   const [modalState, setModalState] = useState("login");
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
   const [registerButtonLoading, setRegisterButtonLoading] = useState(false);
@@ -273,6 +273,6 @@ function LoginModal(props: {
       </div>
     );
   }
-}
+};
 
 export default LoginModal;

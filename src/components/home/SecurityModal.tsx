@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import ShieldIcon from "@/src/icons/ShieldIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-function SecurityModal(props: { fill: string }) {
+const SecurityModal = (props: { fill: string }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -30,6 +30,6 @@ function SecurityModal(props: { fill: string }) {
       </div>
     </div>
   );
-}
+};
 
 export default SecurityModal;

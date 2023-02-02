@@ -15,7 +15,7 @@ import ModalsForSmallScreens from "../components/home/ModalsForSmallScreens";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+const Home = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const switchRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
 
@@ -94,4 +94,6 @@ export default function Home() {
       </div>
     </>
   );
-}
+};
+
+export default Home;

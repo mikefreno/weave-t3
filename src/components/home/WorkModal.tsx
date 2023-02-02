@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import BriefcaseIcon from "@/src/icons/BriefcaseIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-function WorkModal(props: { fill: string }) {
+const WorkModal = (props: { fill: string }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -34,6 +34,6 @@ function WorkModal(props: { fill: string }) {
       </div>
     </div>
   );
-}
+};
 
 export default WorkModal;

@@ -15,7 +15,7 @@ import useOnClickOutside from "@/src/components/ClickOutsideHook";
 import PublicServerModal from "@/src/components/app/PublicServerModal";
 import BotServiceModal from "@/src/components/app/BotServiceModal";
 
-function index() {
+const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [serverModalShowing, setServerModalShowing] = useState(false);
   const [publicServerModalShowing, setPublicServerModalShowing] =
@@ -109,6 +109,6 @@ function index() {
       </div>
     </div>
   );
-}
+};
 
 export default index;

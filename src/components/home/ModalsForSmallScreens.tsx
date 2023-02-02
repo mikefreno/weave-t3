@@ -7,7 +7,7 @@ import GameModal from "./GameModal";
 import SecurityModal from "./SecurityModal";
 import WorkModal from "./WorkModal";
 
-function ModalsForSmallScreens() {
+const ModalsForSmallScreens = () => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -34,6 +34,6 @@ function ModalsForSmallScreens() {
       </div>
     </div>
   );
-}
+};
 
 export default ModalsForSmallScreens;

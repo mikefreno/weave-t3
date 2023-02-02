@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import RobotIcon from "@/src/icons/RobotIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-function BotModal(props: { fill: string }) {
+const BotModal = (props: { fill: string }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -29,6 +29,6 @@ function BotModal(props: { fill: string }) {
       </div>
     </div>
   );
-}
+};
 
 export default BotModal;

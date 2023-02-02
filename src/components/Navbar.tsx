@@ -25,7 +25,7 @@ import useOnClickOutside from "./ClickOutsideHook";
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
 
-function Navbar(props: { switchRef: React.RefObject<HTMLElement> }) {
+const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showingLoginModal, setShowingLoginModal] = useState(false);
@@ -240,6 +240,6 @@ function Navbar(props: { switchRef: React.RefObject<HTMLElement> }) {
       ) : null}
     </div>
   );
-}
+};
 
 export default Navbar;

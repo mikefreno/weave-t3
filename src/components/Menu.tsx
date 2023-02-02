@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
-function Menu(props: {
+const Menu = (props: {
   openLogin: React.MouseEventHandler<HTMLButtonElement> | undefined;
   menuRef: React.LegacyRef<HTMLDivElement> | undefined;
-}) {
+}) => {
   const pathname = usePathname();
 
   return (
@@ -81,6 +81,6 @@ function Menu(props: {
       </div>
     </div>
   );
-}
+};
 
 export default Menu;

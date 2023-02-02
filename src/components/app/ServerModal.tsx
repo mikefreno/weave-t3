@@ -1,8 +1,8 @@
 import React, { LegacyRef, RefObject } from "react";
 
-function ServerModal(props: {
+const ServerModal = (props: {
   serverModalRef: React.LegacyRef<HTMLDivElement>;
-}) {
+}) => {
   return (
     <div id="modal" className="z-10 flex justify-center">
       <div className="modal-offset absolute flex h-screen items-center">
@@ -16,6 +16,6 @@ function ServerModal(props: {
       </div>
     </div>
   );
-}
+};
 
 export default ServerModal;

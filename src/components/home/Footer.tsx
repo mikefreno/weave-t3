@@ -4,7 +4,7 @@ import LinkedIn from "@/src/icons/LinkedIn";
 import Envelope from "@/src/icons/Envelope";
 import ThemeContext from "../ThemeContextProvider";
 
-function Footer() {
+const Footer = () => {
   const currentYear = new Date().getFullYear().toString();
   const { isDarkTheme } = useContext(ThemeContext);
 
@@ -69,6 +69,6 @@ function Footer() {
       </div>
     </div>
   );
-}
+};
 
 export default Footer;

@@ -2,10 +2,10 @@ import { useEffect, RefObject } from "react";
 
 type Refs = RefObject<HTMLElement>[];
 
-export default function useOnClickOutside(
+const useOnClickOutside = (
   refs: Refs,
   handler: (event: MouseEvent | TouchEvent) => void
-) {
+) => {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
       const contains = refs.reduce(
@@ -27,4 +27,5 @@ export default function useOnClickOutside(
       document.removeEventListener("touchstart", listener);
     };
   }, [refs, handler]);
-}
+};
+export default useOnClickOutside;

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import CommentsIcon from "@/src/icons/CommentsIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-function ChatModal(props: { fill: string }) {
+const ChatModal = (props: { fill: string }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -34,6 +34,6 @@ function ChatModal(props: { fill: string }) {
       </div>
     </div>
   );
-}
+};
 
 export default ChatModal;

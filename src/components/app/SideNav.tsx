@@ -9,14 +9,14 @@ import BullhornIcon from "@/src/icons/BullhornIcon";
 import RobotIcon from "@/src/icons/RobotIcon";
 import InnerNav from "./InnerNav";
 
-function SideNav(props: {
+const SideNav = (props: {
   serverModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   serverButtonRef: React.LegacyRef<HTMLButtonElement>;
   publicServerModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   publicServerButtonRef: React.LegacyRef<HTMLButtonElement>;
   botModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   botButtonRef: React.LegacyRef<HTMLButtonElement>;
-}) {
+}) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [currentTab, setCurrentTab] = useState("0");
 
@@ -118,6 +118,6 @@ function SideNav(props: {
       </aside>
     </div>
   );
-}
+};
 
 export default SideNav;

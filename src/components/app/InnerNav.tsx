@@ -6,7 +6,7 @@ import { Input } from "@nextui-org/react";
 import React, { useContext, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 
-function InnerNav(props: { currentTab: string }) {
+const InnerNav = (props: { currentTab: string }) => {
   const { currentTab } = props;
   const { isDarkTheme } = useContext(ThemeContext);
 
@@ -76,6 +76,6 @@ function InnerNav(props: { currentTab: string }) {
   } else {
     return <div>Not DM tab</div>;
   }
-}
+};
 
 export default InnerNav;
