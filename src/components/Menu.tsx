@@ -16,7 +16,7 @@ function Menu(props: {
     <div
       id="menu"
       ref={props.menuRef}
-      className={`fade-in absolute right-4 top-2 mr-2 ${
+      className={`fade-in absolute right-4 top-2 mr-2 w-60${
         pathname == "/app" ? "" : "md:hidden"
       }`}
     >

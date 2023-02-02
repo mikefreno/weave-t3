@@ -30,31 +30,10 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!isDarkTheme) {
       document.getElementById("html")?.classList.remove("dark");
-      document
-        .getElementById("html")
-        ?.setAttribute(
-          "class",
-          `bg-zinc-300 ${pathname === "/app" ? "scollDisabled" : ""}`
-        );
-      document
-        .getElementById("body")
-        ?.setAttribute("class", "bgColorGradientLight");
-      document
-        .getElementById("bottomGradient")
-        ?.setAttribute("class", "bottomGradientLight");
       setTheme("light");
     } else {
-      document
-        .getElementById("html")
-        ?.setAttribute(
-          "class",
-          `dark bg-zinc-800 ${pathname === "/app" ? "scollDisabled" : ""}`
-        );
-      document
-        .getElementById("bottomGradient")
-        ?.setAttribute("class", "bottomGradient");
       setTheme("dark");
-      document.getElementById("body")?.setAttribute("class", "bgColorGradient");
+      document.getElementById("html")?.classList.add("dark");
     }
   }, [isDarkTheme]);
 

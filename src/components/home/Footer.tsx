@@ -14,13 +14,13 @@ function Footer() {
   }
 
   return (
-    <div className="mx-auto mt-12 h-2/5 w-screen text-center text-[#171717] dark:text-[#E2E2E2]">
+    <div className="mx-auto mt-12 h-2/5 w-screen text-center text-zinc-800 dark:text-zinc-300">
       <ul className="icons mt-6">
         <li>
           <a
             href="https://github.com/MikeFreno/"
             target="_blank"
-            className="hvr-grow-rotate-left rounded-full border-[#171717] dark:border-[#E2E2E2]"
+            className="hvr-grow-rotate-left rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">
               <GitHub
@@ -34,8 +34,8 @@ function Footer() {
         </li>
         <li>
           <a
-            href="mailto:mike@notesapp.net"
-            className="hvr-grow rounded-full border-[#171717] dark:border-[#E2E2E2]"
+            href="mailto:michael@freno.me"
+            className="hvr-grow rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">
               <Envelope
@@ -50,7 +50,7 @@ function Footer() {
           <a
             href="https://www.linkedin.com/in/michael-freno-176001256/"
             target="_blank"
-            className="hvr-grow-rotate rounded-full border-[#171717] dark:border-[#E2E2E2]"
+            className="hvr-grow-rotate rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">
               <LinkedIn
@@ -63,7 +63,7 @@ function Footer() {
           </a>
         </li>
       </ul>
-      <div className="mr-24 mb-12 -mt-6 flex flex-col items-end">
+      <div className="mr-24 -mt-6 flex flex-col items-end">
         <span className="flex">©{copyright_tag}</span>
         <span className="flex">Michael Freno</span>
       </div>

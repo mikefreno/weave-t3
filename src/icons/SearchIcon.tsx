@@ -1,17 +1,16 @@
 import React from "react";
 
-function AddIcon(props: {
-  height: number;
-  width: number;
-  stroke: string;
-  strokeWidth: number;
+function SearchIcon(props: {
+  stroke?: string;
+  height?: number;
+  width?: number;
 }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      strokeWidth={props.strokeWidth}
+      strokeWidth={1.5}
       stroke={props.stroke}
       height={props.height}
       width={props.width}
@@ -19,10 +18,10 @@ function AddIcon(props: {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M12 4.5v15m7.5-7.5h-15"
+        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
       />
     </svg>
   );
 }
 
-export default AddIcon;
+export default SearchIcon;

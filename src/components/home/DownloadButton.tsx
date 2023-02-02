@@ -1,6 +1,6 @@
 "use client";
 import DownloadIcon from "@/src/icons/DownloadIcon";
-import { Button } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import { userAgent } from "next/server";
 import React, { useEffect, useState } from "react";
 
@@ -23,9 +23,16 @@ function DownloadButton() {
 
   return (
     <>
-      <Button shadow color={"gradient"} size="xl" className="z-0">
-        Download for {os} <DownloadIcon className="ml-2 h-4 w-4" />
-      </Button>
+      <Tooltip
+        content={"Coming Soon!"}
+        trigger="click"
+        color={"secondary"}
+        placement="topEnd"
+      >
+        <Button shadow color={"gradient"} size="xl" className="z-0">
+          Download for {os} <DownloadIcon className="ml-2 h-4 w-4" />
+        </Button>
+      </Tooltip>
     </>
   );
 }

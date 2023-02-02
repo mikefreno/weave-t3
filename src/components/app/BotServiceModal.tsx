@@ -1,13 +1,13 @@
-import React, { LegacyRef, RefObject } from "react";
+import React from "react";
 
-function ServerModal(props: {
-  serverModalRef: React.LegacyRef<HTMLDivElement>;
+function BotServiceModal(props: {
+  botModalRef: React.LegacyRef<HTMLDivElement>;
 }) {
   return (
     <div id="modal" className="z-10 flex justify-center">
       <div className="modal-offset absolute flex h-screen items-center">
         <div
-          ref={props.serverModalRef}
+          ref={props.botModalRef}
           id="serverModalContent"
           className="fade-in -mt-24 h-96 w-96 rounded-xl bg-white"
         >
@@ -18,4 +18,4 @@ function ServerModal(props: {
   );
 }
 
-export default ServerModal;
+export default BotServiceModal;
