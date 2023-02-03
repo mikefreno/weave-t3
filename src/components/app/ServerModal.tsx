@@ -1,8 +1,6 @@
-import React, { LegacyRef, RefObject } from "react";
+import React, { RefObject } from "react";
 
-const ServerModal = (props: {
-  serverModalRef: React.LegacyRef<HTMLDivElement>;
-}) => {
+const ServerModal = (props: { serverModalRef: RefObject<HTMLDivElement> }) => {
   return (
     <div id="modal" className="z-10 flex justify-center">
       <div className="modal-offset absolute flex h-screen items-center">

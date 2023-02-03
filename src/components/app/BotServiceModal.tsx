@@ -1,8 +1,6 @@
-import React from "react";
+import React, { RefObject } from "react";
 
-const BotServiceModal = (props: {
-  botModalRef: React.LegacyRef<HTMLDivElement>;
-}) => {
+const BotServiceModal = (props: { botModalRef: RefObject<HTMLDivElement> }) => {
   return (
     <div id="modal" className="z-10 flex justify-center">
       <div className="modal-offset absolute flex h-screen items-center">

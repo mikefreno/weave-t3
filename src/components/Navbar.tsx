@@ -32,10 +32,10 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const menuRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const closeRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const loginRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const loginButtonRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const loginRef = useRef<HTMLDivElement>(null);
+  const loginButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (pathname == "/app") {
@@ -193,7 +193,7 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
         <div className={pathname == "/app" ? "my-2" : "my-2 md:hidden"}>
           <div
             className="z-10 my-auto flex justify-end px-4 text-lg"
-            ref={props.switchRef as LegacyRef<HTMLDivElement>}
+            ref={props.switchRef}
           >
             <Switch
               checked={isDarkTheme}
@@ -207,36 +207,22 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
               className="my-auto mr-2"
             />
             {isDarkTheme ? (
-              <button
-                onClick={menuToggle}
-                className="my-auto"
-                ref={closeRef as LegacyRef<HTMLButtonElement>}
-              >
+              <button onClick={menuToggle} className="my-auto" ref={closeRef}>
                 <MenuBars stroke="white" />
               </button>
             ) : (
-              <button
-                onClick={menuToggle}
-                className="my-auto"
-                ref={closeRef as LegacyRef<HTMLButtonElement>}
-              >
+              <button onClick={menuToggle} className="my-auto" ref={closeRef}>
                 <MenuBars stroke="black" />
               </button>
             )}
           </div>
         </div>
         {menuOpen ? (
-          <Menu
-            openLogin={openLoginRegisterModal}
-            menuRef={menuRef as LegacyRef<HTMLDivElement>}
-          />
+          <Menu openLogin={openLoginRegisterModal} menuRef={menuRef} />
         ) : null}
       </nav>
       {showingLoginModal ? (
-        <LoginModal
-          onClose={loginToggle}
-          loginRef={loginRef as LegacyRef<HTMLDivElement>}
-        />
+        <LoginModal onClose={loginToggle} loginRef={loginRef} />
       ) : null}
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { RefObject, useState } from "react";
 import Link from "next/link";
 import { Nunito, Raleway } from "@next/font/google";
 import { Button } from "@nextui-org/react";
@@ -7,8 +7,8 @@ import { usePathname } from "next/navigation";
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
 const Menu = (props: {
-  openLogin: React.MouseEventHandler<HTMLButtonElement> | undefined;
-  menuRef: React.LegacyRef<HTMLDivElement> | undefined;
+  openLogin: React.MouseEventHandler<HTMLButtonElement>;
+  menuRef: RefObject<HTMLDivElement>;
 }) => {
   const pathname = usePathname();
 

@@ -10,12 +10,16 @@ import { ThemeContextProvider } from "../components/ThemeContextProvider";
 
 const lightTheme = createTheme({
   type: "light",
-  theme: {},
+  theme: {
+    colors: {},
+  },
 });
 
 const darkTheme = createTheme({
   type: "dark",
-  theme: {},
+  theme: {
+    colors: {},
+  },
 });
 
 const MyApp: AppType<{ session: Session | null }> = ({

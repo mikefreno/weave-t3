@@ -1,6 +1,5 @@
 import React, {
-  LegacyRef,
-  MutableRefObject,
+  createContext,
   useContext,
   useEffect,
   useRef,
@@ -12,45 +11,68 @@ import ThemeContext from "@/src/components/ThemeContextProvider";
 import SideNav from "@/src/components/app/SideNav";
 import ServerModal from "@/src/components/app/ServerModal";
 import useOnClickOutside from "@/src/components/ClickOutsideHook";
-import PublicServerModal from "@/src/components/app/PublicServerModal";
 import BotServiceModal from "@/src/components/app/BotServiceModal";
+import InnerNav from "@/src/components/app/InnerNav";
+import DirectMessageModal from "@/src/components/app/DirectMessageModal";
+import PublicServersPages from "@/src/components/app/PublicServersPages";
+import DMPages from "@/src/components/app/DMPages";
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [serverModalShowing, setServerModalShowing] = useState(false);
-  const [publicServerModalShowing, setPublicServerModalShowing] =
-    useState(false);
   const [botModalShowing, setBotModalShowing] = useState(false);
 
-  const switchRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const serverModalRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const serverButtonRef =
-    useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const publicServerModalRef =
-    useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const publicServerButtonRef =
-    useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const botModalRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
-  const botButtonRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
+  const [currentTab, setCurrentTab] = useState("DMS");
+  const [selectedInnerTab, setSelectedInnerTab] = useState("");
+
+  const switchRef = useRef<HTMLDivElement>(null);
+  const serverModalRef = useRef<HTMLDivElement>(null);
+  const serverButtonRef = useRef<HTMLButtonElement>(null);
+  const botModalRef = useRef<HTMLDivElement>(null);
+  const botButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [direcMessageModalShowing, setDirecMessageModalShowing] =
+    useState(false);
+  const directMessageButtonRef = useRef<HTMLButtonElement>(null);
+  const directMessageModalRef = useRef<HTMLDivElement>(null);
+
+  const scrollableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollableRef.current) {
+      scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
+    }
+  }, []);
+
+  useOnClickOutside([directMessageModalRef, directMessageButtonRef], () => {
+    setDirecMessageModalShowing(false);
+  });
+
+  function dmModalToggle() {
+    setDirecMessageModalShowing(!direcMessageModalShowing);
+  }
+
+  function currentTabSetter(id: string) {
+    setCurrentTab(id);
+  }
 
   useEffect(() => {
     document.getElementById("html")?.classList.add("scollDisabled");
+    document
+      .getElementById("body")
+      ?.setAttribute("class", "bg-zinc-300 dark:bg-zinc-700");
   }, []);
 
   useEffect(() => {
-    if (serverModalShowing || publicServerModalShowing || botModalShowing) {
+    if (serverModalShowing || botModalShowing || direcMessageModalShowing) {
       document.getElementById("app-body")?.classList.add("modal-open");
     } else {
       document.getElementById("app-body")?.classList.remove("modal-open");
     }
-  }, [serverModalShowing, publicServerModalShowing, botModalShowing]);
+  }, [serverModalShowing, botModalShowing, direcMessageModalShowing]);
 
   useOnClickOutside([serverModalRef, serverButtonRef, switchRef], () =>
     setServerModalShowing(false)
-  );
-  useOnClickOutside(
-    [publicServerModalRef, publicServerButtonRef, switchRef],
-    () => setPublicServerModalShowing(false)
   );
   useOnClickOutside([botModalRef, botButtonRef, switchRef], () =>
     setBotModalShowing(false)
@@ -58,10 +80,6 @@ const index = () => {
 
   function serverModalToggle() {
     setServerModalShowing(!serverModalShowing);
-  }
-
-  function publicServerModalToggle() {
-    setPublicServerModalShowing(!publicServerModalShowing);
   }
 
   function botModalToggle() {
@@ -76,35 +94,53 @@ const index = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar switchRef={switchRef} />
-      <div id="app-body" className="h-screen w-screen">
-        <SideNav
-          serverModalToggle={serverModalToggle}
-          serverButtonRef={serverButtonRef as LegacyRef<HTMLButtonElement>}
-          publicServerModalToggle={publicServerModalToggle}
-          publicServerButtonRef={
-            publicServerButtonRef as LegacyRef<HTMLButtonElement>
-          }
-          botModalToggle={botModalToggle}
-          botButtonRef={botButtonRef as LegacyRef<HTMLButtonElement>}
-        />
+      <div id="app-body" className="flex h-screen w-screen">
+        <div id="outer-nav" className="w-20">
+          <SideNav
+            serverModalToggle={serverModalToggle}
+            serverButtonRef={serverButtonRef}
+            botModalToggle={botModalToggle}
+            botButtonRef={botButtonRef}
+            currentTab={currentTab}
+            currentTabSetter={currentTabSetter}
+          />
+        </div>
+        <div id="inner-nav" className="w-52">
+          <InnerNav
+            currentTab={currentTab}
+            directMessageButtonRef={directMessageButtonRef}
+            dmModalToggle={dmModalToggle}
+            selectedInnerTab={selectedInnerTab}
+            setSelectedInnerTab={setSelectedInnerTab}
+          />
+        </div>
+        <div id="center-page" ref={scrollableRef} className="flex-1">
+          {currentTab == "DMS" ? (
+            <div className="">
+              <DMPages selectedInnerTab={selectedInnerTab} />
+            </div>
+          ) : null}
+          {currentTab === "PublicServers" &&
+          (selectedInnerTab === "Finance & Economics" ||
+            selectedInnerTab === "Music" ||
+            selectedInnerTab === "Entertainment" ||
+            selectedInnerTab === "Gaming" ||
+            selectedInnerTab === "Education" ||
+            selectedInnerTab === "Science & Technology" ||
+            selectedInnerTab === "Made By Weave") ? (
+            <div className="">
+              <PublicServersPages selectedInnerTab={selectedInnerTab} />
+            </div>
+          ) : null}
+        </div>
       </div>
       <div>
         {serverModalShowing ? (
-          <ServerModal
-            serverModalRef={serverModalRef as LegacyRef<HTMLDivElement>}
-          />
+          <ServerModal serverModalRef={serverModalRef} />
         ) : null}
-        {publicServerModalShowing ? (
-          <PublicServerModal
-            publicServerModalRef={
-              publicServerModalRef as LegacyRef<HTMLDivElement>
-            }
-          />
-        ) : null}
-        {botModalShowing ? (
-          <BotServiceModal
-            botModalRef={botModalRef as LegacyRef<HTMLDivElement>}
-          />
+        {botModalShowing ? <BotServiceModal botModalRef={botModalRef} /> : null}
+        {direcMessageModalShowing ? (
+          <DirectMessageModal directMessageModalRef={directMessageModalRef} />
         ) : null}
       </div>
     </div>

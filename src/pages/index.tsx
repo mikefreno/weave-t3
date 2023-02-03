@@ -6,7 +6,7 @@ import Footer from "@/src/components/home/Footer";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
 import DownloadButton from "@/src/components/home/DownloadButton";
-import { MutableRefObject, useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import Head from "next/head";
 import Parallax from "@/src/components/home/Parallax";
 import Parallax_2 from "@/src/components/home/Parallax_2";
@@ -17,7 +17,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 const Home = () => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const switchRef = useRef<HTMLElement>() as MutableRefObject<HTMLElement>;
+  const switchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.getElementById("html")?.classList.remove("scollDisabled");
