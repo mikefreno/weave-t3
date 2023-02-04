@@ -1,10 +1,10 @@
 import React from "react";
 
 function BriefcaseIcon(props: {
-  height: string | number | undefined;
-  width: string | number | undefined;
-  fill: string | undefined;
-  stroke: string | undefined;
+  height: number;
+  width: number;
+  stroke: string;
+  strokeWidth: number;
 }) {
   return (
     <div>
@@ -12,8 +12,8 @@ function BriefcaseIcon(props: {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        strokeWidth={0.5}
-        stroke="currentColor"
+        strokeWidth={props.strokeWidth}
+        stroke={props.stroke}
         height={props.height}
         width={props.width}
       >

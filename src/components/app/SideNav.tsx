@@ -21,6 +21,7 @@ const SideNav = (props: {
   botButtonRef: RefObject<HTMLButtonElement>;
   currentTab: string;
   currentTabSetter: any;
+  setSelectedInnerTab: any;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
@@ -38,6 +39,7 @@ const SideNav = (props: {
             className="logoSpinner z-50"
             onClick={() => {
               props.currentTabSetter("DMS");
+              props.setSelectedInnerTab("");
             }}
           >
             <Image
@@ -66,7 +68,7 @@ const SideNav = (props: {
               <AddIcon
                 height={40}
                 width={40}
-                stroke={"#4c1d95"}
+                stroke={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
                 strokeWidth={1.5}
               />
             </button>
@@ -83,13 +85,14 @@ const SideNav = (props: {
               className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
               onClick={() => {
                 props.currentTabSetter("PublicServers");
+                props.setSelectedInnerTab("");
               }}
             >
               <div className="flex h-[40px] w-[40px] items-center justify-center">
                 <BullhornIcon
                   height={30}
                   width={30}
-                  fill={"#4c1d95"}
+                  fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
                   strokeWidth={1}
                 />
               </div>
@@ -111,7 +114,11 @@ const SideNav = (props: {
               className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
               onClick={props.botModalToggle}
             >
-              <RobotIcon height={40} width={40} fill={"#4c1d95"} />
+              <RobotIcon
+                height={40}
+                width={40}
+                fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
+              />
             </button>
           </Tooltip>
         </div>

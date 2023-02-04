@@ -20,8 +20,8 @@ const WorkModal = (props: { fill: string }) => {
           <BriefcaseIcon
             height={144}
             width={144}
-            fill={props.fill}
-            stroke={undefined}
+            stroke={props.fill}
+            strokeWidth={0.5}
           />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">

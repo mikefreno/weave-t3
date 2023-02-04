@@ -9,7 +9,7 @@ import Navbar from "@/src/components/Navbar";
 import Head from "next/head";
 import ThemeContext from "@/src/components/ThemeContextProvider";
 import SideNav from "@/src/components/app/SideNav";
-import ServerModal from "@/src/components/app/ServerModal";
+import CreateServerModal from "@/src/components/app/CreateServerModal";
 import useOnClickOutside from "@/src/components/ClickOutsideHook";
 import BotServiceModal from "@/src/components/app/BotServiceModal";
 import InnerNav from "@/src/components/app/InnerNav";
@@ -27,6 +27,7 @@ const index = () => {
 
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
+  const serverSelectModalRef = useRef<HTMLDivElement>(null);
   const serverButtonRef = useRef<HTMLButtonElement>(null);
   const botModalRef = useRef<HTMLDivElement>(null);
   const botButtonRef = useRef<HTMLButtonElement>(null);
@@ -71,8 +72,9 @@ const index = () => {
     }
   }, [serverModalShowing, botModalShowing, direcMessageModalShowing]);
 
-  useOnClickOutside([serverModalRef, serverButtonRef, switchRef], () =>
-    setServerModalShowing(false)
+  useOnClickOutside(
+    [serverModalRef, serverButtonRef, switchRef, serverSelectModalRef],
+    () => setServerModalShowing(false)
   );
   useOnClickOutside([botModalRef, botButtonRef, switchRef], () =>
     setBotModalShowing(false)
@@ -103,6 +105,7 @@ const index = () => {
             botButtonRef={botButtonRef}
             currentTab={currentTab}
             currentTabSetter={currentTabSetter}
+            setSelectedInnerTab={setSelectedInnerTab}
           />
         </div>
         <div id="inner-nav" className="w-52">
@@ -136,7 +139,10 @@ const index = () => {
       </div>
       <div>
         {serverModalShowing ? (
-          <ServerModal serverModalRef={serverModalRef} />
+          <CreateServerModal
+            serverModalRef={serverModalRef}
+            serverModalToggle={serverModalToggle}
+          />
         ) : null}
         {botModalShowing ? <BotServiceModal botModalRef={botModalRef} /> : null}
         {direcMessageModalShowing ? (

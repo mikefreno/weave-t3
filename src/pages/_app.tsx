@@ -2,7 +2,6 @@ import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { createTheme, NextUIProvider } from "@nextui-org/react";
-
 import { api } from "../utils/api";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import "@/src/styles/globals.css";

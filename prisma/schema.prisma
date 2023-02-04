@@ -18,10 +18,10 @@ model User {
     emailVerified      Boolean?
     registered_at      DateTime    @default(now())
     image              String?
-    organizations      Organization[]
+    Servers            Server[]
     sessions           Session[]
-    memberships        Organization_Member[]
-    adminships         Organization_Admin[]
+    memberships        Server_Member[]
+    adminships         Server_Admin[]
     provider           String?
     refresh_token      String?
     access_token       String?
@@ -29,50 +29,57 @@ model User {
     type               Json
     comments           Comment[]
 }
-model Organization {
-    id            Int                 @id @default(autoincrement())
-    name          String
-    ownerId       String
-    owner         User                @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-    admin         Organization_Admin[]
-    members       Organization_Member[]   
-    channels      Organization_Channel[]      
+model Server {
+    id              Int                 @id @default(autoincrement())
+    name            String
+    blurb           String
+    logo_url        String
+    banner          String
+    ownerId         String
+    category        String
+    owner           User                @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+    admin           Server_Admin[]
+    members         Server_Member[]
+    memberCount     Int
+    membersOnline   Int
+    channels        Server_Channel[]  
+
 
     @@index([ownerId])
 }
-model Organization_Admin{
+model Server_Admin{
     id              Int            @id @default(autoincrement())
     roles           Json
     admin           User           @relation(fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     adminId         String          
-    organization    Organization   @relation(fields:[organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    organizationId  Int  
+    Server          Server         @relation(fields:[ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ServerId        Int   
     assignedAt      DateTime       @default(now())
     assignedBy      String
 
     @@index([adminId])
-    @@index([organizationId])
+    @@index([ServerId])
 }
-model Organization_Member{
+model Server_Member{
     id              Int           @id @default(autoincrement())
     member          User          @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     memberId        String          
-    organization    Organization  @relation(fields:[organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    organizationId  Int  
+    Server          Server        @relation(fields:[ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ServerId        Int  
     joinedAt        DateTime      @default(now())
     invitedBy       String
 
     @@index([memberId])
-    @@index([organizationId])
+    @@index([ServerId])
 }
-model Organization_Channel{
+model Server_Channel{
     id               Int           @id @default(autoincrement())
     name             String        @unique
-    organization     Organization  @relation(fields:[organizationId],references: [id], onDelete: Cascade, onUpdate: Cascade)
-    organizationId   Int
+    Server           Server        @relation(fields:[ServerId],references: [id], onDelete: Cascade, onUpdate: Cascade)
+    ServerId         Int
     comments         Comment[]     
 
-    @@index([organizationId])
+    @@index([ServerId])
 }
 
 model Comment { 
@@ -80,7 +87,7 @@ model Comment {
     user             User                     @relation(fields: [userId], references: [id])
     userId           String
     message          String
-    channel          Organization_Channel     @relation(fields: [channelName], references: [name], onDelete: Cascade)
+    channel          Server_Channel           @relation(fields: [channelName], references: [name], onDelete: Cascade)
     channelName      String
 
     @@index([userId])

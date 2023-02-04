@@ -16,7 +16,9 @@ const PublicServersPages = (props: { selectedInnerTab: string }) => {
       <div className="mx-auto h-96 rounded-md bg-[url('/Forest-painting.png')] bg-cover bg-center bg-no-repeat pt-24"></div>
       <div className="flex flex-col items-center text-center">
         <div className="text-2xl">
-          Find your Community in {props.selectedInnerTab}!
+          Find your Community
+          {props.selectedInnerTab === "Made By Weave" ? ", " : " in "}
+          {props.selectedInnerTab}!
         </div>
         <div className="my-6 pt-12">
           <Input
@@ -40,12 +42,19 @@ const PublicServersPages = (props: { selectedInnerTab: string }) => {
           />
         </div>
       </div>
-      <div className="mx-12 pt-12">
+      <div className="mx-4 pt-12">
         <div className="grid grid-flow-row grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ">
           {servers.map((child, index) => (
             <div key={index} className="flex flex-col items-center">
               <div className="rounded-lg shadow-lg">
-                <ServerCard />
+                <ServerCard
+                  logo={""}
+                  banner={""}
+                  name={""}
+                  blurb={""}
+                  members={0}
+                  membersOnline={0}
+                />
               </div>
             </div>
           ))}

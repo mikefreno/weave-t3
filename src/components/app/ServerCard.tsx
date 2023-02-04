@@ -1,26 +1,32 @@
-import { Card, Col, Row, Button, Text } from "@nextui-org/react";
+import { Card, Col, Row, Button, Text, Avatar } from "@nextui-org/react";
 import React from "react";
 
-const ServerCard = () => {
+const ServerCard = (props: {
+  logo: string;
+  banner: string;
+  name: string;
+  blurb: string;
+  members: number;
+  membersOnline: number;
+}) => {
+  const { logo, banner, name, blurb, members, membersOnline } = props;
   return (
-    <Card css={{ w: "100%", h: "400px" }}>
+    <Card css={{ w: "12rem", h: "400px" }}>
       <Card.Header css={{ position: "absolute", zIndex: 1, top: 5 }}>
         <Col>
-          <Text size={12} weight="bold" transform="uppercase" color="#ffffffAA">
-            New
-          </Text>
+          <Avatar />
           <Text h3 color="black">
-            Acme camera
+            {name}
           </Text>
         </Col>
       </Card.Header>
       <Card.Body css={{ p: 0 }}>
         <Card.Image
-          src="https://nextui.org/images/card-example-6.jpeg"
+          src={banner}
           width="100%"
           height="100%"
           objectFit="cover"
-          alt="Card example background"
+          alt={`${name} banner`}
         />
       </Card.Body>
       <Card.Footer
@@ -34,12 +40,18 @@ const ServerCard = () => {
         }}
       >
         <Row>
+          <Text color="#000" size={12}>
+            {" "}
+            {blurb}
+          </Text>
+        </Row>
+        <Row>
           <Col>
             <Text color="#000" size={12}>
-              Available soon.
+              {membersOnline} online.
             </Text>
             <Text color="#000" size={12}>
-              Get notified.
+              {members} members.
             </Text>
           </Col>
           <Col>
@@ -51,7 +63,7 @@ const ServerCard = () => {
                   weight="bold"
                   transform="uppercase"
                 >
-                  Notify Me
+                  Join
                 </Text>
               </Button>
             </Row>

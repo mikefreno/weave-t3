@@ -188,6 +188,20 @@ ul.icons li a:active {
 .animate-up-down {
   animation: animateUpDown 5s ease-in-out infinite;
 }
+@keyframes animateLeftRight {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateX(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.animate-left-right {
+  animation: animateLeftRight 3s ease-in-out infinite;
+}
 .layer1 {
   animation-delay: 0s;
 }
@@ -273,4 +287,19 @@ ul.icons li a:active {
   user-select: none;
   -webkit-user-drag: none;
   user-drag: none;
+}
+
+select {
+  border: none;
+  outline: none;
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  margin: 0;
+  display: block;
+  width: 100%;
+  padding: 12px 55px 15px 15px;
+  font-size: 14px;
 }
