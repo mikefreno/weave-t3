@@ -3,13 +3,15 @@ import ArrowTrend from "@/src/icons/ArrowTrend";
 import BeakerIcon from "@/src/icons/BeakerIcon";
 import BooksIcon from "@/src/icons/BooksIcon";
 import CameraIcon from "@/src/icons/CameraIcon";
+import ClockIcon from "@/src/icons/ClockIcon";
+import FlameIcon from "@/src/icons/FlameIcon";
 import GamepadIcon from "@/src/icons/GamepadIcon";
 import HandWave from "@/src/icons/HandWave";
 import PaperPlanes from "@/src/icons/PaperPlanes";
 import SearchIcon from "@/src/icons/SearchIcon";
 import VerifiedIcon from "@/src/icons/VerifiedIcon";
 import VinylIcon from "@/src/icons/VinylIcon";
-import { Input } from "@nextui-org/react";
+import { Input, Tooltip } from "@nextui-org/react";
 import React, { RefObject, useContext, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 
@@ -23,6 +25,7 @@ const InnerNav = (props: {
   const { currentTab, selectedInnerTab, setSelectedInnerTab } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortType, setSortType] = useState("Recent");
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -31,7 +34,7 @@ const InnerNav = (props: {
 
   if (currentTab == "DMS") {
     return (
-      <div className="fixed h-screen w-52 border-r border-r-zinc-500 bg-zinc-400 dark:bg-zinc-800">
+      <div className="fixed h-screen w-52 border-l border-r border-r-zinc-500 border-l-zinc-500 bg-zinc-400 dark:bg-zinc-800">
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
             type="search"
@@ -84,6 +87,52 @@ const InnerNav = (props: {
             <span className="mx-auto">Requests</span>
           </button>
           <hr className="my-4 h-[2px]" />
+          <div className="my-4 flex justify-evenly">
+            <Tooltip
+              content={"Sort by most frequent"}
+              trigger="hover"
+              color={"secondary"}
+              placement="bottom"
+              css={{ width: "min-content" }}
+            >
+              <button onClick={() => setSortType("Frequency")}>
+                <FlameIcon
+                  height={18}
+                  width={18}
+                  stroke={
+                    sortType == "Frequency"
+                      ? "#dc2626"
+                      : isDarkTheme
+                      ? "#e4e4e7"
+                      : "#27272a"
+                  }
+                  strokeWidth={1.5}
+                />
+              </button>
+            </Tooltip>
+            <Tooltip
+              content={"Sort by most recent messages"}
+              trigger="hover"
+              color={"secondary"}
+              placement="bottom"
+              css={{ width: "min-content" }}
+            >
+              <button onClick={() => setSortType("Recent")}>
+                <ClockIcon
+                  height={18}
+                  width={18}
+                  stroke={
+                    sortType == "Recent"
+                      ? "#0284c7"
+                      : isDarkTheme
+                      ? "#e4e4e7"
+                      : "#27272a"
+                  }
+                  strokeWidth={1.5}
+                />
+              </button>
+            </Tooltip>
+          </div>
           <div className="flex justify-center">
             <span>Direct Messages</span>
             <button

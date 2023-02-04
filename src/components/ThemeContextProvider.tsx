@@ -20,17 +20,12 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     setDarkTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.getElementById("html")?.classList.add("dark");
-    } else {
-      document.getElementById("html")?.classList.remove("dark");
-    }
   }, []);
 
   useEffect(() => {
     if (!isDarkTheme) {
-      document.getElementById("html")?.classList.remove("dark");
       setTheme("light");
+      document.getElementById("html")?.classList.remove("dark");
     } else {
       setTheme("dark");
       document.getElementById("html")?.classList.add("dark");

@@ -34,16 +34,6 @@ const CreateServerModal = (props: {
   };
   const handleServerTypeChange = (event: any) => {
     setServerType(event.target.value);
-    const select = document.getElementById("ServerSelect") as HTMLSelectElement;
-    if (select) {
-      const options = select.options;
-      for (let i = 0; i < options.length; i++) {
-        if (options[i]?.value === "") {
-          select.remove(i);
-          break;
-        }
-      }
-    }
   };
 
   if (specifiedTemplate === "selector") {
@@ -232,6 +222,7 @@ const CreateServerModal = (props: {
                 <Checkbox
                   className="my-4"
                   id="publicSet"
+                  isSelected={serverPublic}
                   onChange={() => setServerPublic(!serverPublic)}
                 >
                   Make Public?
@@ -242,8 +233,11 @@ const CreateServerModal = (props: {
                       id="ServerSelect"
                       className="custom-select mb-4 rounded-xl border-zinc-300 bg-zinc-900"
                       onChange={handleServerTypeChange}
+                      defaultValue={""}
                     >
-                      <option value="">--Select Server Type--</option>
+                      <option value="" disabled>
+                        Select Server Type
+                      </option>
                       <option value="Finance & Economics">
                         Finance & Economics
                       </option>
@@ -259,8 +253,8 @@ const CreateServerModal = (props: {
                   </div>
                 ) : null}
                 {serverType === "Other" ? (
-                  <div className="my-6 mx-12 text-center">
-                    Your server will not be listed under any catergory, it will
+                  <div className="mx-12 mb-6 text-center">
+                    Your server will not be listed under any category, it will
                     only be found by searching directly
                   </div>
                 ) : null}
@@ -276,6 +270,11 @@ const CreateServerModal = (props: {
                 </div>
                 <div className="pb-6 pt-2">
                   Logo / Banner can be uploaded at any time
+                </div>
+                <div>
+                  <Button color={"gradient"} size={"lg"}>
+                    Create!
+                  </Button>
                 </div>
               </div>
             </form>

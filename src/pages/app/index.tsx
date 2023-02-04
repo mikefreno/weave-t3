@@ -144,7 +144,12 @@ const index = () => {
             serverModalToggle={serverModalToggle}
           />
         ) : null}
-        {botModalShowing ? <BotServiceModal botModalRef={botModalRef} /> : null}
+        {botModalShowing ? (
+          <BotServiceModal
+            botModalRef={botModalRef}
+            botModalToggle={botModalToggle}
+          />
+        ) : null}
         {direcMessageModalShowing ? (
           <DirectMessageModal directMessageModalRef={directMessageModalRef} />
         ) : null}
