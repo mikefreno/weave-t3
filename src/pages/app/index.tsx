@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Navbar from "@/src/components/Navbar";
 import Head from "next/head";
 import ThemeContext from "@/src/components/ThemeContextProvider";
@@ -16,11 +10,17 @@ import InnerNav from "@/src/components/app/InnerNav";
 import DirectMessageModal from "@/src/components/app/DirectMessageModal";
 import PublicServersPages from "@/src/components/app/PublicServersPages";
 import DMPages from "@/src/components/app/DMPages";
+import InnerNavOverlay from "@/src/components/app/InnerNavOverlay";
+import AccountPage from "@/src/components/app/AccountPage";
+import { useSession } from "next-auth/react";
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [serverModalShowing, setServerModalShowing] = useState(false);
   const [botModalShowing, setBotModalShowing] = useState(false);
+  const { data: session } = useSession();
+  const [microphoneState, setMicrophoneState] = useState(false);
+  const [audioState, setAudioState] = useState(true);
 
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("");
@@ -72,6 +72,29 @@ const index = () => {
     }
   }, [serverModalShowing, botModalShowing, direcMessageModalShowing]);
 
+  useEffect(() => {
+    const storedValue = localStorage.getItem("microphoneState");
+    if (storedValue === "true") {
+      setMicrophoneState(true);
+    }
+  }, []);
+
+  const microphoneToggle = () => {
+    localStorage.setItem("microphoneState", (!microphoneState).toString());
+    setMicrophoneState(!microphoneState);
+  };
+  useEffect(() => {
+    const storedValue = localStorage.getItem("audioState");
+    if (storedValue === "false") {
+      setAudioState(false);
+    }
+  }, []);
+
+  const audioToggle = () => {
+    localStorage.setItem("audioState", (!audioState).toString());
+    setAudioState(!audioState);
+  };
+
   useOnClickOutside(
     [serverModalRef, serverButtonRef, switchRef, serverSelectModalRef],
     () => setServerModalShowing(false)
@@ -116,9 +139,20 @@ const index = () => {
             selectedInnerTab={selectedInnerTab}
             setSelectedInnerTab={setSelectedInnerTab}
           />
+          <InnerNavOverlay
+            setSelectedInnerTab={setSelectedInnerTab}
+            session={session}
+            microphoneState={microphoneState}
+            microphoneToggle={microphoneToggle}
+            audioState={audioState}
+            audioToggle={audioToggle}
+          />
         </div>
         <div id="center-page" ref={scrollableRef} className="flex-1">
-          {currentTab == "DMS" ? (
+          {selectedInnerTab === "AccountOverview" ? (
+            <AccountPage session={session} />
+          ) : null}
+          {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
             <div className="">
               <DMPages selectedInnerTab={selectedInnerTab} />
             </div>

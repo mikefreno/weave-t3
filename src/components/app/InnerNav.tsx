@@ -34,7 +34,7 @@ const InnerNav = (props: {
 
   if (currentTab == "DMS") {
     return (
-      <div className="fixed h-screen w-52 border-l border-r border-r-zinc-500 border-l-zinc-500 bg-zinc-400 dark:bg-zinc-800">
+      <div className="fixed h-screen w-52 border-l border-r border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
             type="search"
@@ -154,7 +154,7 @@ const InnerNav = (props: {
     );
   } else if (currentTab == "PublicServers") {
     return (
-      <div className="fixed h-screen w-52 border-r border-r-zinc-500 bg-zinc-400 dark:bg-zinc-800">
+      <div className="fixed h-screen w-52 border-r border-l border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
         <span className="justify-left flex pl-4 pt-4 text-xl font-bold">
           Public Servers
         </span>

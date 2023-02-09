@@ -4,7 +4,7 @@ function GitHub(props: {
   height: string | number | undefined;
   width: string | number | undefined;
   fill: string | undefined;
-  stroke: string | undefined;
+  stroke?: string | undefined;
 }) {
   return (
     <svg

@@ -303,3 +303,7 @@ select {
   padding: 12px 55px 15px 15px;
   font-size: 14px;
 }
+
+.danger-zone-bg {
+  background-color: rgba(185, 28, 28, 0.5);
+}

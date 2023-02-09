@@ -7,14 +7,10 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
-import { checkPassword } from "@/src/lib/auth";
 
 export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-    maxAge: 60 * 60 * 24 * 30,
-    updateAge: 60 * 60 * 24,
-  },
+  adapter: PrismaAdapter(prisma),
+
   // Include user.id on session
   callbacks: {
     session({ session, user }) {
@@ -25,7 +21,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   // Configure one or more authentication providers
-  adapter: PrismaAdapter(prisma),
   providers: [
     GithubProvider({
       clientId: env.GITHUB_CLIENT_ID,

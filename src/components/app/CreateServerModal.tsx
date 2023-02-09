@@ -4,20 +4,27 @@ import BriefcaseIcon from "@/src/icons/BriefcaseIcon";
 import ClipboardIcon from "@/src/icons/ClipboardIcon";
 import GamepadIcon from "@/src/icons/GamepadIcon";
 import LongArrow from "@/src/icons/LongArrow";
-import SelectChevron from "@/src/icons/SelectChevron";
 import StackedBoxesIcon from "@/src/icons/StackedBoxesIcon";
 import Xmark from "@/src/icons/Xmark";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import { Button, Checkbox, Input } from "@nextui-org/react";
-import React, { RefObject, useContext, useRef, useState } from "react";
+import React, {
+  RefObject,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import ThemeContext from "../ThemeContextProvider";
-import FileUpload from "./FileUpload";
+import Dropzone from "./Dropzone";
 
 const CreateServerModal = (props: {
   serverModalRef: RefObject<HTMLDivElement>;
   serverModalToggle: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
+  const [logoImage, setLogoImage] = useState<string | ArrayBuffer | null>(null);
+  const [bannerImage, setBannerImage] = useState<string | ArrayBuffer | null>(
+    null
+  );
   const { isDarkTheme } = useContext(ThemeContext);
   const [specifiedTemplate, setSpecifiedTemplate] = useState("selector");
   const [serverPublic, setServerPublic] = useState(false);
@@ -35,6 +42,28 @@ const CreateServerModal = (props: {
   const handleServerTypeChange = (event: any) => {
     setServerType(event.target.value);
   };
+
+  const handleBannerDrop = useCallback((acceptedFile: Blob[]) => {
+    acceptedFile.forEach((file: Blob) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const str = reader.result;
+        setBannerImage(str);
+      };
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const handleLogoDrop = useCallback((acceptedFile: Blob[]) => {
+    acceptedFile.forEach((file: Blob) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const str = reader.result;
+        setLogoImage(str);
+      };
+      reader.readAsDataURL(file);
+    });
+  }, []);
 
   if (specifiedTemplate === "selector") {
     return (
@@ -261,11 +290,19 @@ const CreateServerModal = (props: {
                 <div className="mx-12 flex">
                   <div className="mx-8 flex flex-1 flex-col">
                     <div className="text-center">Server Logo (optional)</div>
-                    <FileUpload />
+                    <Dropzone
+                      onDrop={handleLogoDrop}
+                      accept={"image/*"}
+                      fileHolder={logoImage}
+                    />
                   </div>
                   <div className="mx-8 flex flex-1 flex-col">
                     <div className="text-center">Server Banner (optional)</div>
-                    <FileUpload />
+                    <Dropzone
+                      onDrop={handleBannerDrop}
+                      accept={"image/*"}
+                      fileHolder={bannerImage}
+                    />
                   </div>
                 </div>
                 <div className="pb-6 pt-2">

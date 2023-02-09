@@ -1,39 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
+import { useDropzone } from "react-dropzone";
 
-const FileUpload = () => {
-  const [dragged, setDragged] = useState(false);
-
-  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setDragged(true);
-  };
-
-  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setDragged(false);
-  };
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setDragged(false);
-    const files = event.dataTransfer.files;
-    console.log(files);
-    // handle the dropped files here
-  };
-
+const Dropzone = ({ onDrop, accept, fileHolder }: any) => {
+  // Initializing useDropzone hooks with options
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept,
+    maxFiles: 1,
+  });
   return (
     <div
-      className="z-50 my-4 flex rounded-full border border-dashed border-zinc-100 bg-transparent shadow-md"
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+      className={`z-50 my-4 flex rounded-full ${
+        fileHolder === null ? "border" : null
+      } border-dashed border-zinc-100 bg-transparent shadow-md`}
+      {...getRootProps()}
     >
       <label
         htmlFor="upload"
         className=" flex h-32 w-32 cursor-pointer items-center justify-center"
       >
-        {dragged ? (
-          <div>Drop File!</div>
+        <input className="dropzone-input" {...getInputProps()} />
+        {fileHolder !== null && !isDragActive ? (
+          <div>
+            <img
+              src={fileHolder}
+              className="h-32 w-32 rounded-full"
+              alt="upload"
+            />
+          </div>
+        ) : isDragActive ? (
+          <div className="-mt-12">Drop File!</div>
         ) : (
           <>
             <svg
@@ -60,9 +56,8 @@ const FileUpload = () => {
           </>
         )}
       </label>
-      <input id="upload" type="file" className="hidden" />
     </div>
   );
 };
 
-export default FileUpload;
+export default Dropzone;

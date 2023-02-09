@@ -25,14 +25,14 @@ import useOnClickOutside from "./ClickOutsideHook";
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
 
-const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
+const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showingLoginModal, setShowingLoginModal] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const menuRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const loginRef = useRef<HTMLDivElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
@@ -53,13 +53,15 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
     }
   }, [showingLoginModal]);
 
-  useOnClickOutside([menuRef, closeRef, props.switchRef], () => {
-    setMenuOpen(false);
-  });
+  if (props.switchRef) {
+    useOnClickOutside([menuRef, closeRef, props.switchRef], () => {
+      setMenuOpen(false);
+    });
 
-  useOnClickOutside([loginRef, loginButtonRef, props.switchRef], () => {
-    setShowingLoginModal(false);
-  });
+    useOnClickOutside([loginRef, loginButtonRef, props.switchRef], () => {
+      setShowingLoginModal(false);
+    });
+  }
 
   useEffect(() => {
     rotateBars();
@@ -119,7 +121,7 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
         <div className="my-auto flex justify-end" style={{ flex: 3 }}>
           <div className={pathname == "/app" ? "hidden" : "hidden md:block"}>
             <ul className="flex text-sm text-[#171717] dark:text-[#E2E2E2]">
-              <span ref={props.switchRef}>
+              <div ref={props.switchRef} className="mt-1">
                 <Switch
                   checked={isDarkTheme}
                   shadow
@@ -129,18 +131,10 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
                   iconOn={<MoonIcon />}
                   iconOff={<SunIcon />}
                   onChange={switchDarkTheme}
-                  className="my-auto"
                 />
-              </span>
+              </div>
               <li className="mx-2 my-auto">
-                {pathname == "/" ? (
-                  <Link
-                    href="/"
-                    className="border-b-2 border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                  >
-                    Home
-                  </Link>
-                ) : (
+                {pathname == "/" ? null : (
                   <Link
                     href="/"
                     className="border-[#171717] text-[#171717] hover:border-b-2 dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
@@ -155,25 +149,30 @@ const Navbar = (props: { switchRef: React.RefObject<HTMLElement> }) => {
                     href="/downloads"
                     className="border-b-2 border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
                   >
-                    Download
+                    Downloads
                   </Link>
                 ) : (
                   <Link
                     href="/downloads"
                     className="border-[#171717] text-[#171717] hover:border-b-2 dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
                   >
-                    Download
+                    Downloads
                   </Link>
                 )}
               </li>
               {session ? (
                 <li className="mx-2 my-auto">
-                  <button onClick={() => signOut()}>Sign out</button>
+                  <button
+                    className="underline-offset-4 hover:underline"
+                    onClick={() => signOut()}
+                  >
+                    Sign out
+                  </button>
                 </li>
               ) : (
                 <li className="mx-2 my-auto">
                   <button
-                    className="border-[#171717] text-[#171717] hover:border-b-2 dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                    className="underline-offset-4 hover:underline"
                     onClick={loginToggle}
                   >
                     Login / Register
