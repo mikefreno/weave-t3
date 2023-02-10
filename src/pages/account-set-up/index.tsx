@@ -21,11 +21,10 @@ const tempPage = () => {
 
   return (
     <>
-      <div className="mx-auto my-auto -mt-24 flex h-screen flex-row items-center justify-center text-3xl">
+      <div className="mx-auto my-auto flex h-screen flex-row items-center justify-center bg-zinc-100 text-3xl dark:bg-zinc-800">
         Loading...
         <Loading />
       </div>
-      <div></div>
     </>
   );
 };

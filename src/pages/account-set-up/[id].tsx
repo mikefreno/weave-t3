@@ -1,60 +1,89 @@
 import { api } from "@/src/utils/api";
 import router, { useRouter } from "next/router";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useContext, useRef, useState } from "react";
 import Dropzone from "@/src/components/app/Dropzone";
 import Navbar from "@/src/components/Navbar";
-import { Button, Input, Loading, Tooltip } from "@nextui-org/react";
+import { Button, Input, Loading } from "@nextui-org/react";
 import BackArrow from "@/src/icons/BackArrow";
 import ThemeContext from "@/src/components/ThemeContextProvider";
-import { getSession, useSession } from "next-auth/react";
+
+import axios from "axios";
+
+async function uploadPicturesToS3(
+  id: string,
+  type: string,
+  ext: string,
+  picture: File
+) {
+  const category = "users";
+  const data = await axios
+    .get(`/api/s3upload?category=${category}id=${id}&type=${type}&ext=${ext}`)
+    .catch((err) => {
+      console.log(err);
+    });
+  const { uploadURL, key } = data.data;
+  await axios.put(uploadURL, picture).catch((err) => {
+    console.log(err);
+  });
+  return key;
+}
 
 const userSetup = () => {
   const { query } = useRouter();
-  const userQuery = api.users.getById.useQuery(query.id);
-  const [profilePicture, setProfilePicture] = useState<
+  const userQuery = api.users.getCurrentUser.useQuery();
+  const [realNamePicture, setRealNamePicture] = useState<File | Blob | null>(
+    null
+  );
+  const [realNamePictureExt, setRealNamePictureExt] = useState<string>("");
+  const [realNamePicHolder, setRealNamePicHolder] = useState<
     string | ArrayBuffer | null
   >(null);
-  const [workprofilePicture, setWorkProfilePicture] = useState<
+  const [psuedonymPicture, setPsuedonymPicture] = useState<File | Blob | null>(
+    null
+  );
+  const [psuedonymPictureExt, setPsuedonymPictureExt] = useState<string>("");
+  const [psuedonymPicHolder, setPsuedonymPicHolder] = useState<
     string | ArrayBuffer | null
   >(null);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const realName = useRef<HTMLInputElement | null>(null);
   const psuedonym = useRef<HTMLInputElement | null>(null);
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [buttonPassState, setButtonPassState] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (userQuery.data?.id === query.id) {
-        router.push("/");
-      }
-    }, 2000);
-  }, []);
+  const nameMutation = api.users.setUserName.useMutation();
+  const psuedonymMutation = api.users.setUserPsuedonym.useMutation();
+  const imageMutation = api.users.setUserImage.useMutation();
+  const psuedonymImageMutation = api.users.setUserPsuedonymImage.useMutation();
 
-  const handleProfilePicDrop = useCallback((acceptedFile: Blob[]) => {
-    acceptedFile.forEach((file: Blob) => {
+  const [nameField, setNameField] = useState("-");
+  const [psuedonymField, setPsuedonymField] = useState("-");
+
+  const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file: Blob) => {
+      setRealNamePicture(file);
+      const ext = file.type.split("/")[1];
+      setRealNamePictureExt(ext);
+
       const reader = new FileReader();
       reader.onload = () => {
         const str = reader.result;
-        setProfilePicture(str);
+        setRealNamePicHolder(str);
       };
       reader.readAsDataURL(file);
     });
   }, []);
 
-  const handleWorkProfilePicDrop = useCallback((acceptedFile: Blob[]) => {
-    acceptedFile.forEach((file: Blob) => {
+  const handlePsuedonymPictureDrop = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file: Blob) => {
+      setPsuedonymPicture(file);
+      const ext = file.type.split("/")[1];
+      setPsuedonymPictureExt(ext);
       const reader = new FileReader();
       reader.onload = () => {
         const str = reader.result;
-        setWorkProfilePicture(str);
+        setPsuedonymPicHolder(str);
       };
       reader.readAsDataURL(file);
     });
@@ -62,28 +91,47 @@ const userSetup = () => {
 
   const setNames = () => {
     setButtonLoading(true);
-    let realNameValue = "";
-    let psuedonymValue = "";
-    if (realName.current) {
-      realNameValue = realName.current.value;
+    if (nameField !== "-") {
+      nameMutation.mutate({ id: query.id, value: realName.current!.value });
     }
-    if (psuedonym.current) {
-      psuedonymValue = psuedonym.current.value;
+    if (psuedonymField !== "-") {
+      psuedonymMutation.mutate({
+        id: query.id,
+        value: psuedonym.current!.value,
+      });
     }
-    //send to server logic
-    setTimeout(() => {
-      setStep(1);
-      setButtonLoading(false);
-    }, 1000);
+    setButtonLoading(false);
+    setStep(1);
   };
-  const setPictures = () => {
+  const setPictures = async () => {
     setButtonLoading(true);
-    //send to server logic
-    setTimeout(() => {
-      setStep(2);
-      setButtonLoading(false);
-    }, 1000);
+
+    if (realNamePicture !== null) {
+      const type = "image";
+      const ext = realNamePictureExt;
+      const id = userQuery.data?.id;
+      const key = await uploadPicturesToS3(id, type, ext, realNamePicture);
+      imageMutation.mutate(key);
+    }
+    if (psuedonymPicture !== null) {
+      const type = "psuedonym_image";
+      const ext = psuedonymPictureExt;
+      const id = userQuery.data?.id;
+      const key = await uploadPicturesToS3(id, type, ext, psuedonymPicture);
+      psuedonymImageMutation.mutate(key);
+    }
+
+    setStep(2);
+    setButtonLoading(false);
   };
+  if (userQuery.data == null) {
+    return (
+      <div className="mx-auto my-auto flex h-screen flex-row items-center justify-center bg-zinc-100 text-3xl dark:bg-zinc-800">
+        Loading...
+        <Loading />
+      </div>
+    );
+  }
 
   const contextualContentRenderer = () => {
     if (step == 0) {
@@ -97,6 +145,7 @@ const userSetup = () => {
                 <Input
                   id="realName"
                   ref={realName}
+                  onChange={(e) => setNameField(e.target.value)}
                   labelPlaceholder="Your Full Name"
                   required
                   clearable
@@ -114,6 +163,7 @@ const userSetup = () => {
                 <Input
                   id="psuedonym"
                   ref={psuedonym}
+                  onChange={(e) => setPsuedonymField(e.target.value)}
                   labelPlaceholder="Psuedonym"
                   required
                   clearable
@@ -154,7 +204,7 @@ const userSetup = () => {
         <>
           <div className="text-center ">
             <div className="text-3xl">
-              Choose a profile picture, or two - squared images work best{" "}
+              Choose a profile picture, or two - squared images work best
             </div>
             <div className="-mt-6">
               <Button
@@ -173,24 +223,25 @@ const userSetup = () => {
             <div className="flex flex-row">
               <div className="flex w-1/2 flex-col items-center">
                 <Dropzone
-                  onDrop={handleWorkProfilePicDrop}
-                  accept={"image/*"}
-                  fileHolder={workprofilePicture}
+                  onDrop={handleRealNamePictureDrop}
+                  acceptedFiles={"image/jpg, image/jpeg, image/png"}
+                  fileHolder={realNamePicHolder}
+                  preSet={userQuery.data?.image}
                 />
                 Paired with Full Name
               </div>
               <div className="flex w-1/2 flex-col items-center border-l border-l-zinc-500">
                 <Dropzone
-                  onDrop={handleProfilePicDrop}
-                  accept={"image/*"}
-                  fileHolder={profilePicture}
+                  onDrop={handlePsuedonymPictureDrop}
+                  acceptedFiles={"image/jpg, image/jpeg, image/png"}
+                  fileHolder={psuedonymPicHolder}
+                  preSet={userQuery.data?.psuedonym_image}
                 />
                 Paired with Psuedonym
               </div>
             </div>
             <div className="pt-4">
-              If only one picture is chosen it will be used for both. If only
-              one picture is chosen it will be used for both.
+              If only one picture is chosen it will be used for both.
             </div>
             <div className="w-full">
               <div className="float-right flex justify-end">
@@ -204,21 +255,10 @@ const userSetup = () => {
                   >
                     <Loading type="points" size="sm" />
                   </Button>
-                ) : buttonPassState ? (
+                ) : (
                   <Button auto shadow color={"secondary"} onClick={setPictures}>
                     Next
                   </Button>
-                ) : (
-                  <Tooltip content={"Fill out one of the two fields"}>
-                    <Button
-                      auto
-                      shadow
-                      color={"secondary"}
-                      onClick={setPictures}
-                    >
-                      Next
-                    </Button>
-                  </Tooltip>
                 )}
               </div>
             </div>

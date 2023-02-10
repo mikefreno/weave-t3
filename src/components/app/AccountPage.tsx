@@ -1,33 +1,96 @@
 import PencilIcon from "@/src/icons/PencilIcon";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button, Input, Radio, Tooltip } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
+import axios from "axios";
+import { User } from "@prisma/client";
 
-const AccountPage = (props: { session: any }) => {
+async function uploadPicturesToS3(
+  id: string,
+  type: string,
+  ext: string,
+  picture: File
+) {
+  const category = "users";
+  const data = await axios
+    .get(`/api/s3upload?category=${category}id=${id}&type=${type}&ext=${ext}`)
+    .catch((err) => {
+      console.log(err);
+    });
+  const { uploadURL, key } = data.data;
+  await axios.put(uploadURL, picture).catch((err) => {
+    console.log(err);
+  });
+  return key;
+}
+const AccountPage = (props: { currentUser: User }) => {
   const [settingsSelction, setSettingsSelction] = useState("User");
-  const { session } = props;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [profileImage, setProfileImage] = useState<string | ArrayBuffer | null>(
-    null
-  );
-  const { query } = useRouter();
-  const currentUser = api.users.getById.useQuery(session.user.id);
+  const [realNameImage, setRealNameImage] = useState<File | null>(null);
+  const [realNameImageHolder, setRealNameImageHolder] = useState<
+    string | ArrayBuffer | null
+  >(null);
+  const [realNamePictureExt, setRealNamePictureExt] = useState<string>();
 
-  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const str = reader.result;
-        setProfileImage(str);
-      };
-      reader.readAsDataURL(event.target.files[0]);
+  const [psuedonymImage, setPsuedonymImage] = useState<File | null>(null);
+  const [psuedonymImageHolder, setPsuedonymImageHolder] = useState<
+    string | ArrayBuffer | null
+  >(null);
+  const [psuedonymPictureExt, setPsuedonymPictureExt] = useState<string>();
+
+  const { currentUser } = props;
+  const { query } = useRouter();
+
+  const imageMutation = api.users.setUserImage.useMutation();
+  const psuedonymImageMutation = api.users.setUserPsuedonymImage.useMutation();
+
+  const handleFileInput = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    to_set: string
+  ) => {
+    if (to_set === "realName") {
+      if (event.target.files && event.target.files[0]) {
+        setRealNameImage(event.target.files[0]);
+        const ext = event.target.files[0].type.split("/")[1];
+        setRealNamePictureExt(ext);
+        const reader = new FileReader();
+        reader.onload = () => {
+          const str = reader.result;
+          setRealNameImageHolder(str);
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    } else {
+      if (event.target.files && event.target.files[0]) {
+        setPsuedonymImage(event.target.files[0]);
+        const ext = event.target.files[0].type.split("/")[1];
+        setPsuedonymPictureExt(ext);
+        const reader = new FileReader();
+        reader.onload = () => {
+          const str = reader.result;
+          setPsuedonymImageHolder(str);
+        };
+        reader.readAsDataURL(event.target.files[0]);
+      }
     }
   };
-  const sendImageToServer = () => {
-    //send
-    profileImage;
+  useEffect(() => {}, [currentUser]);
+
+  const updateImage = async () => {
+    let type;
+    if (realNameImage !== null) {
+      type = "image";
+    } else type = "psuedonym_image";
+    const ext = realNamePictureExt;
+    const id = currentUser.id;
+    const key = await uploadPicturesToS3(id, type, ext, realNameImage);
+    imageMutation.mutate(key);
+    setRealNameImageHolder(null);
+    setRealNameImage(null);
+    fileInputRef.current!.value = "";
   };
+
   const changeRealNameUsage = () => {};
   const changeNamePreferance = () => {};
 
@@ -36,23 +99,32 @@ const AccountPage = (props: { session: any }) => {
       return (
         <>
           <div className="my-4">
-            {profileImage !== null ? (
-              <div className=" mx-auto ml-36 rounded-lg bg-zinc-200 px-12 py-2 shadow-lg">
+            <div className="mt-4 underline">{currentUser.email}</div>
+            {realNameImageHolder !== null || psuedonymImageHolder !== null ? (
+              <div className="absolute z-10 mx-auto ml-36 rounded-lg bg-zinc-200 px-12 py-2 shadow-lg">
                 <img
-                  src={profileImage as string}
+                  src={
+                    realNameImageHolder !== null
+                      ? (realNameImageHolder as string)
+                      : (psuedonymImageHolder as string)
+                  }
                   className="mx-auto h-32 w-32 rounded-full"
                 />
                 <div className="text-center text-zinc-800">
-                  Confirm New Image?
+                  Confirm New Image to{" "}
+                  {realNameImageHolder !== null ? "Real Name" : "Psuedonym"}?
                 </div>
                 <div className="-mx-6 flex justify-around py-4">
-                  <Button onClick={sendImageToServer} color={"primary"} auto>
+                  <Button onClick={updateImage} color={"primary"} auto>
                     Confirm
                   </Button>
                   <Button
                     onClick={() => {
-                      setProfileImage(null);
+                      setRealNameImageHolder(null);
+                      setRealNameImage(null);
                       fileInputRef.current!.value = "";
+                      setPsuedonymImageHolder(null);
+                      setPsuedonymImage(null);
                     }}
                     color={"error"}
                     auto
@@ -62,27 +134,52 @@ const AccountPage = (props: { session: any }) => {
                 </div>
               </div>
             ) : null}
-            <img
-              src={session?.user?.image}
-              className="h-32 w-32 rounded-full"
-            />
-            <label
-              htmlFor="upload"
-              className="absolute  -mt-6 h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
-            >
-              <span className="mt-1 flex justify-center">
-                <PencilIcon height={14} width={14} color={"#27272a"} />
-              </span>
-            </label>
-            <input
-              ref={fileInputRef}
-              type={"file"}
-              hidden
-              id="upload"
-              onChange={handleFileInput}
-              accept="image/png, image/jpeg"
-            />
-            <div className="mt-2 -ml-2">{session?.user?.email}</div>
+            <div className="flex justify-evenly">
+              <div>
+                <img
+                  src={currentUser.image as string}
+                  className="h-32 w-32 rounded-full"
+                />
+                <label
+                  htmlFor="uploadRealName"
+                  className="absolute  -mt-6 h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
+                >
+                  <span className="mt-1 flex justify-center">
+                    <PencilIcon height={14} width={14} color={"#27272a"} />
+                  </span>
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type={"file"}
+                  hidden
+                  id="uploadRealName"
+                  onChange={(e) => handleFileInput(e, "realName")}
+                  accept="image/png, image/jpeg"
+                />
+              </div>
+              <div>
+                <img
+                  src={currentUser.psuedonym_image as string}
+                  className="h-32 w-32 rounded-full"
+                />
+                <label
+                  htmlFor="uploadPsuedonym"
+                  className="absolute -mt-6 h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
+                >
+                  <span className="mt-1 flex justify-center">
+                    <PencilIcon height={14} width={14} color={"#27272a"} />
+                  </span>
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type={"file"}
+                  hidden
+                  id="uploadPsuedonym"
+                  onChange={(e) => handleFileInput(e, "psuedonym")}
+                  accept="image/png, image/jpeg"
+                />
+              </div>
+            </div>
           </div>
           <div className="my-4 w-full">
             <div className="flex justify-center">
@@ -104,8 +201,8 @@ const AccountPage = (props: { session: any }) => {
                       </div>
                       <div className="ml-16">
                         Currently:
-                        {session?.user?.name ? (
-                          <div>{session?.user?.name}</div>
+                        {currentUser.name ? (
+                          <div>{currentUser.name}</div>
                         ) : (
                           <div className="w-24 break-words">None Set</div>
                         )}
@@ -124,8 +221,10 @@ const AccountPage = (props: { session: any }) => {
                       </div>
                       <div className="ml-16">
                         Currently:
-                        {session?.user?.display_name ? (
-                          <div>{currentUser.data?.display_name}</div>
+                        {currentUser.psuedonym ? (
+                          <div className="w-24 break-words">
+                            {currentUser.psuedonym}
+                          </div>
                         ) : (
                           <div className="w-24 break-words">None Set</div>
                         )}
@@ -148,7 +247,7 @@ const AccountPage = (props: { session: any }) => {
           <Radio.Group
             label="Real Name Usage"
             size="sm"
-            defaultValue={session?.user?.real_name_usage}
+            defaultValue={currentUser.name_display_pref}
             onChange={changeRealNameUsage}
           >
             <Radio value="ask">
@@ -165,12 +264,12 @@ const AccountPage = (props: { session: any }) => {
           <Radio.Group
             label="Name Preferance"
             size="sm"
-            defaultValue={session?.user?.name_display_pref}
+            defaultValue={currentUser.name_display_pref}
             onChange={changeNamePreferance}
           >
             <Tooltip content="No psuedonym is set" placement="top">
               <Radio
-                isDisabled={session?.user?.display_name ? false : true}
+                isDisabled={currentUser.psuedonym ? false : true}
                 value="psuedonym"
               >
                 Prefer Psuedonym

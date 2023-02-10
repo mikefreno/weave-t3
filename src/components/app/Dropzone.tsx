@@ -1,7 +1,7 @@
 import React from "react";
 import { useDropzone } from "react-dropzone";
 
-const Dropzone = ({ onDrop, accept, fileHolder }: any) => {
+const Dropzone = ({ onDrop, accept, fileHolder, preSet }: any) => {
   // Initializing useDropzone hooks with options
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -20,10 +20,10 @@ const Dropzone = ({ onDrop, accept, fileHolder }: any) => {
         className=" flex h-32 w-32 cursor-pointer items-center justify-center"
       >
         <input className="dropzone-input" {...getInputProps()} />
-        {fileHolder !== null && !isDragActive ? (
+        {(fileHolder !== null || preSet !== null) && !isDragActive ? (
           <div>
             <img
-              src={fileHolder}
+              src={fileHolder == null ? preSet : fileHolder}
               className="h-32 w-32 rounded-full"
               alt="upload"
             />
@@ -37,11 +37,11 @@ const Dropzone = ({ onDrop, accept, fileHolder }: any) => {
               className="h-8 w-8 fill-transparent stroke-zinc-700 dark:stroke-zinc-400"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              stroke-width="2"
+              strokeWidth="2"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>

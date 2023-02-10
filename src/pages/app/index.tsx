@@ -13,14 +13,17 @@ import DMPages from "@/src/components/app/DMPages";
 import InnerNavOverlay from "@/src/components/app/InnerNavOverlay";
 import AccountPage from "@/src/components/app/AccountPage";
 import { useSession } from "next-auth/react";
+import { Loading } from "@nextui-org/react";
+import { api } from "@/src/utils/api";
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [serverModalShowing, setServerModalShowing] = useState(false);
   const [botModalShowing, setBotModalShowing] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [microphoneState, setMicrophoneState] = useState(false);
   const [audioState, setAudioState] = useState(true);
+  const currentUser = api.users.getCurrentUser.useQuery().data;
 
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("");
@@ -110,6 +113,14 @@ const index = () => {
   function botModalToggle() {
     setBotModalShowing(!botModalShowing);
   }
+  if (currentUser == undefined) {
+    return (
+      <div className="mx-auto my-auto flex h-screen flex-row items-center justify-center bg-zinc-100 text-3xl dark:bg-zinc-800">
+        Loading...
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-zinc-300 dark:bg-zinc-700">
@@ -141,7 +152,7 @@ const index = () => {
           />
           <InnerNavOverlay
             setSelectedInnerTab={setSelectedInnerTab}
-            session={session}
+            currentUser={currentUser}
             microphoneState={microphoneState}
             microphoneToggle={microphoneToggle}
             audioState={audioState}
@@ -149,8 +160,10 @@ const index = () => {
           />
         </div>
         <div id="center-page" ref={scrollableRef} className="flex-1">
-          {selectedInnerTab === "AccountOverview" ? (
-            <AccountPage session={session} />
+          {status == "unauthenticated" ? (
+            <div></div>
+          ) : selectedInnerTab === "AccountOverview" ? (
+            <AccountPage currentUser={currentUser} />
           ) : null}
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
             <div className="">
