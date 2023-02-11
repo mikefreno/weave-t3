@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
-import ThemeContext from "../ThemeContextProvider";
+import React from "react";
 import GamepadIconThin from "@/src/icons/GamepadIcon-Thin";
 
-const GameModal = (props: { fill: string }) => {
-  const { isDarkTheme } = useContext(ThemeContext);
+const GameModal = (props: { isDarkTheme: Boolean }) => {
+  const { isDarkTheme } = props;
 
   return (
     <div
@@ -17,7 +16,11 @@ const GameModal = (props: { fill: string }) => {
         } w-64 rounded-2xl p-4 shadow-2xl xl:w-96`}
       >
         <span className="flex justify-center">
-          <GamepadIconThin height={120} width={160} color={props.fill} />
+          <GamepadIconThin
+            height={120}
+            width={160}
+            color={isDarkTheme ? "#f4f4f5" : "#27272a"}
+          />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">
           <h3 className="text-md text-center">Easy voice-lobby creation</h3>

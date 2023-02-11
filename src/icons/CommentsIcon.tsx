@@ -3,8 +3,7 @@ import React from "react";
 function CommentsIcon(props: {
   height: string | number | undefined;
   width: string | number | undefined;
-  fill: string | undefined;
-  stroke: string | undefined;
+  color: string | undefined;
 }) {
   return (
     <div>
@@ -13,7 +12,7 @@ function CommentsIcon(props: {
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth={0.5}
-        stroke="currentColor"
+        stroke={props.color}
         height={props.height}
         width={props.width}
       >

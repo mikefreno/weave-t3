@@ -38,6 +38,10 @@ const AccountPage = (props: { currentUser: User }) => {
     string | ArrayBuffer | null
   >(null);
   const [psuedonymPictureExt, setPsuedonymPictureExt] = useState<string>();
+  const realName = useRef<HTMLInputElement>(null);
+  const psuedonym = useRef<HTMLInputElement>(null);
+  const nameMutation = api.users.setUserName.useMutation();
+  const psuedonymMutation = api.users.setUserPsuedonym.useMutation();
 
   const { currentUser } = props;
   const { query } = useRouter();
@@ -75,7 +79,16 @@ const AccountPage = (props: { currentUser: User }) => {
       }
     }
   };
-  useEffect(() => {}, [currentUser]);
+  const setPsuedonym = () => {
+    if (psuedonym.current !== null) {
+      psuedonymMutation.mutate(psuedonym.current.value);
+    }
+  };
+  const setRealName = () => {
+    if (realName.current !== null) {
+      nameMutation.mutate(realName.current.value);
+    }
+  };
 
   const updateImage = async () => {
     let type;
@@ -190,12 +203,12 @@ const AccountPage = (props: { currentUser: User }) => {
                 </div>
                 <div className="mt-4 flex justify-center">
                   <div className="my-4 mx-4 flex flex-col">
-                    <span className="w-48">
-                      <Input labelPlaceholder="Real Name" />
+                    <span className="mb-4 w-48">
+                      <Input labelPlaceholder="Real Name" ref={realName} />
                     </span>
                     <div className="flex flex-row">
                       <div className="w-4">
-                        <Button shadow auto>
+                        <Button shadow auto onClick={setRealName}>
                           Set
                         </Button>
                       </div>
@@ -210,12 +223,17 @@ const AccountPage = (props: { currentUser: User }) => {
                     </div>
                   </div>
                   <div className="my-4 mx-4 flex flex-col">
-                    <span className="w-48">
+                    <span className="mb-4 w-48">
                       <Input labelPlaceholder="Pseudonym" />
                     </span>
                     <div className="flex flex-row">
                       <div className="w-4">
-                        <Button shadow auto>
+                        <Button
+                          shadow
+                          auto
+                          onClick={setPsuedonym}
+                          ref={psuedonym}
+                        >
                           Set
                         </Button>
                       </div>
@@ -302,7 +320,7 @@ const AccountPage = (props: { currentUser: User }) => {
   };
 
   return (
-    <div className="flex h-screen w-full ">
+    <div className="flex h-screen w-full">
       <div id="settings-tabs" className="">
         <div className="w-34 rounded-br-md bg-zinc-400 px-6 py-4 dark:bg-zinc-600">
           <div className="text-xl tracking-wide underline underline-offset-4">

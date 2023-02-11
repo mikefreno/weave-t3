@@ -33,17 +33,17 @@ const Parallax = () => {
     <div className="parallax-container absolute  w-full" ref={parallaxRef}>
       <div className="parallax-layer" data-speed="0.3">
         <div className="animate-up-down layer3 absolute left-20 mt-48">
-          <BotModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <BotModal isDarkTheme={isDarkTheme}/>
         </div>
       </div>
       <div className="parallax-layer" data-speed="0.2">
         <div className="animate-up-down layer-2 absolute ml-56 mt-24 xl:left-80">
-          <SecurityModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <SecurityModal isDarkTheme={isDarkTheme} />
         </div>
       </div>
       <div className="parallax-layer" data-speed="0.4">
         <div className="animate-up-down layer1 absolute right-24">
-          <ConfigModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <ConfigModal isDarkTheme={isDarkTheme} />
         </div>
       </div>
     </div>

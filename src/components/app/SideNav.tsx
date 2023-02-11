@@ -13,6 +13,7 @@ import AddIcon from "@/src/icons/AddIcon";
 import BullhornIcon from "@/src/icons/BullhornIcon";
 import RobotIcon from "@/src/icons/RobotIcon";
 import InnerNav from "./InnerNav";
+import RobotForApp from "@/src/icons/RobotForApp";
 
 const SideNav = (props: {
   serverModalToggle: MouseEventHandler<HTMLButtonElement>;
@@ -114,7 +115,7 @@ const SideNav = (props: {
               className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
               onClick={props.botModalToggle}
             >
-              <RobotIcon
+              <RobotForApp
                 height={40}
                 width={40}
                 fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}

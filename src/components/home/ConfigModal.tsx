@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React from "react";
 import CommandLineIcon from "@/src/icons/CommandLineIcon";
-import ThemeContext from "../ThemeContextProvider";
 
-const ConfigModal = (props: { fill: string }) => {
-  const { isDarkTheme } = useContext(ThemeContext);
+const ConfigModal = (props: { isDarkTheme: boolean }) => {
+  const { isDarkTheme } = props;
 
   return (
     <div
@@ -20,9 +19,8 @@ const ConfigModal = (props: { fill: string }) => {
           <CommandLineIcon
             height={144}
             width={144}
-            stroke={props.fill}
+            stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
             strokeWidth={0.5}
-            fill={""}
           />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">

@@ -28,29 +28,21 @@ export const userRouter = createTRPCRouter({
     });
   }),
   setUserName: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        value: z.string(),
-      })
-    )
+    .input(z.string())
     .mutation(({ ctx, input }) => {
+      const userId = ctx.session.user.id;
       return ctx.prisma.user.update({
-        where: { id: input.id },
-        data: { name: input.value },
+        where: { id: userId },
+        data: { name: input },
       });
     }),
   setUserPsuedonym: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        value: z.string(),
-      })
-    )
+    .input(z.string())
     .mutation(({ ctx, input }) => {
+      const userId = ctx.session.user.id;
       return ctx.prisma.user.update({
-        where: { id: input.id },
-        data: { psuedonym: input.value },
+        where: { id: userId },
+        data: { psuedonym: input },
       });
     }),
   setUserImage: protectedProcedure

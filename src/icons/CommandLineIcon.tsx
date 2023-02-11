@@ -2,7 +2,6 @@ import React from "react";
 import { number } from "zod";
 
 function CommandLineIcon(props: {
-  fill: string | "none";
   height: number | undefined;
   width: number | undefined;
   stroke: string | undefined;

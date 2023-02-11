@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React from "react";
 import BriefcaseIcon from "@/src/icons/BriefcaseIcon";
-import ThemeContext from "../ThemeContextProvider";
 
-const WorkModal = (props: { fill: string }) => {
-  const { isDarkTheme } = useContext(ThemeContext);
+const WorkModal = (props: { isDarkTheme: boolean }) => {
+  const { isDarkTheme } = props;
 
   return (
     <div
@@ -20,7 +19,7 @@ const WorkModal = (props: { fill: string }) => {
           <BriefcaseIcon
             height={144}
             width={144}
-            stroke={props.fill}
+            stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
             strokeWidth={0.5}
           />
         </span>

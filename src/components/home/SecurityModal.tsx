@@ -1,9 +1,7 @@
-import React, { useContext } from "react";
 import ShieldIcon from "@/src/icons/ShieldIcon";
-import ThemeContext from "../ThemeContextProvider";
 
-const SecurityModal = (props: { fill: string }) => {
-  const { isDarkTheme } = useContext(ThemeContext);
+const SecurityModal = (props: { isDarkTheme: boolean }) => {
+  const { isDarkTheme } = props;
 
   return (
     <div
@@ -17,7 +15,11 @@ const SecurityModal = (props: { fill: string }) => {
         } rounded-2xl p-4 shadow-2xl md:w-60`}
       >
         <span className="flex justify-center">
-          <ShieldIcon height={144} width={144} fill={props.fill} />
+          <ShieldIcon
+            height={144}
+            width={144}
+            fill={isDarkTheme ? "#f4f4f5" : "#27272a"}
+          />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">
           <h3 className="text-md text-center">Control Your Data Flow</h3>

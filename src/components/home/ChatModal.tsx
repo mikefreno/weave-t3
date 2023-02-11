@@ -2,9 +2,8 @@ import React, { useContext } from "react";
 import CommentsIcon from "@/src/icons/CommentsIcon";
 import ThemeContext from "../ThemeContextProvider";
 
-const ChatModal = (props: { fill: string }) => {
-  const { isDarkTheme } = useContext(ThemeContext);
-
+const ChatModal = (props: { isDarkTheme: boolean }) => {
+  const { isDarkTheme } = props;
   return (
     <div
       className={`z-50 rounded-2xl p-1 backdrop-blur ${
@@ -20,8 +19,7 @@ const ChatModal = (props: { fill: string }) => {
           <CommentsIcon
             height={144}
             width={144}
-            fill={props.fill}
-            stroke={undefined}
+            color={isDarkTheme ? "#f4f4f5" : "#27272a"}
           />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">

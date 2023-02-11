@@ -25,13 +25,15 @@ import useOnClickOutside from "./ClickOutsideHook";
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
 
-const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
+const Navbar = (props: {
+  switchRef?: React.RefObject<HTMLDivElement>;
+  session: any;
+}) => {
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showingLoginModal, setShowingLoginModal] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession();
-
+  const { session } = props;
   const menuRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const loginRef = useRef<HTMLDivElement>(null);

@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React from "react";
 import RobotIcon from "@/src/icons/RobotIcon";
-import ThemeContext from "../ThemeContextProvider";
 
-const BotModal = (props: { fill: string }) => {
-  const { isDarkTheme } = useContext(ThemeContext);
+const BotModal = (props: { isDarkTheme: boolean }) => {
+  const { isDarkTheme } = props;
 
   return (
     <div
@@ -17,7 +16,11 @@ const BotModal = (props: { fill: string }) => {
         } rounded-2xl p-4 shadow-2xl md:w-72`}
       >
         <span className="flex justify-center">
-          <RobotIcon height={144} width={144} fill={props.fill} />
+          <RobotIcon
+            height={144}
+            width={144}
+            fill={isDarkTheme ? "#f4f4f5" : "#27272a"}
+          />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">
           <h3 className="text-md text-center">Ready-made Bots</h3>
