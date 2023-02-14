@@ -1,22 +1,15 @@
 import { api } from "@/src/utils/api";
-import router, { useRouter } from "next/router";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useContext, useRef, useState } from "react";
 import Dropzone from "@/src/components/app/Dropzone";
 import Navbar from "@/src/components/Navbar";
 import { Button, Input, Loading } from "@nextui-org/react";
 import BackArrow from "@/src/icons/BackArrow";
 import ThemeContext from "@/src/components/ThemeContextProvider";
-
 import axios from "axios";
 import Link from "next/link";
 import LoadingElement from "@/src/components/loading";
 import { useSession } from "next-auth/react";
+import router from "next/router";
 
 async function uploadPicturesToS3(
   id: string,
@@ -26,7 +19,7 @@ async function uploadPicturesToS3(
 ) {
   const category = "users";
   const data = await axios
-    .get(`/api/s3upload?category=${category}id=${id}&type=${type}&ext=${ext}`)
+    .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
     });
@@ -68,6 +61,7 @@ const userSetup = () => {
 
   const [nameField, setNameField] = useState("-");
   const [psuedonymField, setPsuedonymField] = useState("-");
+  const switchRef = useRef<HTMLDivElement | null>(null);
 
   const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {
@@ -101,13 +95,10 @@ const userSetup = () => {
   const setNames = () => {
     setButtonLoading(true);
     if (nameField !== "-") {
-      nameMutation.mutate({ id: userQuery.id, value: realName.current!.value });
+      nameMutation.mutate(realName.current!.value);
     }
     if (psuedonymField !== "-") {
-      psuedonymMutation.mutate({
-        id: userQuery.id,
-        value: psuedonym.current!.value,
-      });
+      psuedonymMutation.mutate(psuedonym.current!.value);
     }
     setButtonLoading(false);
     setStep(1);
@@ -136,7 +127,9 @@ const userSetup = () => {
   if (status === "loading") {
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }
-
+  if (status === "unauthenticated") {
+    return router.push("/");
+  }
   const contextualContentRenderer = () => {
     if (step == 0) {
       // Set Names
@@ -206,7 +199,7 @@ const userSetup = () => {
       // Set Pictures
       return (
         <>
-          <div className="text-center ">
+          <div className="text-center">
             <div className="text-3xl">
               Choose a profile picture, or two - squared images work best
             </div>
@@ -289,13 +282,17 @@ const userSetup = () => {
               Continue to Web App
             </Link>
           </div>
+          <div className="flex justify-center">
+            <div className="my-4 text-lg">Join a few a servers</div>
+            <div></div>
+          </div>
         </div>
       );
     }
   };
   return (
     <>
-      <Navbar session={session} />
+      <Navbar switchRef={switchRef} />
       <div className="flex h-screen flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-800">
         <div className="-mt-24 mb-12 text-3xl">
           Lets Get a Few Things Set Up...

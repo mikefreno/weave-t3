@@ -1,18 +1,20 @@
-import React, { RefObject, useState } from "react";
+import React, { RefObject } from "react";
 import Link from "next/link";
-import { Nunito, Raleway } from "@next/font/google";
-import { Button } from "@nextui-org/react";
+import { Nunito } from "@next/font/google";
+import { Button, Tooltip } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
 const Menu = (props: {
   openLogin: React.MouseEventHandler<HTMLButtonElement>;
   menuRef: RefObject<HTMLDivElement>;
+  session: any;
+  status: any;
 }) => {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { session, status } = props;
 
   return (
     <div
@@ -67,11 +69,25 @@ const Menu = (props: {
           )}
           {pathname == "/app" ? null : (
             <li className="mt-4 text-lg">
-              <Button shadow color="gradient" auto>
-                <Link href={"/app"} className="text-zinc-300">
-                  Web App
-                </Link>
-              </Button>
+              {status == "authenticated" ? (
+                <Button shadow color="gradient" auto size={"sm"}>
+                  <Link href={"/app"} className="text-[#E2E2E2]">
+                    Web App
+                  </Link>
+                </Button>
+              ) : (
+                <Tooltip
+                  content={"Login to use!"}
+                  placement="bottomStart"
+                  color={"secondary"}
+                >
+                  <Button shadow color="gradient" auto size={"sm"}>
+                    <Link href={"/"} className="text-[#E2E2E2]">
+                      Web App
+                    </Link>
+                  </Button>
+                </Tooltip>
+              )}
             </li>
           )}
         </ul>

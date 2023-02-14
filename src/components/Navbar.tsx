@@ -1,11 +1,4 @@
-import React, {
-  LegacyRef,
-  MutableRefObject,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
@@ -15,25 +8,21 @@ import Menu from "./Menu";
 import LoginModal from "./loginModal";
 import { SunIcon } from "@/src/icons/SunIcon";
 import { MoonIcon } from "@/src/icons/MoonIcon";
-import { Switch, Button } from "@nextui-org/react";
+import { Switch, Button, Tooltip } from "@nextui-org/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import useOnClickOutside from "./ClickOutsideHook";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
-const nunito_400 = Nunito({ weight: "400", subsets: ["latin"] });
 
-const Navbar = (props: {
-  switchRef?: React.RefObject<HTMLDivElement>;
-  session: any;
-}) => {
+const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showingLoginModal, setShowingLoginModal] = useState(false);
   const pathname = usePathname();
-  const { session } = props;
+  const { data: session, status } = useSession();
   const menuRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const loginRef = useRef<HTMLDivElement>(null);
@@ -182,11 +171,25 @@ const Navbar = (props: {
                 </li>
               )}
               <li className="mx-2 my-auto text-sm ">
-                <Button shadow color="gradient" auto size={"sm"}>
-                  <Link href={"/app"} className="text-[#E2E2E2]">
-                    Web App
-                  </Link>
-                </Button>
+                {status === "authenticated" ? (
+                  <Button shadow color="gradient" auto size={"sm"}>
+                    <Link href={"/app"} className="text-[#E2E2E2]">
+                      Web App
+                    </Link>
+                  </Button>
+                ) : (
+                  <Tooltip
+                    content={"Login to use!"}
+                    placement="bottomStart"
+                    color={"secondary"}
+                  >
+                    <Button shadow color="gradient" auto size={"sm"}>
+                      <Link href={"/"} className="text-[#E2E2E2]">
+                        Web App
+                      </Link>
+                    </Button>
+                  </Tooltip>
+                )}
               </li>
             </ul>
           </div>
@@ -219,7 +222,12 @@ const Navbar = (props: {
           </div>
         </div>
         {menuOpen ? (
-          <Menu openLogin={openLoginRegisterModal} menuRef={menuRef} />
+          <Menu
+            openLogin={openLoginRegisterModal}
+            menuRef={menuRef}
+            session={session}
+            status={status}
+          />
         ) : null}
       </nav>
       {showingLoginModal ? (

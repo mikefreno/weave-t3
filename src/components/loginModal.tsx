@@ -1,12 +1,13 @@
+"use client";
+
 import React, { useEffect, useState, useRef, useContext } from "react";
 import Xmark from "@/src/icons/Xmark";
-import CheckMark from "@/src/icons/checkMark";
-import { Input, Button, Loading, Popover, Tooltip } from "@nextui-org/react";
+
+import { Input, Button, Loading } from "@nextui-org/react";
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
-import Email from "next-auth/providers/email";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import GoogleLogo from "../icons/GoogleLogo";
 import GitHub from "../icons/GitHub";
@@ -43,6 +44,7 @@ const LoginModal = (props: {
       const email = emailLoginInputRef.current.value;
       signIn("email", { email, callbackUrl: "/account-set-up" });
     }
+    loginButtonLoadingToggle();
   }
 
   function loginButtonLoadingToggle() {
