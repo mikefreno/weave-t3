@@ -39,7 +39,7 @@ model User {
   registered_at       DateTime?       @default(now())
   image               String?
   psuedonym_image     String?
-  servers             Server[]
+  servers             Server[]        
   sessions            Session[]
   memberships         Server_Member[]
   adminships          Server_Admin[]

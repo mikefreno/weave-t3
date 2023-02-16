@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import { Loading } from "@nextui-org/react";
 import { api } from "@/src/utils/api";
 import LoadingElement from "@/src/components/loading";
+import router from "next/router";
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -25,9 +26,9 @@ const index = () => {
   const [microphoneState, setMicrophoneState] = useState(false);
   const [audioState, setAudioState] = useState(true);
   const currentUser = api.users.getCurrentUser.useQuery().data;
-
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("");
+  const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
 
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
@@ -110,7 +111,12 @@ const index = () => {
   function botModalToggle() {
     setBotModalShowing(!botModalShowing);
   }
-  if (currentUser == undefined) {
+  if (currentUser === undefined || currentUser === null) {
+    setTimeout(() => {
+      if (status == "unauthenticated") {
+        router.push("/login");
+      }
+    }, 1000);
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }
 
@@ -132,6 +138,8 @@ const index = () => {
             currentTab={currentTab}
             currentTabSetter={currentTabSetter}
             setSelectedInnerTab={setSelectedInnerTab}
+            currentUser={currentUser}
+            setSelectedInnerTabID={setSelectedInnerTabID}
           />
         </div>
         <div id="inner-nav" className="w-52">
@@ -141,6 +149,8 @@ const index = () => {
             dmModalToggle={dmModalToggle}
             selectedInnerTab={selectedInnerTab}
             setSelectedInnerTab={setSelectedInnerTab}
+            currentUser={currentUser}
+            selectedInnerTabID={selectedInnerTabID}
           />
           <InnerNavOverlay
             setSelectedInnerTab={setSelectedInnerTab}
@@ -152,10 +162,8 @@ const index = () => {
           />
         </div>
         <div id="center-page" ref={scrollableRef} className="flex-1">
-          {status == "unauthenticated" ? (
-            <div></div>
-          ) : selectedInnerTab === "AccountOverview" ? (
-            <AccountPage currentUser={currentUser} />
+          {selectedInnerTab === "AccountOverview" ? (
+            <AccountPage currentUser={currentUser!} />
           ) : null}
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
             <div className="">

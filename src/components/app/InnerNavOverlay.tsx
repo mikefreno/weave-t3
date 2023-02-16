@@ -2,14 +2,18 @@ import HeadphonesIcon from "@/src/icons/HeadphonesIcon";
 import HeadphoneSlashIcon from "@/src/icons/HeadphoneSlashIcon";
 import MicIcon from "@/src/icons/MicIcon";
 import MicSlashIcon from "@/src/icons/MicSlashIcon";
-import { User } from "@prisma/client";
+import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import ThemeContext from "../ThemeContextProvider";
 
 const InnerNavOverlay = (props: {
   setSelectedInnerTab: Dispatch<SetStateAction<string>>;
-  currentUser: User;
+  currentUser: User & {
+    servers: Server[];
+    memberships: Server_Member[];
+    adminships: Server_Admin[];
+  };
   microphoneState: boolean;
   microphoneToggle: any;
   audioState: boolean;

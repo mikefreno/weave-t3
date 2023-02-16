@@ -307,3 +307,34 @@ select {
 .danger-zone-bg {
   background-color: rgba(185, 28, 28, 0.5);
 }
+@keyframes move-and-fade {
+  0% {
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translateX(50px);
+    -moz-transform: translateX(50px);
+    transform: translateX(50px);
+    opacity: 0;
+  }
+}
+.move-fade {
+  -webkit-animation: move-and-fade 0.5s ease-out forwards;
+  -moz-animation: move-and-fade 0.5s ease-out forwards;
+  animation: move-and-fade 0.5s ease-out forwards;
+}
+.rule-around {
+  display: flex;
+  align-items: center;
+}
+
+.rule-around:before,
+.rule-around:after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #ccc;
+  margin: 0 10px;
+}

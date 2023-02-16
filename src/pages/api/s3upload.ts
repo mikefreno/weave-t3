@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import S3 from "aws-sdk/clients/s3";
-import { useSession } from "next-auth/react";
 
 const s3 = new S3({
   apiVersion: "2006-03-01",

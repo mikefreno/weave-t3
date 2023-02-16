@@ -10,6 +10,23 @@ import Link from "next/link";
 import LoadingElement from "@/src/components/loading";
 import { useSession } from "next-auth/react";
 import router from "next/router";
+import Resizer from "react-image-file-resizer";
+
+const resizeFile = (file: File, extension: string) =>
+  new Promise((resolve) => {
+    Resizer.imageFileResizer(
+      file,
+      200,
+      200,
+      extension,
+      100,
+      0,
+      (uri) => {
+        resolve(uri);
+      },
+      "file"
+    );
+  });
 
 async function uploadPicturesToS3(
   id: string,
@@ -24,7 +41,8 @@ async function uploadPicturesToS3(
       console.log(err);
     });
   const { uploadURL, key } = data.data;
-  await axios.put(uploadURL, picture).catch((err) => {
+  const resizedFile = await resizeFile(picture, ext);
+  await axios.put(uploadURL, resizedFile).catch((err) => {
     console.log(err);
   });
   return key;
@@ -221,7 +239,7 @@ const userSetup = () => {
               <div className="flex w-1/2 flex-col items-center">
                 <Dropzone
                   onDrop={handleRealNamePictureDrop}
-                  acceptedFiles={"image/jpg, image/jpeg, image/png"}
+                  acceptedFiles={"image/jpeg, image/png"}
                   fileHolder={realNamePicHolder}
                   preSet={userQuery.data?.image}
                 />
@@ -230,7 +248,7 @@ const userSetup = () => {
               <div className="flex w-1/2 flex-col items-center border-l border-l-zinc-500">
                 <Dropzone
                   onDrop={handlePsuedonymPictureDrop}
-                  acceptedFiles={"image/jpg, image/jpeg, image/png"}
+                  acceptedFiles={"image/jpeg, image/png"}
                   fileHolder={psuedonymPicHolder}
                   preSet={userQuery.data?.psuedonym_image}
                 />

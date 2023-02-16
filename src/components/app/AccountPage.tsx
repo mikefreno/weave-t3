@@ -5,6 +5,23 @@ import { useRouter } from "next/router";
 import { api } from "../../utils/api";
 import axios from "axios";
 import { User } from "@prisma/client";
+import Resizer from "react-image-file-resizer";
+
+const resizeFile = (file: File, extension: string) =>
+  new Promise((resolve) => {
+    Resizer.imageFileResizer(
+      file,
+      200,
+      200,
+      extension,
+      100,
+      0,
+      (uri) => {
+        resolve(uri);
+      },
+      "file"
+    );
+  });
 
 async function uploadPicturesToS3(
   id: string,
@@ -14,12 +31,13 @@ async function uploadPicturesToS3(
 ) {
   const category = "users";
   const data = await axios
-    .get(`/api/s3upload?category=${category}id=${id}&type=${type}&ext=${ext}`)
+    .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
     });
   const { uploadURL, key } = data.data;
-  await axios.put(uploadURL, picture).catch((err) => {
+  const resizedFile = await resizeFile(picture, ext);
+  await axios.put(uploadURL, resizedFile).catch((err) => {
     console.log(err);
   });
   return key;
@@ -90,17 +108,25 @@ const AccountPage = (props: { currentUser: User }) => {
     }
   };
 
-  const updateImage = async () => {
-    let type;
-    if (realNameImage !== null) {
-      type = "image";
-    } else type = "psuedonym_image";
+  const updateRealNameImage = async () => {
+    const type = "image";
     const ext = realNamePictureExt;
     const id = currentUser.id;
     const key = await uploadPicturesToS3(id, type, ext, realNameImage);
     imageMutation.mutate(key);
     setRealNameImageHolder(null);
     setRealNameImage(null);
+    fileInputRef.current!.value = "";
+  };
+
+  const updatePsuedonymImage = async () => {
+    const type = "psuedonym_image";
+    const ext = psuedonymPictureExt;
+    const id = currentUser.id;
+    const key = await uploadPicturesToS3(id, type, ext, psuedonymImage);
+    psuedonymImageMutation.mutate(key);
+    setPsuedonymImageHolder(null);
+    setPsuedonymImage(null);
     fileInputRef.current!.value = "";
   };
 
@@ -128,7 +154,15 @@ const AccountPage = (props: { currentUser: User }) => {
                   {realNameImageHolder !== null ? "Real Name" : "Psuedonym"}?
                 </div>
                 <div className="-mx-6 flex justify-around py-4">
-                  <Button onClick={updateImage} color={"primary"} auto>
+                  <Button
+                    onClick={
+                      realNameImageHolder !== null
+                        ? updateRealNameImage
+                        : updatePsuedonymImage
+                    }
+                    color={"primary"}
+                    auto
+                  >
                     Confirm
                   </Button>
                   <Button
@@ -372,5 +406,4 @@ const AccountPage = (props: { currentUser: User }) => {
     </div>
   );
 };
-
 export default AccountPage;

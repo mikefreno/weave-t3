@@ -12,8 +12,10 @@ import SearchIcon from "@/src/icons/SearchIcon";
 import VerifiedIcon from "@/src/icons/VerifiedIcon";
 import VinylIcon from "@/src/icons/VinylIcon";
 import { Input, Tooltip } from "@nextui-org/react";
-import React, { RefObject, useContext, useState } from "react";
+import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
+import React, { RefObject, useContext, useEffect, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
+import InviteModal from "./InviteModal";
 
 const InnerNav = (props: {
   currentTab: string;
@@ -21,15 +23,65 @@ const InnerNav = (props: {
   dmModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   selectedInnerTab: string;
   setSelectedInnerTab: any;
+  selectedInnerTabID: number;
+  currentUser: User & {
+    servers: Server[];
+    memberships: Server_Member[];
+    adminships: Server_Admin[];
+  };
 }) => {
-  const { currentTab, selectedInnerTab, setSelectedInnerTab } = props;
+  const {
+    currentTab,
+    selectedInnerTab,
+    setSelectedInnerTab,
+    currentUser,
+    selectedInnerTabID,
+  } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
 
+  const currentUsersServersOwner = currentUser?.servers;
+  const currentUsersServersAdmin = currentUser?.adminships;
+  const currentUsersServersMember = currentUser?.memberships;
+  const [joinedServerList, setJoinedServerList] = useState<number[]>([]);
+  const [inviteModalShowing, setInviteModalShowing] = useState(false);
+
+  useEffect(() => {
+    const joinedServers = [...joinedServerList];
+    currentUsersServersOwner.forEach((server) => {
+      if (!joinedServers.includes(server.id)) {
+        joinedServers.push(server.id);
+      }
+    });
+    currentUsersServersAdmin.forEach((server) => {
+      if (!joinedServers.includes(server.id)) {
+        joinedServers.push(server.id);
+      }
+    });
+    currentUsersServersMember.forEach((server) => {
+      if (!joinedServers.includes(server.id)) {
+        joinedServers.push(server.id);
+      }
+    });
+    setJoinedServerList(joinedServers);
+  }, [
+    currentUsersServersOwner,
+    currentUsersServersAdmin,
+    currentUsersServersMember,
+  ]);
+
+  useEffect(() => {
+    if (currentTab === "server") {
+    }
+  }, [joinedServerList]);
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
     // Perform your search logic here
+  };
+  const inviteModalToggle = () => {
+    setInviteModalShowing(!inviteModalShowing);
   };
 
   if (currentTab == "DMS") {
@@ -295,7 +347,38 @@ const InnerNav = (props: {
       </div>
     );
   } else {
-    return <div className="fixed"></div>;
+    return (
+      <div className="fixed h-screen w-52 border-r border-l border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
+        <div className="justify-left flex pl-4 pt-4 text-xl font-bold">
+          {selectedInnerTab}
+        </div>
+        <div className="p-4">
+          {/* if user is owner or admin  */}
+          <div>Server Settings</div>
+          {/* end */}
+          <div>Channel List</div>
+          {/* depends on server settings */}
+          <button className="flex" onClick={inviteModalToggle}>
+            Invite Someone
+            <span className="my-auto">
+              <AddIcon
+                height={16}
+                width={16}
+                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                strokeWidth={2}
+              />
+            </span>
+          </button>
+        </div>
+        {inviteModalShowing ? (
+          <InviteModal
+            isDarkTheme={isDarkTheme}
+            setInviteModalShowing={setInviteModalShowing}
+            selectedInnerTabID={selectedInnerTabID}
+          />
+        ) : null}
+      </div>
+    );
   }
 };
 

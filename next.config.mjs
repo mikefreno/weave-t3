@@ -17,5 +17,14 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "weaveimages.s3.amazonaws.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 export default config;

@@ -1,8 +1,5 @@
-"use client";
-
 import React, { useEffect, useState, useRef, useContext } from "react";
 import Xmark from "@/src/icons/Xmark";
-
 import { Input, Button, Loading } from "@nextui-org/react";
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
@@ -11,21 +8,20 @@ import { signIn } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import GoogleLogo from "../icons/GoogleLogo";
 import GitHub from "../icons/GitHub";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
   loginRef: React.LegacyRef<HTMLDivElement> | undefined;
 }) => {
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
-  const [registerButtonLoading, setRegisterButtonLoading] = useState(false);
-  const [emailInput, setEmailInput] = useState("");
-  const [emailPassState, setEmailPassState] = useState(false);
   const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(
     null
   );
-  const [registerErrorReport, setRegisterErrorReport] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
   const emailLoginInputRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter().route;
 
   useEffect(() => {
     const handleFocus = (event: FocusEvent) => {
@@ -37,16 +33,30 @@ const LoginModal = (props: {
     };
   }, []);
 
-  function emailLogin(event: { preventDefault: () => void }) {
+  async function emailLogin(event: { preventDefault: () => void }) {
     loginButtonLoadingToggle();
     event.preventDefault();
     if (emailLoginInputRef.current) {
       const email = emailLoginInputRef.current.value;
-      signIn("email", { email, callbackUrl: "/account-set-up" });
+      const response = await axios.get(`/api/userCheck?email=${email}`);
+      if (response.status == 204) {
+        signIn("email", { email, callbackUrl: "/account-set-up" });
+      } else {
+        signIn("email", { email });
+      }
     }
     loginButtonLoadingToggle();
   }
-
+  async function googleLogin() {
+    signIn("google", { callbackUrl: "/api/providerUserCreationCheck" }).catch(
+      console.log
+    );
+  }
+  async function githubLogin() {
+    signIn("github", { callbackUrl: "/api/providerUserCreationCheck" }).catch(
+      console.log
+    );
+  }
   function loginButtonLoadingToggle() {
     setLoginButtonLoading(!loginButtonLoading);
   }
@@ -73,11 +83,18 @@ const LoginModal = (props: {
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3"
       >
         <div className="-mb-6 pl-2 text-2xl">
-          <span className="border-b-2 border-zinc-800">Login / Register</span>
+          <span className="border-b-2 border-zinc-800">
+            {router == "/login" ? "Login" : "Login / Register"}
+          </span>
         </div>
-        <button className="absolute right-4 -mt-4 w-10" onClick={props.onClose}>
-          <Xmark className="text-zinc-800 dark:text-zinc-200" />
-        </button>
+        {router == "/login" ? null : (
+          <button
+            className="absolute right-4 -mt-4 w-10"
+            onClick={props.onClose}
+          >
+            <Xmark className="text-zinc-800 dark:text-zinc-200" />
+          </button>
+        )}
         <div className="-mb-12 flex justify-center">
           <Image
             src={isDarkTheme ? DarkLogo : LightLogo}
@@ -106,11 +123,7 @@ const LoginModal = (props: {
             <div className="-mx-2 mb-4 flex justify-around">
               <button
                 className="flex flex-row rounded bg-zinc-100 px-4 py-2 text-black hover:bg-zinc-300 active:bg-zinc-400"
-                onClick={() => {
-                  signIn("google", { callbackUrl: "/account-set-up" }).catch(
-                    console.log
-                  );
-                }}
+                onClick={googleLogin}
               >
                 Sign in with Google
                 <span className="ml-4 -mr-2">
@@ -119,11 +132,7 @@ const LoginModal = (props: {
               </button>
               <button
                 className="flex flex-row rounded bg-zinc-600 px-4 py-2 text-white hover:bg-zinc-700 active:bg-zinc-900"
-                onClick={() => {
-                  signIn("github", { callbackUrl: "/account-set-up" }).catch(
-                    console.log
-                  );
-                }}
+                onClick={githubLogin}
               >
                 Sign in with Github
                 <span className="ml-4 -mr-2">

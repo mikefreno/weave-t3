@@ -18,6 +18,23 @@ import ThemeContext from "../ThemeContextProvider";
 import Dropzone from "@/src/components/app/Dropzone";
 import { api } from "@/src/utils/api";
 import axios from "axios";
+import Resizer from "react-image-file-resizer";
+
+const resizeFile = (file: File, extension: string) =>
+  new Promise((resolve) => {
+    Resizer.imageFileResizer(
+      file,
+      200,
+      200,
+      extension,
+      100,
+      0,
+      (uri) => {
+        resolve(uri);
+      },
+      "file"
+    );
+  });
 
 async function uploadPicturesToS3(
   id: string,
@@ -32,9 +49,16 @@ async function uploadPicturesToS3(
       console.log(err);
     });
   const { uploadURL, key } = data.data;
-  await axios.put(uploadURL, picture).catch((err) => {
-    console.log(err);
-  });
+  let resizedLogo;
+  if (type === "logo") {
+    resizedLogo = await resizeFile(picture, ext);
+  }
+
+  await axios
+    .put(uploadURL, type === "logo" ? resizedLogo : picture)
+    .catch((err) => {
+      console.log(err);
+    });
   return key;
 }
 
@@ -124,14 +148,13 @@ const CreateServerModal = (props: {
     const serverDescription = serverDescriptionRef.current?.value;
     if (serverName) {
       //creates server, grabs server ID
-      createServerMutation.mutate({
+      await createServerMutation.mutateAsync({
         name: serverName,
         blurb: serverDescription ? serverDescription : undefined,
         category: serverType ? serverType : undefined,
       });
     }
     setCreateButtonLoading(false);
-
     setStep(1);
   };
 
@@ -393,12 +416,15 @@ const CreateServerModal = (props: {
                 <div className="flex justify-center">
                   <Textarea
                     ref={serverDescriptionRef}
-                    label={`Server Description (optional) ${serverDescriptionLength}/100`}
+                    label={`Server Description (optional)`}
                     placeholder="Community to discuss the..."
                     onChange={descriptionLengthReport}
                     size="xl"
                     status={serverDescriptionLength > 100 ? "error" : "default"}
                   />
+                </div>
+                <div className="flex justify-center pl-36">
+                  {serverDescriptionLength}/100
                 </div>
                 <div className="my-4 flex justify-center">
                   {createButtonLoading ? (

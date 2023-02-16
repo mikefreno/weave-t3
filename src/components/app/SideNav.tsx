@@ -2,7 +2,7 @@ import React, {
   MouseEventHandler,
   RefObject,
   useContext,
-  useState,
+  useEffect,
 } from "react";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
@@ -11,9 +11,12 @@ import ThemeContext from "../ThemeContextProvider";
 import { Tooltip } from "@nextui-org/react";
 import AddIcon from "@/src/icons/AddIcon";
 import BullhornIcon from "@/src/icons/BullhornIcon";
-import RobotIcon from "@/src/icons/RobotIcon";
-import InnerNav from "./InnerNav";
 import RobotForApp from "@/src/icons/RobotForApp";
+import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
+import { Raleway } from "@next/font/google";
+import { api } from "@/src/utils/api";
+
+const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 
 const SideNav = (props: {
   serverModalToggle: MouseEventHandler<HTMLButtonElement>;
@@ -23,12 +26,30 @@ const SideNav = (props: {
   currentTab: string;
   currentTabSetter: any;
   setSelectedInnerTab: any;
+  setSelectedInnerTabID: any;
+  currentUser: User & {
+    servers: Server[];
+    memberships: Server_Member[];
+    adminships: Server_Admin[];
+  };
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
+  const { currentUser } = props;
+
+  const getServer = api.server.getServerByID;
+
+  const currentUsersServersOwner = currentUser?.servers;
+  // const currentUsersServersAdmin = currentUser?.adminships.map((server) => {
+  //   getServer.useQuery(server.id);
+  // });
+  // const currentUsersServersMember = currentUser?.memberships;
+  // console.log(currentUser?.adminships);
+  // console.log(currentUsersServersAdmin);
+
   return (
     <aside className="stopIT fixed h-screen w-20 bg-zinc-700 dark:bg-zinc-900">
-      <div className="mb-4 flex justify-center border-b-2 border-zinc-400 py-4 dark:border-zinc-600">
+      <div className="flex justify-center border-b-2 border-zinc-400 py-4 dark:border-zinc-600">
         <Tooltip
           content={"Direct Messaging"}
           trigger="hover"
@@ -52,9 +73,50 @@ const SideNav = (props: {
           </button>
         </Tooltip>
       </div>
-      <div id="joined-server-list"></div>
+      <div id="joined-server-list">
+        <div id="users-owned-servers">
+          <div className="flex flex-col items-center border-b-2 border-zinc-400 py-2 dark:border-zinc-600">
+            {currentUsersServersOwner.map((server: Server) => (
+              <div className="py-2">
+                <Tooltip
+                  content={server.name}
+                  trigger="hover"
+                  color={"secondary"}
+                  placement="rightEnd"
+                >
+                  <button
+                    className=""
+                    onClick={() => {
+                      props.setSelectedInnerTab(server.name);
+                      props.setSelectedInnerTabID(server.id);
+                      props.currentTabSetter("server");
+                    }}
+                  >
+                    {server.logo_url ? (
+                      <div className="shaker">
+                        <Image
+                          src={server.logo_url}
+                          alt={""}
+                          width={56}
+                          height={56}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`${raleway.className} borderRadiusTransform shaker flex h-[56px] w-[56px] items-center justify-center rounded-2xl bg-zinc-300 p-2 text-2xl text-violet-500 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:text-violet-900 dark:hover:bg-zinc-700 dark:active:bg-zinc-800`}
+                      >
+                        {server.name.charAt(0)}
+                      </div>
+                    )}
+                  </button>
+                </Tooltip>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <div id="server-utilities">
-        <div className="mb-4 flex justify-center">
+        <div className="my-4 flex justify-center">
           <Tooltip
             content={"Add a Server!"}
             trigger="hover"
