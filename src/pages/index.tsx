@@ -20,12 +20,10 @@ const inter = Inter({ subsets: ["latin"] });
 const Home = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const switchRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
 
   useEffect(() => {
     document.getElementById("html")?.classList.remove("scollDisabled");
-    setLoading(true);
   }, []);
 
   if (status === "loading") {

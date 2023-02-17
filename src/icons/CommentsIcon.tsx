@@ -4,6 +4,7 @@ function CommentsIcon(props: {
   height: string | number | undefined;
   width: string | number | undefined;
   color: string | undefined;
+  strokeWidth: number | 0.5;
 }) {
   return (
     <div>
@@ -11,7 +12,7 @@ function CommentsIcon(props: {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        strokeWidth={0.5}
+        strokeWidth={props.strokeWidth}
         stroke={props.color}
         height={props.height}
         width={props.width}

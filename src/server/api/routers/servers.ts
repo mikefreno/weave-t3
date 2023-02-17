@@ -46,9 +46,9 @@ export const serverRouter = createTRPCRouter({
     const user = await ctx.prisma.user.findFirst({
       where: { id: ctx.session.user.id },
       include: {
-        servers: true,
-        adminships: { include: { Server: true } },
-        memberships: { include: { Server: true } },
+        servers: { include: { channels: true } },
+        adminships: { include: { Server: { include: { channels: true } } } },
+        memberships: { include: { Server: { include: { channels: true } } } },
       },
     });
     let allServers: Server[] = [];

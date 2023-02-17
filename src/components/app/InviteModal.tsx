@@ -7,13 +7,13 @@ import { api } from "@/src/utils/api";
 
 const InviteModal = (props: {
   isDarkTheme: boolean;
-  setInviteModalShowing: any;
+  inviteModalToggle: any;
   selectedInnerTabID: number;
   selectedInnerTab: string;
 }) => {
   const {
     isDarkTheme,
-    setInviteModalShowing,
+    inviteModalToggle,
     selectedInnerTabID,
     selectedInnerTab,
   } = props;
@@ -65,7 +65,7 @@ const InviteModal = (props: {
             <button
               className="right-4 w-10"
               onClick={() => {
-                setInviteModalShowing(false);
+                inviteModalToggle();
               }}
             >
               <Xmark className="text-zinc-800 dark:text-zinc-200" />

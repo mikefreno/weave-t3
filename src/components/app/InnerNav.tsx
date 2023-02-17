@@ -15,6 +15,7 @@ import { Input, Tooltip } from "@nextui-org/react";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import React, { RefObject, useContext, useEffect, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
+import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
 
 const InnerNav = (props: {
@@ -23,6 +24,7 @@ const InnerNav = (props: {
   dmModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   selectedInnerTab: string;
   setSelectedInnerTab: any;
+  usersServers: Server[];
   selectedInnerTabID: number;
   currentUser: User & {
     servers: Server[];
@@ -36,12 +38,19 @@ const InnerNav = (props: {
     setSelectedInnerTab,
     currentUser,
     selectedInnerTabID,
+    usersServers,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
 
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
+  const [createChannelModalShowing, setCreateChannelModalShowing] =
+    useState(false);
+
+  const thisServer = usersServers.find(
+    (server) => server.id === props.selectedInnerTabID
+  );
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -49,6 +58,9 @@ const InnerNav = (props: {
   };
   const inviteModalToggle = () => {
     setInviteModalShowing(!inviteModalShowing);
+  };
+  const createChannelToggle = () => {
+    setCreateChannelModalShowing(!createChannelModalShowing);
   };
 
   if (currentTab == "DMS") {
@@ -313,7 +325,7 @@ const InnerNav = (props: {
         </button>
       </div>
     );
-  } else {
+  } else if (currentTab == "server") {
     return (
       <div className="fixed h-screen w-52 border-r border-l border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
         <div className="justify-left flex pl-4 pt-4 text-xl font-bold">
@@ -323,7 +335,21 @@ const InnerNav = (props: {
           {/* if user is owner or admin  */}
           <div>Server Settings</div>
           {/* end */}
-          <div>Channel List</div>
+          <div>
+            Channel List
+            <div>
+              Create Channel
+              <button onClick={createChannelToggle}>
+                <AddIcon
+                  height={16}
+                  width={16}
+                  stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                  strokeWidth={2}
+                />
+              </button>
+            </div>
+          </div>
+
           {/* depends on server settings */}
           <button className="flex" onClick={inviteModalToggle}>
             Invite Someone
@@ -340,13 +366,21 @@ const InnerNav = (props: {
         {inviteModalShowing ? (
           <InviteModal
             isDarkTheme={isDarkTheme}
-            setInviteModalShowing={setInviteModalShowing}
+            inviteModalToggle={inviteModalToggle}
             selectedInnerTabID={selectedInnerTabID}
             selectedInnerTab={selectedInnerTab}
           />
         ) : null}
+        {createChannelModalShowing ? (
+          <CreateChannelModal
+            isDarkTheme={isDarkTheme}
+            createChannelToggle={createChannelToggle}
+          />
+        ) : null}
       </div>
     );
+  } else {
+    return <></>;
   }
 };
 

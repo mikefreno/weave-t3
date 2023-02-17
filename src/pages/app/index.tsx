@@ -16,6 +16,7 @@ import { useSession } from "next-auth/react";
 import { api } from "@/src/utils/api";
 import LoadingElement from "@/src/components/loading";
 import router from "next/router";
+import ServerMainScreen from "@/src/components/app/SeverMainScreen";
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -152,6 +153,7 @@ const index = () => {
             setSelectedInnerTab={setSelectedInnerTab}
             currentUser={currentUser}
             selectedInnerTabID={selectedInnerTabID}
+            usersServers={usersServers}
           />
           <InnerNavOverlay
             setSelectedInnerTab={setSelectedInnerTab}
@@ -182,6 +184,12 @@ const index = () => {
             <div className="">
               <PublicServersPages selectedInnerTab={selectedInnerTab} />
             </div>
+          ) : null}
+          {currentTab === "server" && usersServers ? (
+            <ServerMainScreen
+              usersServers={usersServers}
+              selectedInnerTabID={selectedInnerTabID}
+            />
           ) : null}
         </div>
       </div>
