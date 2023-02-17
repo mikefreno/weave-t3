@@ -1,5 +1,5 @@
 import { Button, Input, Loading } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { MutableRefObject, useRef, useState } from "react";
 import SendIcon from "@/src/icons/SendIcon";
 import QRCode from "react-qr-code";
 import Xmark from "@/src/icons/Xmark";
@@ -9,24 +9,38 @@ const InviteModal = (props: {
   isDarkTheme: boolean;
   setInviteModalShowing: any;
   selectedInnerTabID: number;
+  selectedInnerTab: string;
 }) => {
-  const { isDarkTheme, setInviteModalShowing, selectedInnerTabID } = props;
+  const {
+    isDarkTheme,
+    setInviteModalShowing,
+    selectedInnerTabID,
+    selectedInnerTab,
+  } = props;
   const [iconClass, setIconClass] = useState("");
   const [emailSendLoading, setEmailSendLoading] = useState(false);
   const [emailSendReport, setEmailSendReport] = useState("");
   const [QRCodeShowing, setQRCodeShowing] = useState(false);
   const [QRCodeValue, setQRCodeValue] = useState("");
   const [showingGenericCode, setShowingGenericCode] = useState(false);
-  let inviteMutaion = api.server.createJWTInvite.useMutation({});
+  const invitee =
+    useRef<HTMLInputElement>() as MutableRefObject<HTMLInputElement>;
+  const createJWTInvite =
+    api.server.createJWTInvite.useQuery(selectedInnerTabID);
+  const sendServerInvite = api.server.sendServerInvite.useMutation({});
 
   const sendEmail = async () => {
-    setEmailSendLoading(true);
-    await inviteMutaion.mutateAsync(selectedInnerTabID);
-
-    setTimeout(() => {
+    if (invitee.current.value.length >= 3) {
+      setIconClass("move-fade");
+      setEmailSendLoading(true);
+      sendServerInvite.mutateAsync({
+        invitee: invitee.current.value,
+        token: createJWTInvite.data,
+        serverName: selectedInnerTab,
+      });
       setEmailSendLoading(false);
       setEmailSendReport("Email Sent!");
-    }, 1000);
+    }
   };
 
   const showCode = async () => {
@@ -34,6 +48,9 @@ const InviteModal = (props: {
   };
 
   const generateQRCode = async () => {
+    setQRCodeValue(
+      `localhost:3000/api/joinServer?token=${createJWTInvite.data}`
+    );
     setQRCodeShowing(!QRCodeShowing);
   };
 
@@ -59,14 +76,16 @@ const InviteModal = (props: {
             <div className="mt-6 flex justify-center">
               <div className="my-auto mx-4">Send by email</div>
               <Input
+                id="invitee-input"
+                ref={invitee}
                 labelPlaceholder="Enter an email..."
                 contentClickable
                 underlined
+                type={"email"}
                 contentRight={
                   <button
                     className="absolute cursor-pointer rounded-full"
                     onClick={() => {
-                      setIconClass("move-fade");
                       sendEmail();
                     }}
                   >
@@ -131,7 +150,7 @@ const InviteModal = (props: {
                         style={{
                           height: "auto",
                         }}
-                        value={"192.168.0.55:3000/login"}
+                        value={QRCodeValue}
                       />
                     </div>
                   ) : null}

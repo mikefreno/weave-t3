@@ -27,6 +27,7 @@ const SideNav = (props: {
   currentTabSetter: any;
   setSelectedInnerTab: any;
   setSelectedInnerTabID: any;
+  usersServers: Server[] | undefined;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -35,17 +36,7 @@ const SideNav = (props: {
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
-  const { currentUser } = props;
-
-  const getServer = api.server.getServerByID;
-
-  const currentUsersServersOwner = currentUser?.servers;
-  // const currentUsersServersAdmin = currentUser?.adminships.map((server) => {
-  //   getServer.useQuery(server.id);
-  // });
-  // const currentUsersServersMember = currentUser?.memberships;
-  // console.log(currentUser?.adminships);
-  // console.log(currentUsersServersAdmin);
+  const { currentUser, usersServers } = props;
 
   return (
     <aside className="stopIT fixed h-screen w-20 bg-zinc-700 dark:bg-zinc-900">
@@ -76,7 +67,7 @@ const SideNav = (props: {
       <div id="joined-server-list">
         <div id="users-owned-servers">
           <div className="flex flex-col items-center border-b-2 border-zinc-400 py-2 dark:border-zinc-600">
-            {currentUsersServersOwner.map((server: Server) => (
+            {usersServers?.map((server: Server) => (
               <div className="py-2">
                 <Tooltip
                   content={server.name}

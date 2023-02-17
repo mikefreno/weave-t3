@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import jwt from "jsonwebtoken";
-import SibApiV3Sdk from "@sendinblue/client";
+import { Server } from "@prisma/client";
 
 export const serverRouter = createTRPCRouter({
   createServer: protectedProcedure
@@ -42,26 +42,32 @@ export const serverRouter = createTRPCRouter({
         },
       });
     }),
-  getAllServers: publicProcedure.query(async ({ ctx }) => {
-    try {
-      return await ctx.prisma.server.findMany({
-        select: {
-          name: true,
-          blurb: true,
-          logo_url: true,
-          banner_url: true,
-          category: true,
-        },
-        orderBy: { id: "asc" },
-      });
-    } catch (error) {
-      console.log("error", error);
+  getAllCurrentUserServers: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.prisma.user.findFirst({
+      where: { id: ctx.session.user.id },
+      include: {
+        servers: true,
+        adminships: { include: { Server: true } },
+        memberships: { include: { Server: true } },
+      },
+    });
+    let allServers: Server[] = [];
+    if (user !== null) {
+      const adminServers = user.adminships.map((adminship) => adminship.Server);
+      const memberServers = user.memberships.map(
+        (membership) => membership.Server
+      );
+      const servers = [
+        ...new Set([...adminServers, ...memberServers, ...user.servers]),
+      ];
+      allServers.push(...servers);
+      return allServers;
     }
   }),
   getServerByID: publicProcedure
     .input(z.number())
     .query(async ({ input, ctx }) => {
-      return await ctx.prisma.server.findFirst({
+      const server = await ctx.prisma.server.findFirst({
         where: {
           id: input,
         },
@@ -69,45 +75,17 @@ export const serverRouter = createTRPCRouter({
     }),
   createJWTInvite: protectedProcedure
     .input(z.number())
-    .mutation(async ({ input, ctx }) => {
+    .query(async ({ input, ctx }) => {
       const userID = ctx.session.user.id;
-      const user = await ctx.prisma.user.findFirst({
-        where: {
-          id: userID,
+      const SK = process.env.JWT_SECRET!;
+      const token = jwt.sign(
+        {
+          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+          data: { server: input, inviter: userID },
         },
-        include: {
-          servers: true,
-          adminships: true,
-          memberships: true,
-        },
-      });
-      if (user == null) {
-        return;
-      } else {
-        const expiry = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // 24 hours from now
-        const payload = {
-          input,
-          exp: expiry,
-        };
-        const SK = process.env.JWT_SECRET;
-        const token = jwt.sign(payload, SK!);
-
-        user.servers.map((server) => {
-          if (server.id === input) {
-            return { token };
-          }
-        });
-        user.adminships.map((admin) => {
-          if (admin.ServerId === input) {
-            return { token };
-          }
-        });
-        user.memberships.map((membership) => {
-          if (membership.ServerId === input) {
-            return { token };
-          }
-        });
-      }
+        SK
+      );
+      return token;
     }),
   sendServerInvite: protectedProcedure
     .input(
@@ -117,14 +95,15 @@ export const serverRouter = createTRPCRouter({
         token: z.string(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const apiInstance = new SibApiV3Sdk.AccountApi();
-      apiInstance.setApiKey(
-        SibApiV3Sdk.AccountApiApiKeys.apiKey,
-        process.env.SENDINBLUE_KEY!
-      );
+    .mutation(async ({ input }) => {
+      const SibApiV3Sdk = require("sib-api-v3-typescript");
 
-      const sendSmtpEmail = {
+      let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+      let apiKey = apiInstance.authentications["apiKey"];
+      apiKey.apiKey = process.env.SENDINBLUE_KEY;
+
+      apiInstance.sendTransacEmail({
         to: [
           {
             email: input.invitee,
@@ -135,7 +114,6 @@ export const serverRouter = createTRPCRouter({
           TOKEN: input.token,
         },
         templateId: 7,
-      };
+      });
     }),
-  // checkServerInvite: protectedProcedure
 });

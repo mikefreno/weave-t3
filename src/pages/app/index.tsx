@@ -13,7 +13,6 @@ import DMPages from "@/src/components/app/DMPages";
 import InnerNavOverlay from "@/src/components/app/InnerNavOverlay";
 import AccountPage from "@/src/components/app/AccountPage";
 import { useSession } from "next-auth/react";
-import { Loading } from "@nextui-org/react";
 import { api } from "@/src/utils/api";
 import LoadingElement from "@/src/components/loading";
 import router from "next/router";
@@ -25,10 +24,11 @@ const index = () => {
   const { data: session, status } = useSession();
   const [microphoneState, setMicrophoneState] = useState(false);
   const [audioState, setAudioState] = useState(true);
-  const currentUser = api.users.getCurrentUser.useQuery().data;
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("");
   const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
+  const [direcMessageModalShowing, setDirecMessageModalShowing] =
+    useState(false);
 
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
@@ -36,13 +36,13 @@ const index = () => {
   const serverButtonRef = useRef<HTMLButtonElement>(null);
   const botModalRef = useRef<HTMLDivElement>(null);
   const botButtonRef = useRef<HTMLButtonElement>(null);
-
-  const [direcMessageModalShowing, setDirecMessageModalShowing] =
-    useState(false);
+  const scrollableRef = useRef<HTMLDivElement>(null);
   const directMessageButtonRef = useRef<HTMLButtonElement>(null);
   const directMessageModalRef = useRef<HTMLDivElement>(null);
 
-  const scrollableRef = useRef<HTMLDivElement>(null);
+  const currentUser = api.users.getCurrentUser.useQuery().data;
+
+  const usersServers = api.server.getAllCurrentUserServers.useQuery().data;
 
   useEffect(() => {
     if (scrollableRef.current) {
@@ -140,6 +140,7 @@ const index = () => {
             setSelectedInnerTab={setSelectedInnerTab}
             currentUser={currentUser}
             setSelectedInnerTabID={setSelectedInnerTabID}
+            usersServers={usersServers}
           />
         </div>
         <div id="inner-nav" className="w-52">

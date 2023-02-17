@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en" id="html">
       <Head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/path/to/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </Head>
       <body className="transition-all duration-500">
         <Main />

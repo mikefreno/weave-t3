@@ -41,40 +41,7 @@ const InnerNav = (props: {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
 
-  const currentUsersServersOwner = currentUser?.servers;
-  const currentUsersServersAdmin = currentUser?.adminships;
-  const currentUsersServersMember = currentUser?.memberships;
-  const [joinedServerList, setJoinedServerList] = useState<number[]>([]);
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
-
-  useEffect(() => {
-    const joinedServers = [...joinedServerList];
-    currentUsersServersOwner.forEach((server) => {
-      if (!joinedServers.includes(server.id)) {
-        joinedServers.push(server.id);
-      }
-    });
-    currentUsersServersAdmin.forEach((server) => {
-      if (!joinedServers.includes(server.id)) {
-        joinedServers.push(server.id);
-      }
-    });
-    currentUsersServersMember.forEach((server) => {
-      if (!joinedServers.includes(server.id)) {
-        joinedServers.push(server.id);
-      }
-    });
-    setJoinedServerList(joinedServers);
-  }, [
-    currentUsersServersOwner,
-    currentUsersServersAdmin,
-    currentUsersServersMember,
-  ]);
-
-  useEffect(() => {
-    if (currentTab === "server") {
-    }
-  }, [joinedServerList]);
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -375,6 +342,7 @@ const InnerNav = (props: {
             isDarkTheme={isDarkTheme}
             setInviteModalShowing={setInviteModalShowing}
             selectedInnerTabID={selectedInnerTabID}
+            selectedInnerTab={selectedInnerTab}
           />
         ) : null}
       </div>
