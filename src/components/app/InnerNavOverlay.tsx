@@ -2,6 +2,8 @@ import HeadphonesIcon from "@/src/icons/HeadphonesIcon";
 import HeadphoneSlashIcon from "@/src/icons/HeadphoneSlashIcon";
 import MicIcon from "@/src/icons/MicIcon";
 import MicSlashIcon from "@/src/icons/MicSlashIcon";
+import SpeakerOff from "@/src/icons/SpeakerOff";
+import SpeakerOn from "@/src/icons/SpeakerOn";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
@@ -65,16 +67,18 @@ const InnerNavOverlay = (props: {
         <div className="flex w-12 justify-between pr-2">
           <button onClick={props.audioToggle}>
             {props.audioState ? (
-              <HeadphonesIcon
+              <SpeakerOn
                 height={16}
                 width={16}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                strokeWidth={1.5}
               />
             ) : (
-              <HeadphoneSlashIcon
+              <SpeakerOff
                 height={16}
                 width={16}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                strokeWidth={1.5}
               />
             )}
           </button>

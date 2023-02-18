@@ -34,6 +34,7 @@ const index = () => {
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
   const serverSelectModalRef = useRef<HTMLDivElement>(null);
+
   const serverButtonRef = useRef<HTMLButtonElement>(null);
   const botModalRef = useRef<HTMLDivElement>(null);
   const botButtonRef = useRef<HTMLButtonElement>(null);

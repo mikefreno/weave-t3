@@ -7,16 +7,43 @@ import ClockIcon from "@/src/icons/ClockIcon";
 import FlameIcon from "@/src/icons/FlameIcon";
 import GamepadIcon from "@/src/icons/GamepadIcon";
 import HandWave from "@/src/icons/HandWave";
+import HeadphonesIcon from "@/src/icons/HeadphonesIcon";
+import MicIcon from "@/src/icons/MicIcon";
 import PaperPlanes from "@/src/icons/PaperPlanes";
 import SearchIcon from "@/src/icons/SearchIcon";
+import SettingsIcon from "@/src/icons/SettingsIcon";
 import VerifiedIcon from "@/src/icons/VerifiedIcon";
 import VinylIcon from "@/src/icons/VinylIcon";
+import useOnClickOutside from "@/weave-t3/src/components/ClickOutsideHook";
+import CommentsIcon from "@/weave-t3/src/icons/CommentsIcon";
 import { Input, Tooltip } from "@nextui-org/react";
-import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
-import React, { RefObject, useContext, useEffect, useState } from "react";
+import {
+  Server_Admin,
+  Server_Channel,
+  Server_Member,
+  User,
+} from "@prisma/client";
+import React, {
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import ThemeContext from "../ThemeContextProvider";
 import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
+
+type Server = {
+  id: number;
+  name: string;
+  blurb: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
+  ownerId: string;
+  category: string | null;
+  channels: Server_Channel[];
+};
 
 const InnerNav = (props: {
   currentTab: string;
@@ -26,6 +53,7 @@ const InnerNav = (props: {
   setSelectedInnerTab: any;
   usersServers: Server[];
   selectedInnerTabID: number;
+
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -47,6 +75,19 @@ const InnerNav = (props: {
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
   const [createChannelModalShowing, setCreateChannelModalShowing] =
     useState(false);
+
+  const inviteModalButtonRef = useRef<HTMLButtonElement>(null);
+  const inviteModalRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside([inviteModalRef, inviteModalButtonRef], () => {
+    setInviteModalShowing(false);
+  });
+  const createChannelButtonRef = useRef<HTMLButtonElement>(null);
+  const createChannelRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
+    setCreateChannelModalShowing(false);
+  });
 
   const thisServer = usersServers.find(
     (server) => server.id === props.selectedInnerTabID
@@ -327,41 +368,84 @@ const InnerNav = (props: {
     );
   } else if (currentTab == "server") {
     return (
-      <div className="fixed h-screen w-52 border-r border-l border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
-        <div className="justify-left flex pl-4 pt-4 text-xl font-bold">
-          {selectedInnerTab}
-        </div>
-        <div className="p-4">
-          {/* if user is owner or admin  */}
-          <div>Server Settings</div>
-          {/* end */}
-          <div>
-            Channel List
+      <div>
+        <div className="fixed h-screen w-52 border-r border-l border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
+          <div className="justify-left flex pl-4 pt-4 text-xl font-bold">
+            {selectedInnerTab}
+          </div>
+          <div className="p-4">
+            {/* if user is owner or admin  */}
+            <button className="logoSpinner ">
+              <SettingsIcon
+                height={24}
+                width={24}
+                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                strokeWidth={1}
+              />
+            </button>
+            {/* end */}
             <div>
-              Create Channel
-              <button onClick={createChannelToggle}>
+              <div>
+                {thisServer?.channels.map((channel) => (
+                  <div className="my-2">
+                    <button className="flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700">
+                      {channel.type == "voice" ? (
+                        <span className="my-auto">
+                          <HeadphonesIcon
+                            height={24}
+                            width={24}
+                            color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                          />
+                        </span>
+                      ) : (
+                        <span className="my-auto">
+                          <CommentsIcon
+                            height={24}
+                            width={24}
+                            strokeWidth={0.5}
+                            color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                          />
+                        </span>
+                      )}
+                      <div className="my-auto ml-4">{channel.name}</div>
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  onClick={createChannelToggle}
+                  className="flex underline-offset-2 hover:underline"
+                  ref={createChannelButtonRef}
+                >
+                  <div>Create Channel</div>
+                  <div className="my-auto">
+                    <AddIcon
+                      height={16}
+                      width={16}
+                      stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                      strokeWidth={2}
+                    />
+                  </div>
+                </button>
+              </div>
+            </div>
+            {/* depends on server settings */}
+            <button
+              className="flex underline-offset-2 hover:underline"
+              onClick={inviteModalToggle}
+              ref={inviteModalButtonRef}
+            >
+              <div>Invite Someone</div>
+              <span className="my-auto">
                 <AddIcon
                   height={16}
                   width={16}
                   stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
                   strokeWidth={2}
                 />
-              </button>
-            </div>
+              </span>
+            </button>
           </div>
-
-          {/* depends on server settings */}
-          <button className="flex" onClick={inviteModalToggle}>
-            Invite Someone
-            <span className="my-auto">
-              <AddIcon
-                height={16}
-                width={16}
-                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                strokeWidth={2}
-              />
-            </span>
-          </button>
         </div>
         {inviteModalShowing ? (
           <InviteModal
@@ -369,12 +453,15 @@ const InnerNav = (props: {
             inviteModalToggle={inviteModalToggle}
             selectedInnerTabID={selectedInnerTabID}
             selectedInnerTab={selectedInnerTab}
+            inviteModalRef={inviteModalRef}
           />
         ) : null}
         {createChannelModalShowing ? (
           <CreateChannelModal
             isDarkTheme={isDarkTheme}
             createChannelToggle={createChannelToggle}
+            selectedInnerTabID={selectedInnerTabID}
+            createChannelRef={createChannelRef}
           />
         ) : null}
       </div>

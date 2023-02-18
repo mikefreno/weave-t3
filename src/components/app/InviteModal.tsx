@@ -1,5 +1,5 @@
 import { Button, Input, Loading } from "@nextui-org/react";
-import React, { MutableRefObject, useRef, useState } from "react";
+import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import SendIcon from "@/src/icons/SendIcon";
 import QRCode from "react-qr-code";
 import Xmark from "@/src/icons/Xmark";
@@ -10,12 +10,14 @@ const InviteModal = (props: {
   inviteModalToggle: any;
   selectedInnerTabID: number;
   selectedInnerTab: string;
+  inviteModalRef: RefObject<HTMLDivElement>;
 }) => {
   const {
     isDarkTheme,
     inviteModalToggle,
     selectedInnerTabID,
     selectedInnerTab,
+    inviteModalRef,
   } = props;
   const [iconClass, setIconClass] = useState("");
   const [emailSendLoading, setEmailSendLoading] = useState(false);
@@ -35,7 +37,7 @@ const InviteModal = (props: {
       setEmailSendLoading(true);
       sendServerInvite.mutateAsync({
         invitee: invitee.current.value,
-        token: createJWTInvite.data,
+        token: createJWTInvite.data as string,
         serverName: selectedInnerTab,
       });
       setEmailSendLoading(false);
@@ -55,10 +57,10 @@ const InviteModal = (props: {
   };
 
   return (
-    <div id="modal" className="fixed">
-      <div className="absolute flex w-screen items-center justify-center">
+    <div className="fixed">
+      <div className="absolute mt-24 flex w-screen items-center justify-center">
         <div
-          id="serverModalContent"
+          ref={props.inviteModalRef}
           className="fade-in w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
         >
           <div className="">

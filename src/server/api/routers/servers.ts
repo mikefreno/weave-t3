@@ -116,4 +116,26 @@ export const serverRouter = createTRPCRouter({
         templateId: 7,
       });
     }),
+  createServerChannel: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        serverType: z.string(),
+        description: z.string().optional(),
+        serverID: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const channel = await ctx.prisma.server_Channel.create({
+        data: {
+          name: input.name,
+          description: input.description ? input.description : null,
+          ServerId: input.serverID,
+          type: input.serverType,
+        },
+      });
+      if (channel) {
+        return true;
+      }
+    }),
 });

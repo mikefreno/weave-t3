@@ -65,7 +65,7 @@ model Server {
   owner         User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   admin         Server_Admin[]    
   members       Server_Member[]
-  channels      Server_Channel[]
+  channels      Server_Channel[] 
 
   @@index([ownerId])
 }
@@ -98,25 +98,28 @@ model Server_Member {
 }
 
 model Server_Channel {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  Server   Server    @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ServerId Int
-  comments Comment[]
+  id            Int            @id @default(autoincrement())
+  name          String         
+  Server        Server         @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ServerId      Int
+  description   String?
+  comments      Comment[]
+  type          String
+
 
   @@index([ServerId])
 }
 
 model Comment {
-  id          Int            @id @default(autoincrement())
-  user        User           @relation(fields: [userId], references: [id])
+  id          Int               @id @default(autoincrement())
+  user        User              @relation(fields: [userId], references: [id])
   userId      String
   message     String
-  channel     Server_Channel @relation(fields: [channelName], references: [name], onDelete: Cascade)
-  channelName String
+  channel     Server_Channel    @relation(fields: [channelID], references: [id], onDelete: Cascade)
+  channelID   Int
 
   @@index([userId])
-  @@index([channelName])
+  @@index([channelID])
 }
 
 model Session {

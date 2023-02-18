@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* colors */
-/* #E2E2E2 */
-/* #171717 */
 .bgColorGradient {
   background: rgb(91, 33, 182);
   background: radial-gradient(
