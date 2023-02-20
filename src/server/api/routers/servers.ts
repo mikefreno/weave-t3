@@ -96,7 +96,7 @@ export const serverRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const SibApiV3Sdk = require("sib-api-v3-typescript");
+      var SibApiV3Sdk = require("sib-api-v3-sdk");
 
       let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 

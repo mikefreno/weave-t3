@@ -68,4 +68,11 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+  // userAccountPageMutaions: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       name: z.string(),
+  //     })
+  //   )
+  //   .mutation(),
 });
