@@ -61,7 +61,8 @@ model Server {
   logo_url      String?
   banner_url    String?
   ownerId       String
-  category      String?
+  category      String           @default("other")
+  type          String           @default("private")
   owner         User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   admin         Server_Admin[]    
   members       Server_Member[]

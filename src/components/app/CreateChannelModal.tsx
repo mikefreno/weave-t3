@@ -1,6 +1,5 @@
 import BackArrow from "@/src/icons/BackArrow";
 import CommentsIcon from "@/src/icons/CommentsIcon";
-import HeadphonesIcon from "@/src/icons/HeadphonesIcon";
 import MicIcon from "@/src/icons/MicIcon";
 import Xmark from "@/src/icons/Xmark";
 import { api } from "@/src/utils/api";
@@ -12,6 +11,7 @@ const CreateChannelModal = (props: {
   createChannelToggle: any;
   selectedInnerTabID: number;
   createChannelRef: RefObject<HTMLDivElement>;
+  refreshUserData;
 }) => {
   const { isDarkTheme, createChannelToggle, createChannelRef } = props;
   const [channelType, setChannelType] = useState("");
@@ -33,6 +33,7 @@ const CreateChannelModal = (props: {
     });
     if (res == true) {
       props.createChannelToggle();
+      await props.refreshUserData();
       setCreateButtonLoading(false);
     }
   };
@@ -88,7 +89,7 @@ const CreateChannelModal = (props: {
           >
             <div className="my-12 flex justify-center">
               <Input
-                labelPlaceholder="Server Name..."
+                labelPlaceholder="Channel Name..."
                 size="lg"
                 required
                 ref={channelNameRef}
@@ -135,12 +136,6 @@ const CreateChannelModal = (props: {
         <>
           <div>
             <div className="text-center text-xl">Finish Setup</div>
-            {/* <div className="flex justify-center">
-              <div className="">Set to a category</div>
-              <select>
-                
-              </select>
-            </div> */}
             <div className="text-center">
               Give it a subtitile or short description
             </div>
@@ -160,7 +155,7 @@ const CreateChannelModal = (props: {
                 )}
               </div>
             </form>
-            <div className="flex items-end">
+            <div className="-mt-12 flex items-end">
               <Button
                 auto
                 color={"secondary"}

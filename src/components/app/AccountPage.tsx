@@ -1,7 +1,6 @@
 import PencilIcon from "@/src/icons/PencilIcon";
-import React, { useState, useRef, useEffect } from "react";
-import { Button, Input, Radio, Tooltip } from "@nextui-org/react";
-import { useRouter } from "next/router";
+import React, { useState, useRef } from "react";
+import { Button, Input, Loading, Radio, Tooltip } from "@nextui-org/react";
 import { api } from "../../utils/api";
 import axios from "axios";
 import { User } from "@prisma/client";
@@ -22,7 +21,6 @@ const resizeFile = (file: File, extension: string) =>
       "file"
     );
   });
-
 async function uploadPicturesToS3(
   id: string,
   type: string,
@@ -42,7 +40,7 @@ async function uploadPicturesToS3(
   });
   return key;
 }
-const AccountPage = (props: { currentUser: User }) => {
+const AccountPage = () => {
   const [settingsSelction, setSettingsSelction] = useState("User");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [realNameImage, setRealNameImage] = useState<File | null>(null);
@@ -60,12 +58,16 @@ const AccountPage = (props: { currentUser: User }) => {
   const psuedonym = useRef<HTMLInputElement>(null);
   const nameMutation = api.users.setUserName.useMutation();
   const psuedonymMutation = api.users.setUserPsuedonym.useMutation();
-
-  const { currentUser } = props;
-  const { query } = useRouter();
+  const [realNameSetLoading, setRealNameSetLoading] = useState(false);
+  const [psuedonymSetLoading, setPsuedonymSetLoading] = useState(false);
+  const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
+  const currentUser = api.users.getCurrentUser.useQuery();
 
   const imageMutation = api.users.setUserImage.useMutation();
   const psuedonymImageMutation = api.users.setUserPsuedonymImage.useMutation();
+
+  const deleteUser = api.users.deleteUser.useMutation();
+  const [timestamp, setTimestamp] = useState(Date.now());
 
   const handleFileInput = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -97,37 +99,63 @@ const AccountPage = (props: { currentUser: User }) => {
       }
     }
   };
-  const setPsuedonym = () => {
+  const setPsuedonym = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setPsuedonymSetLoading(true);
     if (psuedonym.current !== null) {
-      psuedonymMutation.mutate(psuedonym.current.value);
+      await psuedonymMutation.mutateAsync(psuedonym.current.value);
+      await currentUser.refetch();
+      psuedonym.current.value = "";
+      setPsuedonymSetLoading(false);
     }
   };
-  const setRealName = () => {
+  const setRealName = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setRealNameSetLoading(true);
     if (realName.current !== null) {
-      nameMutation.mutate(realName.current.value);
+      await nameMutation.mutateAsync(realName.current.value);
+      await currentUser.refetch();
+      realName.current.value = "";
+      setRealNameSetLoading(false);
     }
   };
 
   const updateRealNameImage = async () => {
+    setImageConfirmLoading(true);
     const type = "image";
-    const ext = realNamePictureExt;
-    const id = currentUser.id;
-    const key = await uploadPicturesToS3(id, type, ext, realNameImage);
-    imageMutation.mutate(key);
+    const ext = realNamePictureExt as string;
+    const id = currentUser.data?.id as string;
+    const key = await uploadPicturesToS3(id, type, ext, realNameImage as File);
+    if (currentUser.data?.image == null) {
+      await imageMutation.mutateAsync(key);
+      await currentUser.refetch();
+    }
+    setTimestamp(Date.now());
     setRealNameImageHolder(null);
     setRealNameImage(null);
     fileInputRef.current!.value = "";
+    setImageConfirmLoading(false);
   };
 
   const updatePsuedonymImage = async () => {
+    setImageConfirmLoading(true);
     const type = "psuedonym_image";
-    const ext = psuedonymPictureExt;
-    const id = currentUser.id;
-    const key = await uploadPicturesToS3(id, type, ext, psuedonymImage);
-    psuedonymImageMutation.mutate(key);
+    const ext = psuedonymPictureExt as string;
+    const id = currentUser.data?.id as string;
+    const key = await uploadPicturesToS3(id, type, ext, psuedonymImage as File);
+    if (currentUser.data?.psuedonym_image == null) {
+      await psuedonymImageMutation.mutateAsync(key);
+      await currentUser.refetch();
+    }
+    setTimestamp(Date.now());
     setPsuedonymImageHolder(null);
     setPsuedonymImage(null);
     fileInputRef.current!.value = "";
+    setImageConfirmLoading(false);
+  };
+
+  const deleteAccount = () => {
+    deleteUser.mutate();
   };
 
   const changeRealNameUsage = () => {};
@@ -138,7 +166,7 @@ const AccountPage = (props: { currentUser: User }) => {
       return (
         <>
           <div className="my-4">
-            <div className="mt-4 underline">{currentUser.email}</div>
+            <div className="my-4 underline">{currentUser.data?.email}</div>
             {realNameImageHolder !== null || psuedonymImageHolder !== null ? (
               <div className="absolute z-10 mx-auto ml-36 rounded-lg bg-zinc-200 px-12 py-2 shadow-lg">
                 <img
@@ -154,17 +182,23 @@ const AccountPage = (props: { currentUser: User }) => {
                   {realNameImageHolder !== null ? "Real Name" : "Psuedonym"}?
                 </div>
                 <div className="-mx-6 flex justify-around py-4">
-                  <Button
-                    onClick={
-                      realNameImageHolder !== null
-                        ? updateRealNameImage
-                        : updatePsuedonymImage
-                    }
-                    color={"primary"}
-                    auto
-                  >
-                    Confirm
-                  </Button>
+                  {imageConfirmLoading ? (
+                    <Button disabled auto bordered>
+                      <Loading type="points" size="sm" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={
+                        realNameImageHolder !== null
+                          ? updateRealNameImage
+                          : updatePsuedonymImage
+                      }
+                      color={"primary"}
+                      auto
+                    >
+                      Confirm
+                    </Button>
+                  )}
                   <Button
                     onClick={() => {
                       setRealNameImageHolder(null);
@@ -184,7 +218,7 @@ const AccountPage = (props: { currentUser: User }) => {
             <div className="flex justify-evenly">
               <div>
                 <img
-                  src={currentUser.image as string}
+                  src={`${currentUser.data?.image}?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -206,7 +240,7 @@ const AccountPage = (props: { currentUser: User }) => {
               </div>
               <div>
                 <img
-                  src={currentUser.psuedonym_image as string}
+                  src={`${currentUser.data?.psuedonym_image}?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -237,51 +271,62 @@ const AccountPage = (props: { currentUser: User }) => {
                 </div>
                 <div className="mt-4 flex justify-center">
                   <div className="my-4 mx-4 flex flex-col">
-                    <span className="mb-4 w-48">
-                      <Input labelPlaceholder="Real Name" ref={realName} />
-                    </span>
-                    <div className="flex flex-row">
-                      <div className="w-4">
-                        <Button shadow auto onClick={setRealName}>
-                          Set
-                        </Button>
+                    <form onSubmit={setRealName}>
+                      <div className="mb-4 w-48">
+                        <Input labelPlaceholder="Real Name" ref={realName} />
                       </div>
-                      <div className="ml-16">
-                        Currently:
-                        {currentUser.name ? (
-                          <div>{currentUser.name}</div>
-                        ) : (
-                          <div className="w-24 break-words">None Set</div>
-                        )}
+                      <div className="flex flex-row">
+                        <div className="w-4">
+                          {realNameSetLoading ? (
+                            <Button disabled auto bordered>
+                              <Loading type="points" size="sm" />
+                            </Button>
+                          ) : (
+                            <Button shadow auto type="submit">
+                              Set
+                            </Button>
+                          )}
+                        </div>
+                        <div className="ml-16">
+                          Currently:
+                          {currentUser.data?.name ? (
+                            <div>{currentUser.data?.name}</div>
+                          ) : (
+                            <div className="w-24 break-words">None Set</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </form>
                   </div>
                   <div className="my-4 mx-4 flex flex-col">
-                    <span className="mb-4 w-48">
-                      <Input labelPlaceholder="Pseudonym" />
-                    </span>
-                    <div className="flex flex-row">
-                      <div className="w-4">
-                        <Button
-                          shadow
-                          auto
-                          onClick={setPsuedonym}
-                          ref={psuedonym}
-                        >
-                          Set
-                        </Button>
+                    <form onSubmit={setPsuedonym}>
+                      <div className="mb-4 w-48">
+                        <Input labelPlaceholder="Pseudonym" ref={psuedonym} />
                       </div>
-                      <div className="ml-16">
-                        Currently:
-                        {currentUser.psuedonym ? (
-                          <div className="w-24 break-words">
-                            {currentUser.psuedonym}
-                          </div>
-                        ) : (
-                          <div className="w-24 break-words">None Set</div>
-                        )}
+                      <div className="flex flex-row">
+                        <div className="w-4">
+                          {psuedonymSetLoading ? (
+                            <Button disabled auto bordered>
+                              <Loading type="points" size="sm" />
+                            </Button>
+                          ) : (
+                            <Button shadow auto type="submit">
+                              Set
+                            </Button>
+                          )}
+                        </div>
+                        <div className="ml-16">
+                          Currently:
+                          {currentUser.data?.psuedonym ? (
+                            <div className="w-24 break-words">
+                              {currentUser.data?.psuedonym}
+                            </div>
+                          ) : (
+                            <div className="w-24 break-words">None Set</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -299,7 +344,7 @@ const AccountPage = (props: { currentUser: User }) => {
           <Radio.Group
             label="Real Name Usage"
             size="sm"
-            defaultValue={currentUser.name_display_pref}
+            defaultValue={currentUser.data?.name_display_pref}
             onChange={changeRealNameUsage}
           >
             <Radio value="ask">
@@ -316,12 +361,12 @@ const AccountPage = (props: { currentUser: User }) => {
           <Radio.Group
             label="Name Preferance"
             size="sm"
-            defaultValue={currentUser.name_display_pref}
+            defaultValue={currentUser.data?.name_display_pref}
             onChange={changeNamePreferance}
           >
             <Tooltip content="No psuedonym is set" placement="top">
               <Radio
-                isDisabled={currentUser.psuedonym ? false : true}
+                isDisabled={currentUser.data?.psuedonym ? false : true}
                 value="psuedonym"
               >
                 Prefer Psuedonym
@@ -346,7 +391,11 @@ const AccountPage = (props: { currentUser: User }) => {
         <div>
           <hr />
           <div className="danger-zone-bg h-64 w-full rounded-lg  p-4">
-            <div className="text-3xl"></div>
+            <div className="text-3xl">
+              <Button color={"error"} onClick={deleteAccount}>
+                Delete Account
+              </Button>
+            </div>
           </div>
         </div>
       );

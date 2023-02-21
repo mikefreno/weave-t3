@@ -64,6 +64,7 @@ async function uploadPicturesToS3(
 
 const CreateServerModal = (props: {
   serverModalToggle: React.MouseEventHandler<HTMLButtonElement>;
+  serverModalRef: RefObject<HTMLDivElement>;
 }) => {
   const [logoImage, setLogoImage] = useState<File | Blob | null>(null);
   const [bannerImage, setBannerImage] = useState<File | Blob | null>(null);
@@ -152,6 +153,7 @@ const CreateServerModal = (props: {
         name: serverName,
         blurb: serverDescription ? serverDescription : undefined,
         category: serverType ? serverType : undefined,
+        type: serverPublic ? "public" : "private",
       });
     }
     setCreateButtonLoading(false);
@@ -194,6 +196,7 @@ const CreateServerModal = (props: {
       <div id="modal" className="fixed">
         <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
           <div
+            ref={props.serverModalRef}
             id="serverModalContent"
             className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
           >
@@ -300,6 +303,7 @@ const CreateServerModal = (props: {
       <div className="fixed">
         <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
           <div
+            ref={props.serverModalRef}
             id="serverModalContent"
             className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-12 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
           >
@@ -346,6 +350,7 @@ const CreateServerModal = (props: {
         <div className="fixed">
           <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
             <div
+              ref={props.serverModalRef}
               id="serverModalContent"
               className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
@@ -456,6 +461,7 @@ const CreateServerModal = (props: {
         <div className="fixed">
           <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
             <div
+              ref={props.serverModalRef}
               id="serverModalContent"
               className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
@@ -516,6 +522,7 @@ const CreateServerModal = (props: {
         <div className="fixed">
           <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
             <div
+              ref={props.serverModalRef}
               id="serverModalContent"
               className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
@@ -557,6 +564,7 @@ const CreateServerModal = (props: {
         <div className="fixed">
           <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
             <div
+              ref={props.serverModalRef}
               id="serverModalContent"
               className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >

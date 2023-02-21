@@ -8,14 +8,13 @@ import FlameIcon from "@/src/icons/FlameIcon";
 import GamepadIcon from "@/src/icons/GamepadIcon";
 import HandWave from "@/src/icons/HandWave";
 import HeadphonesIcon from "@/src/icons/HeadphonesIcon";
-import MicIcon from "@/src/icons/MicIcon";
 import PaperPlanes from "@/src/icons/PaperPlanes";
 import SearchIcon from "@/src/icons/SearchIcon";
 import SettingsIcon from "@/src/icons/SettingsIcon";
 import VerifiedIcon from "@/src/icons/VerifiedIcon";
 import VinylIcon from "@/src/icons/VinylIcon";
-import useOnClickOutside from "@/weave-t3/src/components/ClickOutsideHook";
-import CommentsIcon from "@/weave-t3/src/icons/CommentsIcon";
+import useOnClickOutside from "@/src/components/ClickOutsideHook";
+import CommentsIcon from "@/src/icons/CommentsIcon";
 import { Input, Tooltip } from "@nextui-org/react";
 import {
   Server_Admin,
@@ -23,13 +22,7 @@ import {
   Server_Member,
   User,
 } from "@prisma/client";
-import React, {
-  RefObject,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { RefObject, useContext, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
@@ -53,11 +46,14 @@ const InnerNav = (props: {
   setSelectedInnerTab: any;
   usersServers: Server[];
   selectedInnerTabID: number;
-
+  selectedChannel: Server_Channel | null;
+  setSelectedChannel: any;
+  refreshUserData: any;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
     adminships: Server_Admin[];
+    channels: Server_Channel[];
   };
 }) => {
   const {
@@ -65,6 +61,7 @@ const InnerNav = (props: {
     selectedInnerTab,
     setSelectedInnerTab,
     currentUser,
+    selectedChannel,
     selectedInnerTabID,
     usersServers,
   } = props;
@@ -370,9 +367,14 @@ const InnerNav = (props: {
     return (
       <div>
         <div className="fixed h-screen w-52 border-r border-l border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
-          <div className="justify-left flex pl-4 pt-4 text-xl font-bold">
+          <button
+            className="justify-left flex pl-4 pt-4 text-xl font-bold"
+            onClick={() => {
+              props.setSelectedChannel(null);
+            }}
+          >
             {selectedInnerTab}
-          </div>
+          </button>
           <div className="p-4">
             {/* if user is owner or admin  */}
             <button className="logoSpinner ">
@@ -388,7 +390,16 @@ const InnerNav = (props: {
               <div>
                 {thisServer?.channels.map((channel) => (
                   <div className="my-2">
-                    <button className="flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700">
+                    <button
+                      onClick={() => {
+                        props.setSelectedChannel(channel);
+                      }}
+                      className={`flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 ${
+                        selectedChannel?.id == channel.id
+                          ? "dark:border-purple-600"
+                          : "border-zinc-300 dark:border-zinc-600"
+                      } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
+                    >
                       {channel.type == "voice" ? (
                         <span className="my-auto">
                           <HeadphonesIcon
@@ -458,6 +469,7 @@ const InnerNav = (props: {
         ) : null}
         {createChannelModalShowing ? (
           <CreateChannelModal
+            refreshUserData={props.refreshUserData}
             isDarkTheme={isDarkTheme}
             createChannelToggle={createChannelToggle}
             selectedInnerTabID={selectedInnerTabID}

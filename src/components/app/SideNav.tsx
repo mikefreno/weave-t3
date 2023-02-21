@@ -1,9 +1,4 @@
-import React, {
-  MouseEventHandler,
-  RefObject,
-  useContext,
-  useEffect,
-} from "react";
+import React, { MouseEventHandler, RefObject, useContext } from "react";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
 import Image from "next/image";
@@ -14,11 +9,11 @@ import BullhornIcon from "@/src/icons/BullhornIcon";
 import RobotForApp from "@/src/icons/RobotForApp";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import { Raleway } from "@next/font/google";
-import { api } from "@/src/utils/api";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 
 const SideNav = (props: {
+  setSelectedChannel: any;
   serverModalToggle: MouseEventHandler<HTMLButtonElement>;
   serverButtonRef: RefObject<HTMLButtonElement>;
   botModalToggle: MouseEventHandler<HTMLButtonElement>;
@@ -28,6 +23,7 @@ const SideNav = (props: {
   setSelectedInnerTab: any;
   setSelectedInnerTabID: any;
   usersServers: Server[] | undefined;
+  selectedInnerTabID: number;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -69,6 +65,10 @@ const SideNav = (props: {
           <div className="flex flex-col items-center border-b-2 border-zinc-400 py-2 dark:border-zinc-600">
             {usersServers?.map((server: Server) => (
               <div className="py-2">
+                {props.selectedInnerTabID == server.id &&
+                props.currentTab == "server" ? (
+                  <span className="absolute -ml-[1.25rem] mt-4 h-4 w-4 rounded-full bg-zinc-200" />
+                ) : null}
                 <Tooltip
                   content={server.name}
                   trigger="hover"
@@ -81,6 +81,7 @@ const SideNav = (props: {
                       props.setSelectedInnerTab(server.name);
                       props.setSelectedInnerTabID(server.id);
                       props.currentTabSetter("server");
+                      props.setSelectedChannel(null);
                     }}
                   >
                     {server.logo_url ? (

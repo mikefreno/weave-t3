@@ -17,6 +17,8 @@ import { api } from "@/src/utils/api";
 import LoadingElement from "@/src/components/loading";
 import router from "next/router";
 import ServerMainScreen from "@/src/components/app/SeverMainScreen";
+import ChannelMain from "@/src/components/app/ChannelMain";
+import { Server_Channel } from "@prisma/client";
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -33,7 +35,6 @@ const index = () => {
 
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
-  const serverSelectModalRef = useRef<HTMLDivElement>(null);
 
   const serverButtonRef = useRef<HTMLButtonElement>(null);
   const botModalRef = useRef<HTMLDivElement>(null);
@@ -41,10 +42,13 @@ const index = () => {
   const scrollableRef = useRef<HTMLDivElement>(null);
   const directMessageButtonRef = useRef<HTMLButtonElement>(null);
   const directMessageModalRef = useRef<HTMLDivElement>(null);
+  const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(
+    null
+  );
 
   const currentUser = api.users.getCurrentUser.useQuery().data;
 
-  const usersServers = api.server.getAllCurrentUserServers.useQuery().data;
+  const usersServers = api.server.getAllCurrentUserServers.useQuery();
 
   useEffect(() => {
     if (scrollableRef.current) {
@@ -54,6 +58,10 @@ const index = () => {
 
   useOnClickOutside([directMessageModalRef, directMessageButtonRef], () => {
     setDirecMessageModalShowing(false);
+  });
+
+  useOnClickOutside([serverModalRef, serverButtonRef], () => {
+    setServerModalShowing(false);
   });
 
   function dmModalToggle() {
@@ -121,6 +129,9 @@ const index = () => {
     }, 1000);
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }
+  const refreshUserData = async () => {
+    await usersServers.refetch();
+  };
 
   return (
     <div className="bg-zinc-300 dark:bg-zinc-700">
@@ -133,6 +144,7 @@ const index = () => {
       <div id="app-body" className="flex h-screen w-screen">
         <div id="outer-nav" className="w-20">
           <SideNav
+            setSelectedChannel={setSelectedChannel}
             serverModalToggle={serverModalToggle}
             serverButtonRef={serverButtonRef}
             botModalToggle={botModalToggle}
@@ -142,11 +154,13 @@ const index = () => {
             setSelectedInnerTab={setSelectedInnerTab}
             currentUser={currentUser}
             setSelectedInnerTabID={setSelectedInnerTabID}
-            usersServers={usersServers}
+            usersServers={usersServers.data}
+            selectedInnerTabID={selectedInnerTabID}
           />
         </div>
         <div id="inner-nav" className="w-52">
           <InnerNav
+            refreshUserData={refreshUserData}
             currentTab={currentTab}
             directMessageButtonRef={directMessageButtonRef}
             dmModalToggle={dmModalToggle}
@@ -154,7 +168,9 @@ const index = () => {
             setSelectedInnerTab={setSelectedInnerTab}
             currentUser={currentUser}
             selectedInnerTabID={selectedInnerTabID}
-            usersServers={usersServers}
+            usersServers={usersServers?.data}
+            setSelectedChannel={setSelectedChannel}
+            selectedChannel={selectedChannel}
           />
           <InnerNavOverlay
             setSelectedInnerTab={setSelectedInnerTab}
@@ -166,9 +182,8 @@ const index = () => {
           />
         </div>
         <div id="center-page" ref={scrollableRef} className="flex-1">
-          {selectedInnerTab === "AccountOverview" ? (
-            <AccountPage currentUser={currentUser!} />
-          ) : null}
+          {selectedInnerTab === "AccountOverview" ? <AccountPage /> : null}
+
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
             <div className="">
               <DMPages selectedInnerTab={selectedInnerTab} />
@@ -187,16 +202,23 @@ const index = () => {
             </div>
           ) : null}
           {currentTab === "server" && usersServers ? (
-            <ServerMainScreen
-              usersServers={usersServers}
-              selectedInnerTabID={selectedInnerTabID}
-            />
+            selectedChannel !== null ? (
+              <ChannelMain selectedChannel={selectedChannel} />
+            ) : (
+              <ServerMainScreen
+                usersServers={usersServers?.data}
+                selectedInnerTabID={selectedInnerTabID}
+              />
+            )
           ) : null}
         </div>
       </div>
       <div>
         {serverModalShowing ? (
-          <CreateServerModal serverModalToggle={serverModalToggle} />
+          <CreateServerModal
+            serverModalToggle={serverModalToggle}
+            serverModalRef={serverModalRef}
+          />
         ) : null}
         {botModalShowing ? (
           <BotServiceModal

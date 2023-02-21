@@ -32,6 +32,7 @@ const InviteModal = (props: {
   const sendServerInvite = api.server.sendServerInvite.useMutation({});
 
   const sendEmail = async () => {
+    await createJWTInvite.refetch();
     if (invitee.current.value.length >= 3) {
       setIconClass("move-fade");
       setEmailSendLoading(true);
@@ -46,10 +47,12 @@ const InviteModal = (props: {
   };
 
   const showCode = async () => {
+    await createJWTInvite.refetch();
     setShowingGenericCode(!showingGenericCode);
   };
 
   const generateQRCode = async () => {
+    await createJWTInvite.refetch();
     setQRCodeValue(
       `localhost:3000/api/joinServer?token=${createJWTInvite.data}`
     );
@@ -134,6 +137,9 @@ const InviteModal = (props: {
                   >
                     Get
                   </Button>
+                  <div className="w-36 break-words">
+                    {showingGenericCode ? createJWTInvite.data : null}
+                  </div>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="mb-2">Generate QR Code</div>

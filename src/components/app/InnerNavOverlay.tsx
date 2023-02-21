@@ -1,11 +1,8 @@
-import HeadphonesIcon from "@/src/icons/HeadphonesIcon";
-import HeadphoneSlashIcon from "@/src/icons/HeadphoneSlashIcon";
 import MicIcon from "@/src/icons/MicIcon";
 import MicSlashIcon from "@/src/icons/MicSlashIcon";
 import SpeakerOff from "@/src/icons/SpeakerOff";
 import SpeakerOn from "@/src/icons/SpeakerOn";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
-import { useSession } from "next-auth/react";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import ThemeContext from "../ThemeContextProvider";
 
@@ -40,7 +37,10 @@ const InnerNavOverlay = (props: {
                   ></img>
                 </button>
               ) : (
-                <button className="h-8 w-8 rounded-full border border-zinc-200 bg-zinc-600">
+                <button
+                  className="h-8 w-8 rounded-full border border-zinc-200 bg-zinc-600"
+                  onClick={() => props.setSelectedInnerTab("AccountOverview")}
+                >
                   {currentUser?.name?.split(" ")[0]?.charAt(0)}{" "}
                   {currentUser?.name?.split(" ")[1]?.charAt(0)}
                 </button>
