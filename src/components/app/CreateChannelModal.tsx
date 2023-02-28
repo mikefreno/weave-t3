@@ -11,7 +11,7 @@ const CreateChannelModal = (props: {
   createChannelToggle: any;
   selectedInnerTabID: number;
   createChannelRef: RefObject<HTMLDivElement>;
-  refreshUserData;
+  refreshUserServers;
 }) => {
   const { isDarkTheme, createChannelToggle, createChannelRef } = props;
   const [channelType, setChannelType] = useState("");
@@ -33,7 +33,7 @@ const CreateChannelModal = (props: {
     });
     if (res == true) {
       props.createChannelToggle();
-      await props.refreshUserData();
+      await props.refreshUserServers();
       setCreateButtonLoading(false);
     }
   };

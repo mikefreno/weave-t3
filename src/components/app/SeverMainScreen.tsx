@@ -18,7 +18,7 @@ const ServerMainScreen = (props: {
           <img
             src={thisServer?.banner_url}
             alt={`${thisServer?.name}-banner`}
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full rounded-lg object-cover object-center"
           />
         </div>
       ) : null}

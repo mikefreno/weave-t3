@@ -137,7 +137,7 @@ const InviteModal = (props: {
                   >
                     Get
                   </Button>
-                  <div className="w-36 break-words">
+                  <div className="mt-2 w-40 break-words">
                     {showingGenericCode ? createJWTInvite.data : null}
                   </div>
                 </div>

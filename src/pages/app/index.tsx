@@ -129,7 +129,7 @@ const index = () => {
     }, 1000);
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }
-  const refreshUserData = async () => {
+  const refreshUserServers = async () => {
     await usersServers.refetch();
   };
 
@@ -142,7 +142,7 @@ const index = () => {
       </Head>
       <Navbar switchRef={switchRef} />
       <div id="app-body" className="flex h-screen w-screen">
-        <div id="outer-nav" className="w-20">
+        <div id="outer-nav" className="flex">
           <SideNav
             setSelectedChannel={setSelectedChannel}
             serverModalToggle={serverModalToggle}
@@ -158,9 +158,9 @@ const index = () => {
             selectedInnerTabID={selectedInnerTabID}
           />
         </div>
-        <div id="inner-nav" className="w-52">
+        <div id="inner-nav" className="ml-20">
           <InnerNav
-            refreshUserData={refreshUserData}
+            refreshUserServers={refreshUserServers}
             currentTab={currentTab}
             directMessageButtonRef={directMessageButtonRef}
             dmModalToggle={dmModalToggle}
@@ -181,7 +181,7 @@ const index = () => {
             audioToggle={audioToggle}
           />
         </div>
-        <div id="center-page" ref={scrollableRef} className="flex-1">
+        <div id="center-page" ref={scrollableRef} className="flex-1 pl-52">
           {selectedInnerTab === "AccountOverview" ? <AccountPage /> : null}
 
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
@@ -203,10 +203,13 @@ const index = () => {
           ) : null}
           {currentTab === "server" && usersServers ? (
             selectedChannel !== null ? (
-              <ChannelMain selectedChannel={selectedChannel} />
+              <ChannelMain
+                selectedChannel={selectedChannel}
+                currentUser={currentUser}
+              />
             ) : (
               <ServerMainScreen
-                usersServers={usersServers?.data}
+                usersServers={usersServers.data}
                 selectedInnerTabID={selectedInnerTabID}
               />
             )
@@ -216,6 +219,7 @@ const index = () => {
       <div>
         {serverModalShowing ? (
           <CreateServerModal
+            refreshUserServers={refreshUserServers}
             serverModalToggle={serverModalToggle}
             serverModalRef={serverModalRef}
           />

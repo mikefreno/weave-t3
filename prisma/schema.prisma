@@ -17,12 +17,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -31,54 +31,55 @@ model Account {
 }
 
 model User {
-  id                  String          @id @default(cuid())
-  name                String?
-  psuedonym           String? 
-  email               String?         @unique
-  emailVerified       DateTime?
-  registered_at       DateTime?       @default(now())
-  image               String?
-  psuedonym_image     String?
-  servers             Server[]        
-  sessions            Session[]
-  memberships         Server_Member[]
-  adminships          Server_Admin[]
-  provider            String?
-  refresh_token       String?
-  access_token        String?
-  token_expiration    DateTime?
-  type                Json?
-  real_name_use       String        @default("ask")
-  name_display_pref   String        @default("real")
-  comments            Comment[]
-  account             Account[]
+  id                String          @id @default(cuid())
+  name              String?
+  psuedonym         String?
+  email             String?         @unique
+  emailVerified     DateTime?
+  registered_at     DateTime?       @default(now())
+  image             String?
+  psuedonym_image   String?
+  servers           Server[]
+  sessions          Session[]
+  memberships       Server_Member[]
+  adminships        Server_Admin[]
+  provider          String?
+  refresh_token     String?
+  access_token      String?
+  token_expiration  DateTime?
+  type              Json?
+  real_name_use     String          @default("ask")
+  name_display_pref String          @default("real")
+  comments          Comment[]
+  account           Account[]
+  WSConnection      WSConnection[]
 }
 
 model Server {
-  id            Int              @id @default(autoincrement())
-  name          String
-  blurb         String?
-  logo_url      String?
-  banner_url    String?
-  ownerId       String
-  category      String           @default("other")
-  type          String           @default("private")
-  owner         User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  admin         Server_Admin[]    
-  members       Server_Member[]
-  channels      Server_Channel[] 
+  id         Int              @id @default(autoincrement())
+  name       String
+  blurb      String?
+  logo_url   String?
+  banner_url String?
+  ownerId    String
+  category   String           @default("other")
+  type       String           @default("private")
+  owner      User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  admin      Server_Admin[]
+  members    Server_Member[]
+  channels   Server_Channel[]
 
   @@index([ownerId])
 }
 
 model Server_Admin {
-  id         Int         @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   roles      Json
-  admin      User        @relation(fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   adminId    String
-  Server     Server      @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Server     Server   @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ServerId   Int
-  assignedAt DateTime    @default(now())
+  assignedAt DateTime @default(now())
   assignedBy String
 
   @@index([adminId])
@@ -99,25 +100,24 @@ model Server_Member {
 }
 
 model Server_Channel {
-  id            Int            @id @default(autoincrement())
-  name          String         
-  Server        Server         @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ServerId      Int
-  description   String?
-  comments      Comment[]
-  type          String
-
+  id          Int       @id @default(autoincrement())
+  name        String
+  Server      Server    @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ServerId    Int
+  description String?
+  comments    Comment[]
+  type        String
 
   @@index([ServerId])
 }
 
 model Comment {
-  id          Int               @id @default(autoincrement())
-  user        User              @relation(fields: [userId], references: [id])
-  userId      String
-  message     String
-  channel     Server_Channel    @relation(fields: [channelID], references: [id], onDelete: Cascade)
-  channelID   Int
+  id        Int            @id @default(autoincrement())
+  user      User           @relation(fields: [userId], references: [id])
+  userId    String
+  message   String
+  channel   Server_Channel @relation(fields: [channelID], references: [id], onDelete: Cascade)
+  channelID Int
 
   @@index([userId])
   @@index([channelID])
@@ -139,4 +139,12 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model WSConnection {
+  connectionID String @id
+  user         User?   @relation(fields: [userId], references: [id])
+  userId       String?
+  channelID    Int?
+  @@index([userId])
 }

@@ -1,4 +1,4 @@
-import { authOptions } from "@/weave-t3/src/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { unstable_getServerSession } from "next-auth/next";
 

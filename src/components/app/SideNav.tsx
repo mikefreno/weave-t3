@@ -64,7 +64,7 @@ const SideNav = (props: {
         <div id="users-owned-servers">
           <div className="flex flex-col items-center border-b-2 border-zinc-400 py-2 dark:border-zinc-600">
             {usersServers?.map((server: Server) => (
-              <div className="py-2">
+              <div className="py-2" key={server.id}>
                 {props.selectedInnerTabID == server.id &&
                 props.currentTab == "server" ? (
                   <span className="absolute -ml-[1.25rem] mt-4 h-4 w-4 rounded-full bg-zinc-200" />
@@ -88,9 +88,10 @@ const SideNav = (props: {
                       <div className="shaker">
                         <Image
                           src={server.logo_url}
-                          alt={""}
+                          alt={`${server.name} logo`}
                           width={56}
                           height={56}
+                          className="rounded-full"
                         />
                       </div>
                     ) : (

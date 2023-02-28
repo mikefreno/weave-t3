@@ -65,6 +65,7 @@ async function uploadPicturesToS3(
 const CreateServerModal = (props: {
   serverModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   serverModalRef: RefObject<HTMLDivElement>;
+  refreshUserServers: () => any;
 }) => {
   const [logoImage, setLogoImage] = useState<File | Blob | null>(null);
   const [bannerImage, setBannerImage] = useState<File | Blob | null>(null);
@@ -91,6 +92,7 @@ const CreateServerModal = (props: {
   const serverBannerMutation = api.server.updateServerBanner.useMutation({});
   const [createButtonLoading, setCreateButtonLoading] = useState(false);
   const [step, setStep] = useState(0);
+  const [serverImageLoading, setServerImageLoading] = useState(false);
 
   const templateSetter = (event: React.MouseEvent<HTMLButtonElement>) => {
     setSpecifiedTemplate(event.currentTarget.id);
@@ -156,11 +158,13 @@ const CreateServerModal = (props: {
         type: serverPublic ? "public" : "private",
       });
     }
+    await props.refreshUserServers();
     setCreateButtonLoading(false);
     setStep(1);
   };
 
   const updateServerImages = async (event: { preventDefault: () => void }) => {
+    setServerImageLoading(true);
     event.preventDefault();
     if (bannerImage) {
       const key = await uploadPicturesToS3(
@@ -188,6 +192,8 @@ const CreateServerModal = (props: {
         url: key,
       });
     }
+    await props.refreshUserServers();
+    setServerImageLoading(false);
     setStep(2);
   };
 
@@ -500,17 +506,23 @@ const CreateServerModal = (props: {
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <Button auto color={"secondary"} type="submit">
-                    Next
-                    <div className="rotate-180">
-                      <BackArrow
-                        height={24}
-                        width={24}
-                        stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                        strokeWidth={1.5}
-                      />
-                    </div>
-                  </Button>
+                  {serverImageLoading ? (
+                    <Button disabled auto bordered size={"lg"} color="gradient">
+                      <Loading type="points" size="sm" />
+                    </Button>
+                  ) : (
+                    <Button auto color={"secondary"} type="submit">
+                      Next
+                      <div className="rotate-180">
+                        <BackArrow
+                          height={24}
+                          width={24}
+                          stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                          strokeWidth={1.5}
+                        />
+                      </div>
+                    </Button>
+                  )}
                 </div>
               </form>
             </div>

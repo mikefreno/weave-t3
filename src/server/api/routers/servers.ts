@@ -147,4 +147,21 @@ export const serverRouter = createTRPCRouter({
       },
     });
   }),
+  postComment: protectedProcedure
+    .input(
+      z.object({
+        channelID: z.number(),
+        commentContent: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userID = ctx.session.user.id;
+      return await ctx.prisma.comment.create({
+        data: {
+          userId: userID,
+          message: input.commentContent,
+          channelID: input.channelID,
+        },
+      });
+    }),
 });

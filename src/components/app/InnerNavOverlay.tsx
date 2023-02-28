@@ -26,7 +26,7 @@ const InnerNavOverlay = (props: {
       <div className="flex w-52 justify-between">
         <div className="flex justify-start">
           <div className="flex flex-row p-2">
-            <div className="my-auto">
+            <div className="mr- flex items-center">
               {currentUser?.image ? (
                 <button
                   onClick={() => props.setSelectedInnerTab("AccountOverview")}
@@ -34,7 +34,7 @@ const InnerNavOverlay = (props: {
                   <img
                     src={currentUser.image}
                     className="stopIT h-8 w-8 rounded-full"
-                  ></img>
+                  />
                 </button>
               ) : (
                 <button
@@ -46,7 +46,7 @@ const InnerNavOverlay = (props: {
                 </button>
               )}
             </div>
-            <div className="my-auto flex flex-col pl-2">
+            <div className="my-auto flex flex-col pl-3">
               <div>
                 <button
                   onClick={() => props.setSelectedInnerTab("AccountOverview")}

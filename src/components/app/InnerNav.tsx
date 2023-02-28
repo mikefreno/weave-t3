@@ -48,7 +48,7 @@ const InnerNav = (props: {
   selectedInnerTabID: number;
   selectedChannel: Server_Channel | null;
   setSelectedChannel: any;
-  refreshUserData: any;
+  refreshUserServers: any;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -389,7 +389,7 @@ const InnerNav = (props: {
             <div>
               <div>
                 {thisServer?.channels.map((channel) => (
-                  <div className="my-2">
+                  <div className="my-2" key={channel.id}>
                     <button
                       onClick={() => {
                         props.setSelectedChannel(channel);
@@ -469,7 +469,7 @@ const InnerNav = (props: {
         ) : null}
         {createChannelModalShowing ? (
           <CreateChannelModal
-            refreshUserData={props.refreshUserData}
+            refreshUserData={props.refreshUserServers}
             isDarkTheme={isDarkTheme}
             createChannelToggle={createChannelToggle}
             selectedInnerTabID={selectedInnerTabID}
