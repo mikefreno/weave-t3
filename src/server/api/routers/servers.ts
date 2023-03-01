@@ -116,10 +116,11 @@ export const serverRouter = createTRPCRouter({
         params: {
           SERVER: input.serverName,
           TOKEN: input.token,
-          source_URL: process.env.NEXT_PUBLIC_HOSTNAME,
+          SOURCE_URL: process.env.NEXT_PUBLIC_HOSTNAME,
         },
         subject: `Invitation to join ${input.serverName}`,
       };
+      console.log(process.env.NEXT_PUBLIC_HOSTNAME);
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: {
