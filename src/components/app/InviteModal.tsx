@@ -30,19 +30,29 @@ const InviteModal = (props: {
   const createJWTInvite =
     api.server.createJWTInvite.useQuery(selectedInnerTabID);
   const sendServerInvite = api.server.sendServerInvite.useMutation({});
+  const userCheck = api.server.checkForMemberEmail.useMutation({});
 
   const sendEmail = async () => {
+    const email = invitee.current.value;
     await createJWTInvite.refetch();
-    if (invitee.current.value.length >= 3) {
+    if (email.length >= 3) {
       setIconClass("move-fade");
       setEmailSendLoading(true);
-      sendServerInvite.mutateAsync({
-        invitee: invitee.current.value,
-        token: createJWTInvite.data as string,
-        serverName: selectedInnerTab,
+      const res = await userCheck.mutateAsync({
+        email: email,
+        serverID: selectedInnerTabID,
       });
+      if (res === false) {
+        await sendServerInvite.mutateAsync({
+          invitee: invitee.current.value,
+          token: createJWTInvite.data as string,
+          serverName: selectedInnerTab,
+        });
+        setEmailSendReport("Email Sent!");
+      } else if (res === true) {
+        setEmailSendReport("User Exists!");
+      }
       setEmailSendLoading(false);
-      setEmailSendReport("Email Sent!");
     }
   };
 
@@ -123,6 +133,22 @@ const InviteModal = (props: {
                   >
                     Send Another?
                   </button>
+                </div>
+              ) : emailSendReport === "User Exists!" ? (
+                <div>
+                  {" "}
+                  <div>
+                    {emailSendReport}{" "}
+                    <button
+                      className="hover:underline"
+                      onClick={() => {
+                        setIconClass("");
+                        setEmailSendReport("");
+                      }}
+                    >
+                      Try Another?
+                    </button>
+                  </div>
                 </div>
               ) : null}
               <div className="rule-around my-4">Or</div>

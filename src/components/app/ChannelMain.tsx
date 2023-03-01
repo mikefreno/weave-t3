@@ -65,7 +65,6 @@ const ChannelMain = (props: {
       channelID: selectedChannel.id,
       channelUpdate: true,
     };
-    console.log("send" + payload);
     socket.send(JSON.stringify(payload));
   }, [selectedChannel]);
 
@@ -73,11 +72,6 @@ const ChannelMain = (props: {
     const comments = await getMessages.mutateAsync(selectedChannel.id);
     setMessages(comments);
   };
-
-  socket.addEventListener("message", (event) => {
-    console.log(`Received message: ${event.data}`);
-  });
-
   const manualReconnect = () => {
     if (socket.readyState === 0 || socket.readyState === 2) {
       const newSocket = new WebSocket(

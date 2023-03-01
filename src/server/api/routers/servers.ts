@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import jwt from "jsonwebtoken";
-import { type Server } from "@prisma/client";
+import { User, type Server } from "@prisma/client";
 
 export const serverRouter = createTRPCRouter({
   createServer: protectedProcedure
@@ -80,7 +80,7 @@ export const serverRouter = createTRPCRouter({
     .input(z.number())
     .query(async ({ input, ctx }) => {
       const userID = ctx.session.user.id;
-      const SK = process.env.JWT_SECRET!;
+      const SK = process.env.JWT_SECRET as string;
       const token = jwt.sign(
         {
           exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
@@ -99,26 +99,62 @@ export const serverRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      var SibApiV3Sdk = require("sib-api-v3-sdk"); // eslint-disable-line no-var
+      const apiKey = process.env.SENDINBLUE_KEY as string;
+      const apiUrl = "https://api.sendinblue.com/v3/smtp/email";
 
-      const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-      const apiKey = apiInstance.authentications["apiKey"];
-      apiKey.apiKey = process.env.SENDINBLUE_KEY;
-
-      apiInstance.sendTransacEmail({
+      const sendinblueData = {
+        sender: {
+          name: "Weave",
+          email: "michael@freno.me",
+        },
         to: [
           {
             email: input.invitee,
           },
         ],
+        templateId: 7,
         params: {
           SERVER: input.serverName,
           TOKEN: input.token,
         },
-        templateId: 7,
+        subject: `Invitation to join ${input.serverName}`,
+      };
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "api-key": apiKey,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(sendinblueData),
       });
+    }),
+  checkForMemberEmail: protectedProcedure
+    .input(z.object({ email: z.string(), serverID: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const server = await ctx.prisma.server.findFirst({
+        where: {
+          id: input.serverID,
+        },
+        include: {
+          owner: true,
+          admin: { include: { admin: true } },
+          members: { include: { member: true } },
+        },
+      });
+      if (server !== null) {
+        const adminEmails = server.admin.map((admin) => admin.admin.email);
+        const memberEmails = server.members.map(
+          (member) => member.member.email
+        );
+        const emails = [
+          ...new Set([...adminEmails, ...memberEmails, server.owner.email]),
+        ];
+        console.log(emails);
+        if (emails.includes(input.email)) {
+          return true;
+        } else return false;
+      }
     }),
   createServerChannel: protectedProcedure
     .input(
