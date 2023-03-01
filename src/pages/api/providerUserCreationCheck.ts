@@ -1,6 +1,8 @@
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { unstable_getServerSession } from "next-auth/next";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export default async function providerUserCreationCheck(
   req: NextApiRequest,
