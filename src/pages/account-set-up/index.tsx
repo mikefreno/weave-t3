@@ -35,7 +35,8 @@ async function uploadPicturesToS3(
   picture: File
 ) {
   const category = "users";
-  const data = await axios
+  let data: any;
+  data = await axios
     .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
@@ -85,7 +86,7 @@ const userSetup = () => {
     acceptedFiles.forEach((file: Blob) => {
       setRealNamePicture(file);
       const ext = file.type.split("/")[1];
-      setRealNamePictureExt(ext);
+      setRealNamePictureExt(ext as string);
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -100,7 +101,7 @@ const userSetup = () => {
     acceptedFiles.forEach((file: Blob) => {
       setPsuedonymPicture(file);
       const ext = file.type.split("/")[1];
-      setPsuedonymPictureExt(ext);
+      setPsuedonymPictureExt(ext as string);
       const reader = new FileReader();
       reader.onload = () => {
         const str = reader.result;
@@ -127,15 +128,25 @@ const userSetup = () => {
     if (realNamePicture !== null) {
       const type = "image";
       const ext = realNamePictureExt;
-      const id = userQuery.data?.id;
-      const key = await uploadPicturesToS3(id, type, ext, realNamePicture);
+      const id = userQuery.data!.id;
+      const key = await uploadPicturesToS3(
+        id,
+        type,
+        ext,
+        realNamePicture as File
+      );
       imageMutation.mutate(key);
     }
     if (psuedonymPicture !== null) {
       const type = "psuedonym_image";
       const ext = psuedonymPictureExt;
-      const id = userQuery.data?.id;
-      const key = await uploadPicturesToS3(id, type, ext, psuedonymPicture);
+      const id = userQuery.data!.id;
+      const key = await uploadPicturesToS3(
+        id,
+        type,
+        ext,
+        psuedonymPicture as File
+      );
       psuedonymImageMutation.mutate(key);
     }
 

@@ -18,7 +18,18 @@ import LoadingElement from "@/src/components/loading";
 import router from "next/router";
 import ServerMainScreen from "@/src/components/app/SeverMainScreen";
 import ChannelMain from "@/src/components/app/ChannelMain";
-import { Server_Channel } from "@prisma/client";
+import { Server, Server_Channel } from "@prisma/client";
+
+type ServerIncludingChannel = {
+  id: number;
+  name: string;
+  blurb: string | null;
+  logo_url: string | null;
+  banner_url: string | null;
+  ownerId: string;
+  category: string | null;
+  channels: Server_Channel[];
+};
 
 const index = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -45,7 +56,6 @@ const index = () => {
   const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(
     null
   );
-
   const currentUser = api.users.getCurrentUser.useQuery().data;
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
@@ -183,7 +193,7 @@ const index = () => {
             setSelectedInnerTab={setSelectedInnerTab}
             currentUser={currentUser}
             selectedInnerTabID={selectedInnerTabID}
-            usersServers={usersServers?.data}
+            usersServers={usersServers.data as any}
             setSelectedChannel={setSelectedChannel}
             selectedChannel={selectedChannel}
           />
@@ -221,12 +231,12 @@ const index = () => {
               <ChannelMain
                 selectedChannel={selectedChannel}
                 currentUser={currentUser}
-                socket={socket}
+                socket={socket as WebSocket}
                 setSocket={setSocket}
               />
             ) : (
               <ServerMainScreen
-                usersServers={usersServers.data}
+                usersServers={usersServers.data as Server[]}
                 selectedInnerTabID={selectedInnerTabID}
               />
             )

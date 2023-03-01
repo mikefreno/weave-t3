@@ -43,7 +43,8 @@ async function uploadPicturesToS3(
   picture: File
 ) {
   const category = "servers";
-  const data = await axios
+  let data: any;
+  data = await axios
     .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
@@ -168,27 +169,27 @@ const CreateServerModal = (props: {
     event.preventDefault();
     if (bannerImage) {
       const key = await uploadPicturesToS3(
-        createServerMutation.data.id.toString(),
+        createServerMutation.data!.id.toString(),
         "banner",
         bannerImageExt as string,
         bannerImage as File
       );
       //update server with image url
       serverBannerMutation.mutate({
-        serverID: createServerMutation.data.id,
+        serverID: createServerMutation.data!.id,
         url: key,
       });
     }
     if (logoImage) {
       const key = await uploadPicturesToS3(
-        createServerMutation.data.id.toString(),
+        createServerMutation.data!.id.toString(),
         "logo",
         logoImageExt as string,
         logoImage as File
       );
       //update server with image url
       serverLogoMutation.mutate({
-        serverID: createServerMutation.data.id,
+        serverID: createServerMutation.data!.id,
         url: key,
       });
     }

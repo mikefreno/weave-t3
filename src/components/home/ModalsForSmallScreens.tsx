@@ -14,22 +14,22 @@ const ModalsForSmallScreens = () => {
     <div className="absolute z-20 mt-12 w-screen sm:mt-24">
       <div className="mx-auto grid w-11/12 grid-flow-col grid-rows-3 gap-2 sm:grid-rows-2">
         <div className="animate-up-down layer2">
-          <ChatModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <ChatModal isDarkTheme={isDarkTheme} />
         </div>
         <div className="animate-up-down layer1">
-          <GameModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <GameModal isDarkTheme={isDarkTheme} />
         </div>
         <div className="animate-up-down layer3">
-          <WorkModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <WorkModal isDarkTheme={isDarkTheme} />
         </div>
         <div className="animate-up-down layer3">
-          <BotModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <BotModal isDarkTheme={isDarkTheme} />
         </div>
         <div className="animate-up-down layer1">
-          <ConfigModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <ConfigModal isDarkTheme={isDarkTheme} />
         </div>
         <div className="animate-up-down layer2">
-          <SecurityModal fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
+          <SecurityModal isDarkTheme={isDarkTheme} />
         </div>
       </div>
     </div>

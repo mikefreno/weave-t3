@@ -16,10 +16,12 @@ export default async function joinServer(
     jwt.verify(token, key, async function (err, decoded) {
       if (err) {
         return res.status(401).json({ error: err.message });
+      } else if (typeof decoded === "string") {
+        return res.status(401).json({ error: "unknown error" });
       } else {
-        const userId = session.user.id;
-        const serverID = decoded.data.server;
-        const inviter = decoded.data.inviter;
+        const userId = session?.user?.id;
+        const serverID = decoded?.data.server;
+        const inviter = decoded?.data.inviter;
         const serverMember = await prisma?.server_Member.create({
           data: {
             member: {

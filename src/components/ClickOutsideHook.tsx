@@ -8,7 +8,7 @@ const useOnClickOutside = (
 ) => {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
-      const contains = refs.reduce(
+      const contains = refs.reduce<boolean | null>(
         (acc, curr) =>
           acc || (curr.current && curr.current.contains(event.target as Node)),
         false

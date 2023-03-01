@@ -88,8 +88,8 @@ const ChannelMain = (props: {
   };
   const sendMessage = async (e: any) => {
     e.preventDefault();
-    const input = messageInputRef.current.value;
-    if (input.length > 0) {
+    const input = messageInputRef.current?.value;
+    if (input!.length > 0) {
       setIconClass("move-fade");
       const payload = {
         message: input,
@@ -98,7 +98,7 @@ const ChannelMain = (props: {
         channelUpdate: false,
       };
       socket.send(JSON.stringify(payload));
-      messageInputRef.current.value = "";
+      messageInputRef.current!.value = "";
       setTimeout(() => {
         setIconClass("");
       }, 500);

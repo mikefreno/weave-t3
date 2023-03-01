@@ -11,7 +11,7 @@ const CreateChannelModal = (props: {
   createChannelToggle: any;
   selectedInnerTabID: number;
   createChannelRef: RefObject<HTMLDivElement>;
-  refreshUserServers;
+  refreshUserServers: any;
 }) => {
   const { isDarkTheme, createChannelToggle, createChannelRef } = props;
   const [channelType, setChannelType] = useState("");

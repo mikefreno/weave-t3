@@ -11,15 +11,15 @@ const Parallax = () => {
   useEffect(() => {
     const handleScroll = () => {
       let offset = window.pageYOffset;
-      Array.from(parallaxRef.current!.children).forEach(
-        (layer: HTMLElement, index) => {
-          let speed = parseFloat(layer.getAttribute("data-speed")!);
-          if (index === 0) {
-            speed = speed * -1;
-          }
-          layer.style.transform = `translateY(${offset * speed}px)`;
+      Array.from(parallaxRef.current!.children).map((layer: Element, index) => {
+        let speed = parseFloat(layer.getAttribute("data-speed")!);
+        if (index === 0 || index === 2) {
+          speed = speed * -1;
         }
-      );
+        (layer as HTMLElement).style.transform = `translateY(${
+          offset * speed
+        }px)`;
+      });
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -33,7 +33,7 @@ const Parallax = () => {
     <div className="parallax-container absolute  w-full" ref={parallaxRef}>
       <div className="parallax-layer" data-speed="0.3">
         <div className="animate-up-down layer3 absolute left-20 mt-48">
-          <BotModal isDarkTheme={isDarkTheme}/>
+          <BotModal isDarkTheme={isDarkTheme} />
         </div>
       </div>
       <div className="parallax-layer" data-speed="0.2">

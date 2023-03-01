@@ -11,15 +11,15 @@ const Parallax_2 = (props: { isDarkTheme: boolean }) => {
   useEffect(() => {
     const handleScroll = () => {
       let offset = window.pageYOffset;
-      Array.from(parallaxRef.current!.children).forEach(
-        (layer: HTMLElement, index) => {
-          let speed = parseFloat(layer.getAttribute("data-speed")!);
-          if (index === 0 || index === 2) {
-            speed = speed * -1;
-          }
-          layer.style.transform = `translateY(${offset * speed}px)`;
+      Array.from(parallaxRef.current!.children).map((layer: Element, index) => {
+        let speed = parseFloat(layer.getAttribute("data-speed")!);
+        if (index === 0 || index === 2) {
+          speed = speed * -1;
         }
-      );
+        (layer as HTMLElement).style.transform = `translateY(${
+          offset * speed
+        }px)`;
+      });
     };
     window.addEventListener("scroll", handleScroll);
 

@@ -20,6 +20,7 @@ const ChatModal = (props: { isDarkTheme: boolean }) => {
             height={144}
             width={144}
             color={isDarkTheme ? "#f4f4f5" : "#27272a"}
+            strokeWidth={0.5}
           />
         </span>
         <div className="text-[#171717] dark:text-[#E2E2E2]">

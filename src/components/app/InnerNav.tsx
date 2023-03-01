@@ -17,6 +17,7 @@ import useOnClickOutside from "@/src/components/ClickOutsideHook";
 import CommentsIcon from "@/src/icons/CommentsIcon";
 import { Input, Tooltip } from "@nextui-org/react";
 import {
+  Server,
   Server_Admin,
   Server_Channel,
   Server_Member,
@@ -27,7 +28,7 @@ import ThemeContext from "../ThemeContextProvider";
 import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
 
-type Server = {
+type ServerIncludingChannel = {
   id: number;
   name: string;
   blurb: string | null;
@@ -44,7 +45,7 @@ const InnerNav = (props: {
   dmModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   selectedInnerTab: string;
   setSelectedInnerTab: any;
-  usersServers: Server[];
+  usersServers: ServerIncludingChannel[];
   selectedInnerTabID: number;
   selectedChannel: Server_Channel | null;
   setSelectedChannel: any;
@@ -53,7 +54,6 @@ const InnerNav = (props: {
     servers: Server[];
     memberships: Server_Member[];
     adminships: Server_Admin[];
-    channels: Server_Channel[];
   };
 }) => {
   const {
@@ -469,7 +469,7 @@ const InnerNav = (props: {
         ) : null}
         {createChannelModalShowing ? (
           <CreateChannelModal
-            refreshUserData={props.refreshUserServers}
+            refreshUserServers={props.refreshUserServers}
             isDarkTheme={isDarkTheme}
             createChannelToggle={createChannelToggle}
             selectedInnerTabID={selectedInnerTabID}
