@@ -112,8 +112,8 @@ const ChannelMain = (props: {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
 
-  const UsersCommentClass = "userCommentBGColor rounded-lg py-4 pl-10 pr-4";
-  const OtherCommentsClass = "bg-zinc-800 rounded-lg py-4 pr-10 pl-4";
+  const UsersCommentClass = "userCommentBGColor rounded-lg py-5 px-6";
+  const OtherCommentsClass = "bg-zinc-800 rounded-lg py-5 px-6";
 
   return (
     <div className="">
@@ -156,7 +156,7 @@ const ChannelMain = (props: {
                 {message.userId == currentUser.id ? null : (
                   <div>
                     {/* <div className="pt-2 text-sm">{message.user.name}</div> */}
-                    <div className="absolute -ml-6">
+                    <div className="absolute -ml-6 mt-1">
                       <Tooltip
                         content={message.user.name}
                         color="secondary"

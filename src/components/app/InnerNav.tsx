@@ -140,11 +140,11 @@ const InnerNav = (props: {
           </button>
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
-              selectedInnerTab == "conversations"
+              selectedInnerTab == "requests"
                 ? "bg-zinc-400 dark:bg-zinc-500"
                 : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
             }`}
-            onClick={() => setSelectedInnerTab("conversations")}
+            onClick={() => setSelectedInnerTab("requests")}
           >
             <span className="my-auto">
               <PaperPlanes
