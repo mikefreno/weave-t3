@@ -50,6 +50,21 @@ const index = () => {
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
 
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    const socket = new WebSocket(
+      "wss://ho6sto5l50.execute-api.us-east-1.amazonaws.com/prod"
+    );
+    socket.onopen = () => {
+      console.log("Socket opened");
+    };
+    setSocket(socket);
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   useEffect(() => {
     if (scrollableRef.current) {
       scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
@@ -206,6 +221,8 @@ const index = () => {
               <ChannelMain
                 selectedChannel={selectedChannel}
                 currentUser={currentUser}
+                socket={socket}
+                setSocket={setSocket}
               />
             ) : (
               <ServerMainScreen

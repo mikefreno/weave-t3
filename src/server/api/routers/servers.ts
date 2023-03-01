@@ -164,4 +164,14 @@ export const serverRouter = createTRPCRouter({
         },
       });
     }),
+  getChannelComments: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.comment.findMany({
+        where: { channelID: input },
+        include: {
+          user: true,
+        },
+      });
+    }),
 });

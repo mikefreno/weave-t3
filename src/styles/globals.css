@@ -338,3 +338,6 @@ select {
 .chatScreen {
   height: calc(100vh - 8em);
 }
+.userCommentBGColor {
+  background: rgba(76, 29, 149, 0.2);
+}
