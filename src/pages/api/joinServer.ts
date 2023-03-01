@@ -11,9 +11,12 @@ export default async function joinServer(
 ) {
   const session = await unstable_getServerSession(req, res, authOptions);
   if (session == null) {
-    res.redirect(401, "https://weavechat.net/login");
+    res.status(401).redirect("/login");
   } else {
     const token = req.query.token as string;
+    if (token == null) {
+      res.status(401).redirect("/");
+    }
     const key = process.env.JWT_SECRET as string;
     console.log("token: " + token);
     console.log("key: " + key);
@@ -38,7 +41,7 @@ export default async function joinServer(
             invitedBy: inviter,
           },
         });
-        return res.redirect(202, "https://weavechat.net/app");
+        return res.status(202).redirect("/app");
       }
     });
   }
