@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const ThemeContext = createContext({
   isDarkTheme: false,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   switchDarkTheme: () => {},
 });
 

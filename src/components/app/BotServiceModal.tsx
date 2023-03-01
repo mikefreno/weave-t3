@@ -16,7 +16,9 @@ const BotServiceModal = (props: {
     event.preventDefault();
     // Perform your search logic here
   };
-  const switchToCategory = () => {};
+  // const switchToCategory = () => {
+  //   return;
+  // };
 
   const showGoTo = (event: any) => {
     document
@@ -59,7 +61,7 @@ const BotServiceModal = (props: {
 
               <button
                 id="goto"
-                onClick={switchToCategory}
+                // onClick={switchToCategory}
                 className="hover:text-color-zinc ml-24 flex cursor-default justify-center opacity-0 transition duration-1000"
               >
                 <span className="my-auto">Go to Category</span>

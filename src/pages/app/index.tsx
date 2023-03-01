@@ -20,18 +20,7 @@ import ServerMainScreen from "@/src/components/app/SeverMainScreen";
 import ChannelMain from "@/src/components/app/ChannelMain";
 import { Server, Server_Channel } from "@prisma/client";
 
-type ServerIncludingChannel = {
-  id: number;
-  name: string;
-  blurb: string | null;
-  logo_url: string | null;
-  banner_url: string | null;
-  ownerId: string;
-  category: string | null;
-  channels: Server_Channel[];
-};
-
-const index = () => {
+const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [serverModalShowing, setServerModalShowing] = useState(false);
   const [botModalShowing, setBotModalShowing] = useState(false);
@@ -265,4 +254,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default App;

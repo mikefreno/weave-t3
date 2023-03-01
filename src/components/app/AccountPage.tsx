@@ -28,8 +28,7 @@ async function uploadPicturesToS3(
   picture: File
 ) {
   const category = "users";
-  let data: any;
-  data = await axios
+  const data: any = await axios
     .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
@@ -159,8 +158,8 @@ const AccountPage = () => {
     deleteUser.mutate();
   };
 
-  const changeRealNameUsage = () => {};
-  const changeNamePreferance = () => {};
+  // const changeRealNameUsage = () => {};
+  // const changeNamePreferance = () => {};
 
   const renderSettingsSelection = () => {
     if (settingsSelction === "User") {
@@ -346,7 +345,7 @@ const AccountPage = () => {
             label="Real Name Usage"
             size="sm"
             defaultValue={currentUser.data?.name_display_pref}
-            onChange={changeRealNameUsage}
+            // onChange={changeRealNameUsage}
           >
             <Radio value="ask">
               Ask for every community - you can change in community settings tab
@@ -363,7 +362,7 @@ const AccountPage = () => {
             label="Name Preferance"
             size="sm"
             defaultValue={currentUser.data?.name_display_pref}
-            onChange={changeNamePreferance}
+            // onChange={changeNamePreferance}
           >
             <Tooltip content="No psuedonym is set" placement="top">
               <Radio

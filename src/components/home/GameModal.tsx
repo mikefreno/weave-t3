@@ -1,7 +1,7 @@
 import React from "react";
 import GamepadIconThin from "@/src/icons/GamepadIcon-Thin";
 
-const GameModal = (props: { isDarkTheme: Boolean }) => {
+const GameModal = (props: { isDarkTheme: boolean }) => {
   const { isDarkTheme } = props;
 
   return (

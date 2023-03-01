@@ -43,8 +43,7 @@ async function uploadPicturesToS3(
   picture: File
 ) {
   const category = "servers";
-  let data: any;
-  data = await axios
+  const data: any = await axios
     .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
@@ -586,7 +585,7 @@ const CreateServerModal = (props: {
                   <Xmark className={"w-10"} />
                 </button>
               </div>
-              <div>You're all set</div>
+              <div>You&apos;re all set</div>
               <div>You can invite others now with the following link: </div>
               <div className="flex justify-end">
                 <Button auto color={"secondary"} type="submit">

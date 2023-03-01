@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import jwt from "jsonwebtoken";
-import { Server } from "@prisma/client";
+import { type Server } from "@prisma/client";
 
 export const serverRouter = createTRPCRouter({
   createServer: protectedProcedure
@@ -53,7 +53,7 @@ export const serverRouter = createTRPCRouter({
         memberships: { include: { Server: { include: { channels: true } } } },
       },
     });
-    let allServers: Server[] = [];
+    const allServers: Server[] = [];
     if (user !== null) {
       const adminServers = user.adminships.map((adminship) => adminship.Server);
       const memberServers = user.memberships.map(
@@ -74,6 +74,7 @@ export const serverRouter = createTRPCRouter({
           id: input,
         },
       });
+      return server;
     }),
   createJWTInvite: protectedProcedure
     .input(z.number())
@@ -98,11 +99,12 @@ export const serverRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      var SibApiV3Sdk = require("sib-api-v3-sdk");
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      var SibApiV3Sdk = require("sib-api-v3-sdk"); // eslint-disable-line no-var
 
-      let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+      const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-      let apiKey = apiInstance.authentications["apiKey"];
+      const apiKey = apiInstance.authentications["apiKey"];
       apiKey.apiKey = process.env.SENDINBLUE_KEY;
 
       apiInstance.sendTransacEmail({

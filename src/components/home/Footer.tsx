@@ -20,6 +20,7 @@ const Footer = () => {
           <a
             href="https://github.com/MikeFreno/"
             target="_blank"
+            rel="noreferrer"
             className="hvr-grow-rotate-left rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">
@@ -50,6 +51,7 @@ const Footer = () => {
           <a
             href="https://www.linkedin.com/in/michael-freno-176001256/"
             target="_blank"
+            rel="noreferrer"
             className="hvr-grow-rotate rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">

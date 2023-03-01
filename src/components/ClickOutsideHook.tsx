@@ -2,7 +2,7 @@ import { useEffect, RefObject } from "react";
 
 type Refs = RefObject<HTMLElement>[];
 
-const useOnClickOutside = (
+const UseOnClickOutside = (
   refs: Refs,
   handler: (event: MouseEvent | TouchEvent) => void
 ) => {
@@ -28,4 +28,4 @@ const useOnClickOutside = (
     };
   }, [refs, handler]);
 };
-export default useOnClickOutside;
+export default UseOnClickOutside;

@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  RefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
@@ -44,15 +50,19 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
     }
   }, [showingLoginModal]);
 
-  if (props.switchRef) {
-    useOnClickOutside([menuRef, closeRef, props.switchRef], () => {
+  useOnClickOutside(
+    [menuRef, closeRef, props.switchRef as RefObject<HTMLDivElement>],
+    () => {
       setMenuOpen(false);
-    });
+    }
+  );
 
-    useOnClickOutside([loginRef, loginButtonRef, props.switchRef], () => {
+  useOnClickOutside(
+    [loginRef, loginButtonRef, props.switchRef as RefObject<HTMLDivElement>],
+    () => {
       setShowingLoginModal(false);
-    });
-  }
+    }
+  );
 
   useEffect(() => {
     rotateBars();

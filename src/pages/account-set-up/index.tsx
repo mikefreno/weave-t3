@@ -35,8 +35,7 @@ async function uploadPicturesToS3(
   picture: File
 ) {
   const category = "users";
-  let data: any;
-  data = await axios
+  const data: any = await axios
     .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
     .catch((err) => {
       console.log(err);
@@ -49,7 +48,7 @@ async function uploadPicturesToS3(
   return key;
 }
 
-const userSetup = () => {
+const UserSetup = () => {
   const userQuery = api.users.getCurrentUser.useQuery();
   const [realNamePicture, setRealNamePicture] = useState<File | Blob | null>(
     null
@@ -334,4 +333,4 @@ const userSetup = () => {
   );
 };
 
-export default userSetup;
+export default UserSetup;

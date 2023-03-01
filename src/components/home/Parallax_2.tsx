@@ -10,7 +10,7 @@ const Parallax_2 = (props: { isDarkTheme: boolean }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      let offset = window.pageYOffset;
+      const offset = window.pageYOffset;
       Array.from(parallaxRef.current!.children).map((layer: Element, index) => {
         let speed = parseFloat(layer.getAttribute("data-speed")!);
         if (index === 0 || index === 2) {
