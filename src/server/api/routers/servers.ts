@@ -116,6 +116,7 @@ export const serverRouter = createTRPCRouter({
         params: {
           SERVER: input.serverName,
           TOKEN: input.token,
+          source_URL: process.env.NEXT_PUBLIC_HOSTNAME,
         },
         subject: `Invitation to join ${input.serverName}`,
       };
@@ -150,7 +151,6 @@ export const serverRouter = createTRPCRouter({
         const emails = [
           ...new Set([...adminEmails, ...memberEmails, server.owner.email]),
         ];
-        console.log(emails);
         if (emails.includes(input.email)) {
           return true;
         } else return false;
