@@ -106,8 +106,8 @@ const ChannelMain = (props: {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
 
-  const UsersCommentClass = "userCommentBGColor rounded-lg py-5 px-6";
-  const OtherCommentsClass = "bg-zinc-800 rounded-lg py-5 px-6";
+  const UsersCommentClass = "userCommentBGColor rounded-2xl py-5 px-6";
+  const OtherCommentsClass = "bg-zinc-800 rounded-2xl py-5 px-6";
 
   return (
     <div className="">

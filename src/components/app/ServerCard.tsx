@@ -1,5 +1,17 @@
-import { Card, Col, Row, Button, Text, Avatar } from "@nextui-org/react";
-import React from "react";
+import InfoIcon from "@/src/icons/InfoIcon";
+import { api } from "@/src/utils/api";
+import {
+  Card,
+  Col,
+  Row,
+  Button,
+  Text,
+  Avatar,
+  Tooltip,
+  Loading,
+} from "@nextui-org/react";
+import React, { useState } from "react";
+import ServerTooltip from "./ServerTooltip";
 
 const ServerCard = (props: {
   logo: string;
@@ -8,13 +20,46 @@ const ServerCard = (props: {
   blurb: string;
   members: number;
   membersOnline: number;
+  serverID: number;
+  refreshUserServers: () => void;
 }) => {
-  const { logo, banner, name, blurb, members, membersOnline } = props;
+  const {
+    logo,
+    banner,
+    name,
+    blurb,
+    members,
+    membersOnline,
+    serverID,
+    refreshUserServers,
+  } = props;
+  const serverJoinMutation = api.server.joinPublicServer.useMutation();
+  const [joinButtonLoading, setJoinButtonLoading] = useState(false);
+
+  const joinPublicServer = async () => {
+    setJoinButtonLoading(true);
+    await serverJoinMutation.mutateAsync(serverID);
+    refreshUserServers();
+    setJoinButtonLoading(false);
+  };
+
   return (
     <Card css={{ w: "12rem", h: "400px" }}>
       <Card.Header css={{ position: "absolute", zIndex: 1, top: 5 }}>
         <Col>
-          <Avatar />
+          <Row>
+            <Avatar src={logo} />
+            <div className="absolute right-0">
+              <Tooltip
+                content={
+                  <ServerTooltip serverName={name} serverBlurb={blurb} />
+                }
+                placement="rightStart"
+              >
+                <InfoIcon height={20} width={20} fill={"#9333ea"} />
+              </Tooltip>
+            </div>
+          </Row>
           <Text h3 color="black">
             {name}
           </Text>
@@ -40,12 +85,6 @@ const ServerCard = (props: {
         }}
       >
         <Row>
-          <Text color="#000" size={12}>
-            {" "}
-            {blurb}
-          </Text>
-        </Row>
-        <Row>
           <Col>
             <Text color="#000" size={12}>
               {membersOnline} online.
@@ -56,16 +95,28 @@ const ServerCard = (props: {
           </Col>
           <Col>
             <Row justify="flex-end">
-              <Button flat auto rounded color="secondary">
-                <Text
-                  css={{ color: "inherit" }}
-                  size={12}
-                  weight="bold"
-                  transform="uppercase"
+              {joinButtonLoading ? (
+                <Button disabled auto bordered color="gradient">
+                  <Loading type="points" size="sm" />
+                </Button>
+              ) : (
+                <Button
+                  flat
+                  auto
+                  rounded
+                  color="secondary"
+                  onClick={joinPublicServer}
                 >
-                  Join
-                </Text>
-              </Button>
+                  <Text
+                    css={{ color: "inherit" }}
+                    size={12}
+                    weight="bold"
+                    transform="uppercase"
+                  >
+                    Join
+                  </Text>
+                </Button>
+              )}
             </Row>
           </Col>
         </Row>

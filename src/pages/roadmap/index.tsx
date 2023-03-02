@@ -1,3 +1,4 @@
+import Footer from "@/src/components/home/Footer";
 import Navbar from "@/src/components/Navbar";
 import React, { useEffect, useRef } from "react";
 
@@ -26,24 +27,33 @@ const RoadMap = () => {
             </li>
             <li className="hvr-move-right">
               <a
-                href="#UserAccount"
+                href="#useraccount"
                 className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100"
               >
                 User / Account
               </a>
             </li>
             <li className="hvr-move-right">
-              <a className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100">
+              <a
+                href="#server"
+                className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100"
+              >
                 Servers
               </a>
             </li>
             <li className="hvr-move-right">
-              <a className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100">
+              <a
+                href="#bots"
+                className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100"
+              >
                 Bots
               </a>
             </li>
             <li className="hvr-move-right">
-              <a className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100">
+              <a
+                href="#bots"
+                className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100"
+              >
                 Misc
               </a>
             </li>
@@ -92,7 +102,8 @@ const RoadMap = () => {
               </span>
             </p>
           </div>
-          <div id="UI" className="py-16">
+          <div id="UI" className="absolute -mt-20"></div>
+          <div className="py-16">
             <div className="text-2xl font-semibold tracking-wider">
               User Interface
             </div>
@@ -140,7 +151,8 @@ const RoadMap = () => {
               </li>
             </ul>
           </div>
-          <div id="UserAccount">
+          <div id="useraccount" className="absolute -mt-20"></div>
+          <div>
             <div className="text-2xl font-semibold tracking-wider">
               User / Account
             </div>
@@ -171,7 +183,8 @@ const RoadMap = () => {
               </li>
             </ul>
           </div>
-          <div id="UserAccount">
+          <div id="server" className="absolute -mt-20"></div>
+          <div>
             <div className="text-2xl font-semibold tracking-wider">Server</div>
             <p className="px-36 pt-12 tracking-wide">
               These features regard how servers function
@@ -187,7 +200,9 @@ const RoadMap = () => {
               </li>
               <li className="flex">
                 <div className="my-auto h-3 w-3 rounded-full border border-zinc-400 bg-zinc-900 pt-1"></div>{" "}
-                <div className="pl-2">Server Aesthetics</div>
+                <div className="pl-2">
+                  Server Aesthetics defined by owner / admin
+                </div>
               </li>
               <li className="flex">
                 <div className="my-auto h-3 w-3 rounded-full border border-zinc-400 bg-zinc-900 pt-1"></div>{" "}
@@ -209,9 +224,31 @@ const RoadMap = () => {
                 <div className="my-auto h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Real name vs Pseudonym</div>
               </li>
+              <li className="flex">
+                <div className="my-auto h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
+                <div className="pl-2">Public Server Listing</div>
+              </li>
             </ul>
           </div>
-          <div id="misc">
+          <div id="bots" className="absolute -mt-20"></div>
+          <div>
+            <div className="text-2xl font-semibold tracking-wider">Bots</div>
+            <p className="px-36 pt-12 tracking-wide">
+              These features regard the usage of bots
+            </p>
+            <ul className="px-40">
+              <li className="flex">
+                <div className="my-auto h-3 w-3 rounded-full border border-zinc-400 bg-zinc-900 pt-1"></div>{" "}
+                <div className="pl-2">Pre-made Bots</div>
+              </li>
+              <li className="flex">
+                <div className="my-auto h-3 w-3 rounded-full border border-zinc-400 bg-zinc-900 pt-1"></div>{" "}
+                <div className="pl-2">User defined bots</div>
+              </li>
+            </ul>
+          </div>
+          <div id="misc" className="absolute -mt-20"></div>
+          <div>
             <div className="text-2xl font-semibold tracking-wider">
               Miscellaneous
             </div>
@@ -251,6 +288,8 @@ const RoadMap = () => {
             </ul>
           </div>
         </div>
+        <div className="ml-52 mb-4 mt-12 border-b border-zinc-800 dark:border-zinc-300" />
+        <Footer />
       </div>
     </div>
   );

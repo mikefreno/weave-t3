@@ -25,16 +25,19 @@ const InviteModal = (props: {
   const [QRCodeShowing, setQRCodeShowing] = useState(false);
   const [QRCodeValue, setQRCodeValue] = useState("");
   const [showingGenericCode, setShowingGenericCode] = useState(false);
+  const [genericCodeData, setGenericCodeData] = useState("");
   const invitee =
     useRef<HTMLInputElement>() as MutableRefObject<HTMLInputElement>;
-  const createJWTInvite =
-    api.server.createJWTInvite.useQuery(selectedInnerTabID);
+  const createJWTInvite = api.server.createJWTInvite.useMutation({});
   const sendServerInvite = api.server.sendServerInvite.useMutation({});
   const userCheck = api.server.checkForMemberEmail.useMutation({});
 
   const sendEmail = async () => {
     const email = invitee.current.value;
-    await createJWTInvite.refetch();
+    const token = await createJWTInvite.mutateAsync({
+      email: email,
+      serverID: selectedInnerTabID,
+    });
     if (email.length >= 3) {
       setIconClass("move-fade");
       setEmailSendLoading(true);
@@ -45,7 +48,7 @@ const InviteModal = (props: {
       if (res === false) {
         await sendServerInvite.mutateAsync({
           invitee: invitee.current.value,
-          token: createJWTInvite.data as string,
+          token: token as string,
           serverName: selectedInnerTab,
         });
         setEmailSendReport("Email Sent!");
@@ -57,16 +60,35 @@ const InviteModal = (props: {
   };
 
   const showCode = async () => {
-    await createJWTInvite.refetch();
-    setShowingGenericCode(!showingGenericCode);
+    if (showingGenericCode) {
+      setShowingGenericCode(false);
+    } else {
+      const email = invitee.current.value;
+      if (email.length >= 3) {
+        const token = await createJWTInvite.mutateAsync({
+          email: email,
+          serverID: selectedInnerTabID,
+        });
+        setGenericCodeData(token);
+        setShowingGenericCode(true);
+      } else {
+        alert("Please enter a valid email address in above field!");
+      }
+    }
   };
 
   const generateQRCode = async () => {
-    await createJWTInvite.refetch();
-    setQRCodeValue(
-      `localhost:3000/api/joinServer?token=${createJWTInvite.data}`
-    );
-    setQRCodeShowing(!QRCodeShowing);
+    const email = invitee.current.value;
+    if (email.length >= 3) {
+      const token = await createJWTInvite.mutateAsync({
+        email: email,
+        serverID: selectedInnerTabID,
+      });
+      setQRCodeValue(`localhost:3000/api/joinServer?token=${token}`);
+      setQRCodeShowing(!QRCodeShowing);
+    } else {
+      alert("Please enter a valid email address in above field!");
+    }
   };
 
   return (
@@ -164,7 +186,7 @@ const InviteModal = (props: {
                     Get
                   </Button>
                   <div className="mt-2 w-40 break-words">
-                    {showingGenericCode ? createJWTInvite.data : null}
+                    {showingGenericCode ? genericCodeData : null}
                   </div>
                 </div>
                 <div className="flex flex-col items-center">

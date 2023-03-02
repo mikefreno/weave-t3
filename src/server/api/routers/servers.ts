@@ -77,14 +77,14 @@ export const serverRouter = createTRPCRouter({
       return server;
     }),
   createJWTInvite: protectedProcedure
-    .input(z.number())
-    .query(async ({ input, ctx }) => {
+    .input(z.object({ serverID: z.number(), email: z.string() }))
+    .mutation(async ({ input, ctx }) => {
       const userID = ctx.session.user.id;
       const SK = process.env.JWT_SECRET as string;
       const token = jwt.sign(
         {
           exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-          data: { server: input, inviter: userID },
+          data: { server: input.serverID, inviter: userID, email: input.email },
         },
         SK
       );
@@ -120,7 +120,6 @@ export const serverRouter = createTRPCRouter({
         },
         subject: `Invitation to join ${input.serverName}`,
       };
-      console.log(process.env.NEXT_PUBLIC_HOSTNAME);
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -179,13 +178,16 @@ export const serverRouter = createTRPCRouter({
         return true;
       }
     }),
-  getAllPublicServers: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.server.findMany({
-      where: {
-        type: "public",
-      },
-    });
-  }),
+  getAllPublicServers: publicProcedure
+    .input(z.string())
+    .mutation(({ input, ctx }) => {
+      return ctx.prisma.server.findMany({
+        where: {
+          type: "public",
+          category: input,
+        },
+      });
+    }),
   postComment: protectedProcedure
     .input(
       z.object({
@@ -238,6 +240,41 @@ export const serverRouter = createTRPCRouter({
       if (serverAdmin) {
         await ctx.prisma.server_Member.delete({
           where: { id: serverAdmin.id },
+        });
+      }
+    }),
+  joinPublicServer: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      const userID = ctx.session.user.id;
+      const member = await ctx.prisma.server_Member.findFirst({
+        where: { memberId: userID, ServerId: input },
+      });
+      const admin = await ctx.prisma.server_Admin.findFirst({
+        where: { adminId: userID, ServerId: input },
+      });
+      const server = await ctx.prisma.server.findFirst({
+        where: { id: input },
+      });
+      let owner: boolean;
+      if (userID == server?.ownerId) {
+        owner = true;
+      } else {
+        owner = false;
+      }
+      if (member || admin || owner) {
+        return false;
+      } else {
+        await ctx.prisma.server_Member.create({
+          data: {
+            member: {
+              connect: { id: userID },
+            },
+            Server: {
+              connect: { id: input },
+            },
+            invitedBy: "publicJoin",
+          },
         });
       }
     }),

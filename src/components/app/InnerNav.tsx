@@ -28,6 +28,7 @@ import ThemeContext from "../ThemeContextProvider";
 import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
 import { api } from "@/src/utils/api";
+import LoadingOverlay from "./LoadingOverlay";
 
 type ServerIncludingChannel = {
   id: number;
@@ -56,6 +57,8 @@ const InnerNav = (props: {
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
+  loadingOverlaySetter: (boolean: boolean) => void;
+  serverRefetch: () => void;
 }) => {
   const {
     currentTab,
@@ -65,6 +68,8 @@ const InnerNav = (props: {
     selectedChannel,
     selectedInnerTabID,
     usersServers,
+    loadingOverlaySetter,
+    serverRefetch,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,6 +88,7 @@ const InnerNav = (props: {
   const createChannelButtonRef = useRef<HTMLButtonElement>(null);
   const createChannelRef = useRef<HTMLDivElement>(null);
   const deleteUser = api.server.deleteUserFromServer.useMutation({});
+  const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
 
   useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
     setCreateChannelModalShowing(false);
@@ -107,7 +113,10 @@ const InnerNav = (props: {
       "Are you sure you want to leave the server?"
     );
     if (confirmed) {
+      loadingOverlaySetter(true);
       await deleteUser.mutateAsync(thisServer!.id);
+      serverRefetch();
+      loadingOverlaySetter(false);
     }
   };
 

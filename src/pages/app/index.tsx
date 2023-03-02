@@ -19,6 +19,7 @@ import router from "next/router";
 import ServerMainScreen from "@/src/components/app/SeverMainScreen";
 import ChannelMain from "@/src/components/app/ChannelMain";
 import { Server, Server_Channel } from "@prisma/client";
+import LoadingOverlay from "@/src/components/app/LoadingOverlay";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -45,6 +46,7 @@ const App = () => {
   const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(
     null
   );
+  const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
   const currentUser = api.users.getCurrentUser.useQuery().data;
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
@@ -85,7 +87,12 @@ const App = () => {
   function currentTabSetter(id: string) {
     setCurrentTab(id);
   }
-
+  const loadingOverlaySetter = (boolean: boolean) => {
+    setLoadingOverlayShowing(boolean);
+  };
+  const serverRefetch = () => {
+    usersServers.refetch();
+  };
   useEffect(() => {
     document.getElementById("html")?.classList.add("scollDisabled");
     document
@@ -185,6 +192,8 @@ const App = () => {
             usersServers={usersServers.data as any}
             setSelectedChannel={setSelectedChannel}
             selectedChannel={selectedChannel}
+            loadingOverlaySetter={loadingOverlaySetter}
+            serverRefetch={serverRefetch}
           />
           <InnerNavOverlay
             setSelectedInnerTab={setSelectedInnerTab}
@@ -212,7 +221,10 @@ const App = () => {
             selectedInnerTab === "Science & Technology" ||
             selectedInnerTab === "Made By Weave") ? (
             <div className="">
-              <PublicServersPages selectedInnerTab={selectedInnerTab} />
+              <PublicServersPages
+                selectedInnerTab={selectedInnerTab}
+                refreshUserServers={refreshUserServers}
+              />
             </div>
           ) : null}
           {currentTab === "server" && usersServers ? (
@@ -231,6 +243,9 @@ const App = () => {
             )
           ) : null}
         </div>
+        {loadingOverlayShowing ? (
+          <LoadingOverlay isDarkTheme={isDarkTheme} />
+        ) : null}
       </div>
       <div>
         {serverModalShowing ? (
