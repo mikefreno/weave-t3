@@ -15,12 +15,9 @@ const StageBanner = () => {
       <button onClick={close} className="my-auto flex justify-end">
         <Xmark className={"w-8"} />
       </button>
-      <div className="my-auto flex pl-12">
+      <div className="my-auto pl-12">
         This app is currently in an alpha stage, many core feature have yet to
-        be deployed. Read more{" "}
-        <Link className="pl-1" href={"/roadmap"}>
-          here
-        </Link>
+        be deployed. Read more <Link href={"/roadmap"}>here</Link>
       </div>
     </div>
   );

@@ -94,7 +94,7 @@ const Home = () => {
             </div>
             <div
               id="spacer"
-              className="z-0 mx-4 mb-36 mt-36 h-screen rounded-md bg-[url('/work.jpg')] bg-cover bg-center sm:mb-0 md:mx-12 lg:mx-24 lg:rounded-[3rem] xl:mx-36"
+              className="z-0 mx-4 mb-36 mt-36 h-screen rounded-lg bg-[url('/work.jpg')] bg-cover bg-center sm:mb-0 md:mx-12 lg:mx-24 lg:rounded-3xl xl:mx-36"
             ></div>
           </div>
           <div className="mx-12 mb-4 mt-12 border-b border-zinc-800 dark:border-zinc-300" />
