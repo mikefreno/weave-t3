@@ -112,7 +112,7 @@ const ChannelMain = (props: {
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} />
-      <div className="chatScreen container overflow-y-scroll rounded bg-zinc-900">
+      <div className="chatScreen overflow-y-scroll rounded bg-zinc-900 px-3">
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
             <button onClick={manualReconnect}>Connect</button>
@@ -129,7 +129,7 @@ const ChannelMain = (props: {
           </div>
         ) : null}
         {/* messages */}
-        <ul className="pt-6">
+        <ul className="w-full pt-6">
           {messages.map((message, index) => (
             <div
               key={index}
@@ -174,7 +174,7 @@ const ChannelMain = (props: {
           ))}
         </ul>
       </div>
-      <div className="container bg-zinc-700">
+      <div className="bg-zinc-700">
         <div className="mx-2 pt-3 md:mx-6 lg:mx-8 xl:mx-12">
           <form onSubmit={sendMessage}>
             <Input
