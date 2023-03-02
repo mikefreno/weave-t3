@@ -107,7 +107,7 @@ const InnerNav = (props: {
       "Are you sure you want to leave the server?"
     );
     if (confirmed) {
-      await deleteUser.mutateAsync(thisServer.id);
+      await deleteUser.mutateAsync(thisServer!.id);
     }
   };
 
