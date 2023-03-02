@@ -27,7 +27,7 @@ export default async function joinServer(
       } else if (typeof decoded === "string") {
         return res.status(401).json({ error: "unknown error" });
       } else {
-        const userId = session?.user?.id;
+        const userId = decoded?.data.userID;
         const serverID = decoded?.data.server;
         const inviter = decoded?.data.inviter;
         await prisma.server_Member.create({

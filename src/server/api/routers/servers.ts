@@ -213,4 +213,32 @@ export const serverRouter = createTRPCRouter({
         },
       });
     }),
+  deleteUserFromServer: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      const userID = ctx.session.user.id;
+
+      const serverMember = await ctx.prisma.server_Member.findFirst({
+        where: {
+          memberId: userID,
+          ServerId: input,
+        },
+      });
+      if (serverMember) {
+        await ctx.prisma.server_Member.delete({
+          where: { id: serverMember.id },
+        });
+      }
+      const serverAdmin = await ctx.prisma.server_Admin.findFirst({
+        where: {
+          adminId: userID,
+          ServerId: input,
+        },
+      });
+      if (serverAdmin) {
+        await ctx.prisma.server_Member.delete({
+          where: { id: serverAdmin.id },
+        });
+      }
+    }),
 });

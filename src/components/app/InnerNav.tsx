@@ -27,6 +27,7 @@ import React, { RefObject, useContext, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
+import { api } from "@/src/utils/api";
 
 type ServerIncludingChannel = {
   id: number;
@@ -81,6 +82,7 @@ const InnerNav = (props: {
   });
   const createChannelButtonRef = useRef<HTMLButtonElement>(null);
   const createChannelRef = useRef<HTMLDivElement>(null);
+  const deleteUser = api.server.deleteUserFromServer.useMutation({});
 
   useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
     setCreateChannelModalShowing(false);
@@ -99,6 +101,14 @@ const InnerNav = (props: {
   };
   const createChannelToggle = () => {
     setCreateChannelModalShowing(!createChannelModalShowing);
+  };
+  const leaveServerAlert = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to leave the server?"
+    );
+    if (confirmed) {
+      await deleteUser.mutateAsync(thisServer.id);
+    }
   };
 
   if (currentTab == "DMS") {
@@ -324,7 +334,6 @@ const InnerNav = (props: {
               color={isDarkTheme ? "#e4e4e7" : "#27272a"}
             />
           </span>
-
           <span className="mx-auto pl-2">Entertainment</span>
         </button>
         <button
@@ -455,6 +464,14 @@ const InnerNav = (props: {
                   strokeWidth={2}
                 />
               </span>
+            </button>
+            <button
+              className="flex underline-offset-2 hover:underline"
+              onClick={leaveServerAlert}
+              ref={inviteModalButtonRef}
+            >
+              <div>Leave Server</div>
+              <span className="my-auto"></span>
             </button>
           </div>
         </div>
