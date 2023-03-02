@@ -216,7 +216,7 @@ const RoadMap = () => {
               Miscellaneous
             </div>
             <p className="px-36 pt-12 tracking-wide">
-              These features don't neatly fall into any of the previous
+              These features don&apos;t neatly fall into any of the previous
               categories
             </p>
             <ul className="px-40">
