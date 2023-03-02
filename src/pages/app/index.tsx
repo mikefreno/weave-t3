@@ -47,6 +47,7 @@ const App = () => {
     null
   );
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
+  const [innerNavShowing, setInnerNavShowing] = useState(true);
   const currentUser = api.users.getCurrentUser.useQuery().data;
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
@@ -153,6 +154,9 @@ const App = () => {
   const refreshUserServers = async () => {
     await usersServers.refetch();
   };
+  const toggleInnerNav = () => {
+    setInnerNavShowing(!innerNavShowing);
+  };
 
   return (
     <div className="bg-zinc-300 dark:bg-zinc-700">
@@ -177,9 +181,13 @@ const App = () => {
             setSelectedInnerTabID={setSelectedInnerTabID}
             usersServers={usersServers.data}
             selectedInnerTabID={selectedInnerTabID}
+            toggleInnerNav={toggleInnerNav}
           />
         </div>
-        <div id="inner-nav" className="ml-20">
+        <div
+          id="inner-nav"
+          className={`${innerNavShowing ? "ml-20" : "hidden"}`}
+        >
           <InnerNav
             refreshUserServers={refreshUserServers}
             currentTab={currentTab}
@@ -204,7 +212,11 @@ const App = () => {
             audioToggle={audioToggle}
           />
         </div>
-        <div id="center-page" ref={scrollableRef} className="flex-1 pl-52">
+        <div
+          id="center-page"
+          ref={scrollableRef}
+          className={`flex-1 ${innerNavShowing ? "pl-52" : "pl-20"}`}
+        >
           {selectedInnerTab === "AccountOverview" ? <AccountPage /> : null}
 
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (

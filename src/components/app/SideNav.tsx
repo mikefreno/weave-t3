@@ -1,4 +1,9 @@
-import React, { MouseEventHandler, RefObject, useContext } from "react";
+import React, {
+  MouseEventHandler,
+  RefObject,
+  useContext,
+  useState,
+} from "react";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
 import Image from "next/image";
@@ -9,6 +14,7 @@ import BullhornIcon from "@/src/icons/BullhornIcon";
 import RobotForApp from "@/src/icons/RobotForApp";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import { Raleway } from "@next/font/google";
+import DoubleChevrons from "@/src/icons/DoubleChevrons";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 
@@ -29,10 +35,12 @@ const SideNav = (props: {
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
+  toggleInnerNav: () => void;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
 
-  const { currentUser, usersServers } = props;
+  const { currentUser, usersServers, toggleInnerNav } = props;
+  const [innerHiddenRotate, setInnerHiddenRotate] = useState(false);
 
   return (
     <aside className="stopIT fixed h-screen w-20 bg-zinc-700 dark:bg-zinc-900">
@@ -177,6 +185,22 @@ const SideNav = (props: {
               />
             </button>
           </Tooltip>
+        </div>
+        <div className="flex justify-end p-2 align-bottom">
+          <button
+            onClick={() => {
+              toggleInnerNav();
+              setInnerHiddenRotate(!innerHiddenRotate);
+            }}
+            className={`${innerHiddenRotate ? "rotate-180" : ""}`}
+          >
+            <DoubleChevrons
+              height={24}
+              width={24}
+              stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
+              strokeWidth={1}
+            />
+          </button>
         </div>
       </div>
     </aside>
