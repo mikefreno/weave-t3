@@ -14,6 +14,7 @@ import ThemeContext from "../components/ThemeContextProvider";
 import ModalsForSmallScreens from "../components/home/ModalsForSmallScreens";
 import LoadingElement from "../components/loading";
 import { useSession } from "next-auth/react";
+import StageBanner from "../components/StageBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ const Home = () => {
         className={isDarkTheme ? "bgColorGradient" : "bgColorGradientLight"}
         id="body"
       >
+        <StageBanner />
         <div
           id="bottomGradient"
           className={`${

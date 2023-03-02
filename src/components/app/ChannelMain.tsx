@@ -146,11 +146,11 @@ const ChannelMain = (props: {
                     : OtherCommentsClass
                 }
               >
-                <div>{message.message}</div>
+                <div className="relative">{message.message}</div>
                 {message.userId == currentUser.id ? null : (
                   <div>
                     {/* <div className="pt-2 text-sm">{message.user.name}</div> */}
-                    <div className="absolute -ml-6 mt-1">
+                    <div className="-ml-8 mt-1 -mb-12">
                       <Tooltip
                         content={message.user.name}
                         color="secondary"
