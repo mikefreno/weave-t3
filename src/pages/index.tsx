@@ -32,7 +32,7 @@ const Home = () => {
   }
 
   return (
-    <>
+    <div className="bannerBGColor w-screen">
       <div
         className={isDarkTheme ? "bgColorGradient" : "bgColorGradientLight"}
         id="body"
@@ -97,7 +97,7 @@ const Home = () => {
           <Footer />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
