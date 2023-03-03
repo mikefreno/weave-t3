@@ -56,7 +56,6 @@ const Home = () => {
               <div className="hidden pt-24 md:block">
                 <Parallax_2 isDarkTheme={isDarkTheme} />
               </div>
-              ``
               <div className="flex justify-center pt-28">
                 <Image
                   src={isDarkTheme ? DarkLogo : LightLogo}
