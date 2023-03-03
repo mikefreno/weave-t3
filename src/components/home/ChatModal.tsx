@@ -6,7 +6,7 @@ const ChatModal = (props: { isDarkTheme: boolean }) => {
   const { isDarkTheme } = props;
   return (
     <div
-      className={`z-50 rounded-2xl p-1 backdrop-blur ${
+      className={`z-50 max-w-[40vw] rounded-2xl p-1 backdrop-blur ${
         isDarkTheme ? "darkBorder" : "lightBorder"
       }`}
     >

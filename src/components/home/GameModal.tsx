@@ -6,16 +6,16 @@ const GameModal = (props: { isDarkTheme: boolean }) => {
 
   return (
     <div
-      className={`z-50 rounded-2xl p-1 backdrop-blur ${
+      className={`z-50 max-w-[40vw] rounded-2xl p-1 backdrop-blur ${
         isDarkTheme ? "darkBorder" : "lightBorder"
       }`}
     >
       <div
-        className={`${
+        className={`max-w-[40vw] ${
           isDarkTheme ? "transparentZinc800" : "transparentZinc300"
         } w-64 rounded-2xl p-4 shadow-2xl xl:w-96`}
       >
-        <span className="flex justify-center">
+        <span className="flex max-w-[40vw] justify-center">
           <GamepadIconThin
             height={120}
             width={160}

@@ -106,13 +106,13 @@ const ChannelMain = (props: {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
 
-  const UsersCommentClass = "userCommentBGColor rounded-2xl py-5 px-6";
+  const UsersCommentClass = "bg-purple-900 rounded-2xl py-5 px-6";
   const OtherCommentsClass = "bg-zinc-800 rounded-2xl py-5 px-6";
 
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} />
-      <div className="chatScreen overflow-y-scroll rounded bg-zinc-900 px-3">
+      <div className="chatScreen scollXDisabled overflow-y-scroll rounded bg-zinc-900">
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
             <button onClick={manualReconnect}>Connect</button>
@@ -135,8 +135,8 @@ const ChannelMain = (props: {
               key={index}
               className={
                 message.userId == currentUser.id
-                  ? "my-4 flex justify-end"
-                  : "my-4 flex"
+                  ? "my-4 flex justify-end pr-9"
+                  : "my-4 flex pl-3"
               }
             >
               <li

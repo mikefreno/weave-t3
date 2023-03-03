@@ -98,9 +98,7 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
     <div className="stopIT">
       <nav
         className={`fixed z-50 flex p-2 ${
-          pathname !== "/app"
-            ? "w-screen backdrop-blur"
-            : "right-0 rounded-lg backdrop-blur-[2px]"
+          pathname !== "/app" ? "w-screen backdrop-blur" : "right-0 rounded-lg"
         }`}
       >
         {pathname == "/app" ? null : (

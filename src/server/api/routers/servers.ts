@@ -278,4 +278,11 @@ export const serverRouter = createTRPCRouter({
         });
       }
     }),
+  getUserCounts: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ ctx, input }) => {
+      const server = await ctx.prisma.server.findFirst({
+        where: { id: input },
+      });
+    }),
 });

@@ -89,15 +89,15 @@ const Home = () => {
             <div className="hidden md:block">
               <Parallax />
             </div>
-            <div className="md:hidden">
+            <div className="hidden sm:-my-24 sm:block md:my-0 md:hidden">
               <ModalsForSmallScreens />
             </div>
             <div
               id="spacer"
-              className="z-0 mx-4 mb-36 mt-36 h-screen rounded-lg bg-[url('/work.jpg')] bg-cover bg-center sm:mb-0 md:mx-12 lg:mx-24 lg:rounded-3xl xl:mx-36"
+              className="z-0 mx-4 h-screen rounded-lg bg-[url('/work.jpg')] bg-contain bg-center bg-no-repeat sm:mb-0 sm:bg-cover md:mx-12 md:mb-36 md:mt-36 lg:mx-24 lg:rounded-3xl xl:mx-36"
             ></div>
           </div>
-          <div className="mx-12 mb-4 mt-12 border-b border-zinc-800 dark:border-zinc-300" />
+          <div className="mx-12 mb-4 border-b border-zinc-800 dark:border-zinc-300 md:mt-12" />
           <Footer />
         </div>
       </div>

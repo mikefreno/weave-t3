@@ -28,7 +28,7 @@ const ModalsForSmallScreens = () => {
         <div className="animate-up-down layer1">
           <ConfigModal isDarkTheme={isDarkTheme} />
         </div>
-        <div className="animate-up-down layer2">
+        <div className="animate-up-down layer2 -mt-12">
           <SecurityModal isDarkTheme={isDarkTheme} />
         </div>
       </div>

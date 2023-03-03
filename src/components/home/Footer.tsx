@@ -65,7 +65,7 @@ const Footer = () => {
           </a>
         </li>
       </ul>
-      <div className="mr-24 -mt-6 flex flex-col items-end pb-4">
+      <div className="mr-6 -mt-6 flex flex-col items-end pb-12 md:mr-24 md:pb-4">
         <span className="flex">©{copyright_tag}</span>
         <span className="flex">Michael Freno</span>
       </div>
