@@ -56,7 +56,7 @@ const SideNav = (props: {
             className="logoSpinner z-50"
             onClick={() => {
               props.currentTabSetter("DMS");
-              props.setSelectedInnerTab("");
+              props.setSelectedInnerTab("AccountOverview");
             }}
           >
             <Image

@@ -210,6 +210,7 @@ const App = () => {
             microphoneToggle={microphoneToggle}
             audioState={audioState}
             audioToggle={audioToggle}
+            currentTabSetter={currentTabSetter}
           />
         </div>
         <div

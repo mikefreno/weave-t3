@@ -8,6 +8,7 @@ import ThemeContext from "../ThemeContextProvider";
 
 const InnerNavOverlay = (props: {
   setSelectedInnerTab: Dispatch<SetStateAction<string>>;
+  currentTabSetter: (id: string) => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -29,7 +30,10 @@ const InnerNavOverlay = (props: {
             <div className="mr- flex items-center">
               {currentUser?.image ? (
                 <button
-                  onClick={() => props.setSelectedInnerTab("AccountOverview")}
+                  onClick={() => {
+                    props.setSelectedInnerTab("AccountOverview");
+                    props.currentTabSetter("DMS");
+                  }}
                 >
                   <img
                     src={currentUser.image}
@@ -39,7 +43,10 @@ const InnerNavOverlay = (props: {
               ) : (
                 <button
                   className="h-8 w-8 rounded-full border border-zinc-200 bg-zinc-600"
-                  onClick={() => props.setSelectedInnerTab("AccountOverview")}
+                  onClick={() => {
+                    props.setSelectedInnerTab("AccountOverview");
+                    props.currentTabSetter("DMS");
+                  }}
                 >
                   {currentUser?.name?.split(" ")[0]?.charAt(0)}{" "}
                   {currentUser?.name?.split(" ")[1]?.charAt(0)}
@@ -47,16 +54,23 @@ const InnerNavOverlay = (props: {
               )}
             </div>
             <div className="my-auto flex flex-col pl-3">
-              <div>
+              <div className="">
                 <button
-                  onClick={() => props.setSelectedInnerTab("AccountOverview")}
+                  className="flex text-left"
+                  onClick={() => {
+                    props.setSelectedInnerTab("AccountOverview");
+                    props.currentTabSetter("DMS");
+                  }}
                 >
                   {currentUser?.name}
                 </button>
               </div>
               <div>
                 <button
-                  onClick={() => props.setSelectedInnerTab("AccountOverview")}
+                  onClick={() => {
+                    props.setSelectedInnerTab("AccountOverview");
+                    props.currentTabSetter("DMS");
+                  }}
                 >
                   {currentUser.psuedonym}
                 </button>
