@@ -30,7 +30,12 @@ const RoadMap = () => {
           } `}
         >
           <div className="pl-2 text-xl font-semibold underline underline-offset-4">
-            Roadmap Overview
+            <a
+              href="#top"
+              className="cursor-pointer text-zinc-900 dark:text-zinc-100"
+            >
+              Roadmap Overview
+            </a>
           </div>
           <ul>
             <li className="hvr-move-right">
@@ -93,13 +98,14 @@ const RoadMap = () => {
             />
           </button>
         </div>
+        <div id="top" className="absolute -mt-20" />
         <div
           id="content"
           className={`${
             showingAside ? "ml-[30vw] md:ml-[20vw] xl:ml-[15vw]" : null
-          } flex flex-col overflow-y-scroll px-6 md:px-10 lg:px-16`}
+          } overflow-y-scroll px-6 md:px-10 lg:px-16`}
         >
-          <div id="top" className="pb-16">
+          <div className="pb-16">
             <div className="text-3xl font-semibold tracking-wider">
               Weave Roadmap
             </div>
