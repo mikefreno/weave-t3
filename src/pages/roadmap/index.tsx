@@ -2,6 +2,7 @@ import Footer from "@/src/components/home/Footer";
 import Navbar from "@/src/components/Navbar";
 import ThemeContext from "@/src/components/ThemeContextProvider";
 import DoubleChevrons from "@/src/icons/DoubleChevrons";
+import Head from "next/head";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 const RoadMap = () => {
@@ -14,6 +15,10 @@ const RoadMap = () => {
 
   return (
     <div className="">
+      <Head>
+        <title>Roadmap | Weave</title>
+        <meta name="description" content="Weave's Roadmap" />
+      </Head>
       <Navbar switchRef={switchRef} />
       <div className="container pt-20">
         <aside

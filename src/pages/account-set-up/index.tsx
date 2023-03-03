@@ -11,6 +11,7 @@ import LoadingElement from "@/src/components/loading";
 import { useSession } from "next-auth/react";
 import router from "next/router";
 import Resizer from "react-image-file-resizer";
+import Head from "next/head";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -320,6 +321,10 @@ const UserSetup = () => {
   };
   return (
     <>
+      <Head>
+        <title>Account Set Up | Weave</title>
+        <meta name="description" content="Account Set Up" />
+      </Head>
       <Navbar switchRef={switchRef} />
       <div className="flex h-screen flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-800">
         <div className="-mt-24 mb-12 text-3xl">
