@@ -6,6 +6,7 @@ import { createTheme, NextUIProvider } from "@nextui-org/react";
 import { api } from "../utils/api";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ThemeContextProvider } from "../components/ThemeContextProvider";
+import { Analytics } from "@vercel/analytics/react";
 
 const lightTheme = createTheme({
   type: "light",
@@ -38,6 +39,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <NextUIProvider>
           <ThemeContextProvider>
             <Component {...pageProps} />
+            <Analytics />
           </ThemeContextProvider>
         </NextUIProvider>
       </NextThemesProvider>
