@@ -10,7 +10,7 @@ const StageBanner = () => {
   return (
     <div
       ref={banner}
-      className="bannerBGColor fixed z-[100] flex h-12 w-screen"
+      className="bannerBGColor fixed z-[100] flex w-screen backdrop-blur"
     >
       <button onClick={close} className="my-auto flex justify-end">
         <Xmark className={"w-8"} />
