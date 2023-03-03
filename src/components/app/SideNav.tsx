@@ -43,7 +43,7 @@ const SideNav = (props: {
   const [innerHiddenRotate, setInnerHiddenRotate] = useState(false);
 
   return (
-    <aside className="stopIT fixed h-screen w-20 bg-zinc-700 dark:bg-zinc-900">
+    <aside className="stopIT fixed h-screen w-20 border-r border-zinc-400 bg-zinc-700 dark:bg-zinc-900">
       <div className="flex justify-center border-b-2 border-zinc-400 py-4 dark:border-zinc-600">
         <Tooltip
           content={"Direct Messaging"}

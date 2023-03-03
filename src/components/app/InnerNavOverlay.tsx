@@ -22,7 +22,7 @@ const InnerNavOverlay = (props: {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
-    <div className="fixed bottom-0 w-52 border-l border-r border-zinc-700 bg-zinc-600 dark:border-zinc-500 dark:bg-zinc-900">
+    <div className="fixed bottom-0 w-52 border-r border-zinc-700 bg-zinc-600 dark:border-zinc-500 dark:bg-zinc-900">
       <div className="flex w-52 justify-between">
         <div className="flex justify-start">
           <div className="flex flex-row p-2">
