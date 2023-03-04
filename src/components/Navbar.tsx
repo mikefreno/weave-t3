@@ -20,10 +20,16 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import useOnClickOutside from "./ClickOutsideHook";
+import FlipMessageIcon from "../icons/FilpMessage";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 
-const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
+const Navbar = (props: {
+  switchRef?: React.RefObject<HTMLDivElement>;
+  currentTabSetter?: (tab: string) => void;
+  setSelectedInnerTab?: (innerTab: string) => void;
+}) => {
+  const { setSelectedInnerTab, currentTabSetter } = props;
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showingLoginModal, setShowingLoginModal] = useState(false);
@@ -33,6 +39,9 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
   const closeRef = useRef<HTMLButtonElement>(null);
   const loginRef = useRef<HTMLDivElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
+  const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
+  const infoModalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (pathname == "/app") {
@@ -56,6 +65,10 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
       setMenuOpen(false);
     }
   );
+
+  useOnClickOutside([infoModalRef, infoButtonRef], () => {
+    setInfoDropdownShowing(false);
+  });
 
   useOnClickOutside(
     [loginRef, loginButtonRef, props.switchRef as RefObject<HTMLDivElement>],
@@ -93,6 +106,9 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
   function openLoginRegisterModal() {
     loginToggle();
   }
+  const infoDropdownToggle = () => {
+    setInfoDropdownShowing(!infoDropdownShowing);
+  };
 
   return (
     <div className="stopIT">
@@ -122,7 +138,10 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
         <div className="my-auto flex justify-end" style={{ flex: 3 }}>
           <div className={pathname == "/app" ? "hidden" : "hidden md:block"}>
             <ul className="flex text-sm text-[#171717] dark:text-[#E2E2E2]">
-              <div ref={props.switchRef} className="mt-1">
+              <div
+                ref={props.switchRef}
+                className={`${pathname == "/" ? "-mr-4" : null} z-50 mt-1`}
+              >
                 <Switch
                   checked={isDarkTheme}
                   shadow
@@ -134,7 +153,7 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
                   onChange={switchDarkTheme}
                 />
               </div>
-              <li className="mx-2 my-auto">
+              <li className="z-50 my-auto pl-4">
                 {pathname == "/" ? null : (
                   <Link
                     href="/"
@@ -144,36 +163,178 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
                   </Link>
                 )}
               </li>
-              <li className="mx-2 my-auto">
-                {pathname == "/downloads" ? (
-                  <Link
-                    href="/downloads"
-                    className="border-b-2 border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+              <li className="my-auto flex flex-col">
+                <button
+                  ref={infoButtonRef}
+                  className={`z-50 px-4 underline-offset-[6px] hover:underline ${
+                    infoDropdownShowing ? "underline" : null
+                  }`}
+                  onClick={infoDropdownToggle}
+                >
+                  Info
+                </button>
+                {infoDropdownShowing ? (
+                  <div
+                    className="fade-in absolute mx-auto p-2"
+                    ref={infoModalRef}
                   >
-                    Downloads
-                  </Link>
-                ) : (
-                  <Link
-                    href="/downloads"
-                    className="border-[#171717] text-[#171717] hover:border-b-2 dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                  >
-                    Downloads
-                  </Link>
-                )}
+                    <div className="mt-8 ml-2 rounded-b-3xl rounded-tr-3xl rounded-tl-sm border border-zinc-500 bg-zinc-900 shadow-xl">
+                      <div className="p-1">
+                        <Tooltip
+                          content={"Coming Soon!"}
+                          trigger="click"
+                          color={"secondary"}
+                          placement="top"
+                        >
+                          <div className="w-48 p-2">
+                            {pathname == "/downloads" ? (
+                              <div className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]">
+                                <div className="rounded-b rounded-tr-2xl rounded-tl-sm bg-zinc-700 p-2">
+                                  <div className="text-lg text-zinc-100">
+                                    Downloads
+                                  </div>
+                                  <p className="text-center text-sm text-zinc-400">
+                                    Coming soon
+                                  </p>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]">
+                                <div className="rounded-b rounded-tr-2xl rounded-tl-sm p-2 hover:bg-zinc-700">
+                                  <div className="text-lg text-zinc-100">
+                                    Downloads
+                                  </div>
+                                  <p className="text-center text-sm text-zinc-400">
+                                    Coming soon
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </Tooltip>
+                        <div className="w-48 p-2">
+                          {pathname == "/roadmap" ? (
+                            <Link
+                              href="/roadmap"
+                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                            >
+                              <div className="rounded bg-zinc-700 p-2">
+                                <div className="text-lg text-zinc-100">
+                                  Roadmap
+                                </div>
+                                <p className="text-center text-sm text-zinc-400">
+                                  See whats coming to Weave
+                                </p>
+                              </div>
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/roadmap"
+                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                            >
+                              <div className="rounded p-2 hover:bg-zinc-700">
+                                <div className="text-lg text-zinc-100">
+                                  Roadmap
+                                </div>
+                                <p className="text-center text-sm text-zinc-400">
+                                  See what's coming to Weave next!
+                                </p>
+                              </div>
+                            </Link>
+                          )}
+                        </div>
+                        <div className="w-48 p-2">
+                          {pathname == "/what-is-weave" ? (
+                            <Link
+                              href="/what-is-weave"
+                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                            >
+                              <div className="rounded rounded-t rounded-br-2xl bg-zinc-700 p-2">
+                                <div className="text-lg text-zinc-100">
+                                  What is Weave?
+                                </div>
+                                <p className="text-center text-sm text-zinc-400">
+                                  An explainer
+                                </p>
+                              </div>
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/what-is-weave"
+                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                            >
+                              <div className="rounded p-2 hover:bg-zinc-700">
+                                <div className="text-lg text-zinc-100">
+                                  What is Weave?
+                                </div>
+                                <p className="text-center text-sm text-zinc-400">
+                                  An explainer
+                                </p>
+                              </div>
+                            </Link>
+                          )}
+                        </div>
+                        <div className="w-48 p-2">
+                          {pathname == "/why-weave" ? (
+                            <Link
+                              href="/why-weave"
+                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                            >
+                              <div className="rounded- rounded-t-sm rounded-br-2xl bg-zinc-700 p-2">
+                                <div className="text-lg text-zinc-100">
+                                  Why Weave?
+                                </div>
+                                <p className="text-center text-sm text-zinc-400">
+                                  And how to use
+                                </p>
+                              </div>
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/why-weave"
+                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
+                            >
+                              <div className="rounded-b-3xl rounded-t-sm p-2 hover:bg-zinc-700">
+                                <div className="text-lg text-zinc-100">
+                                  Why Weave?
+                                </div>
+                                <p className="text-center text-sm text-zinc-400">
+                                  And how to use
+                                </p>
+                              </div>
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </li>
               {session ? (
-                <li className="mx-2 my-auto">
-                  <button
-                    className="underline-offset-4 hover:underline"
-                    onClick={() => signOut()}
-                  >
-                    Sign out
-                  </button>
-                </li>
+                <>
+                  <li className="z-50 my-auto">
+                    {pathname == "/user-settings" ? null : (
+                      <Link
+                        href="/user-settings"
+                        className="border-[#171717] pr-4 text-[#171717] underline-offset-[6px] hover:underline dark:border-[#E2E2E2]  dark:text-[#E2E2E2]"
+                      >
+                        User Settings
+                      </Link>
+                    )}
+                  </li>
+                  <li className="z-50 my-auto pr-2">
+                    <button
+                      className="underline-offset-[6px] hover:underline"
+                      onClick={() => signOut()}
+                    >
+                      Sign out
+                    </button>
+                  </li>
+                </>
               ) : (
-                <li className="mx-2 my-auto">
+                <li className="z-50 mx-2 my-auto">
                   <button
-                    className="underline-offset-4 hover:underline"
+                    className="underline-offset-[6px] hover:underline"
                     onClick={loginToggle}
                   >
                     Login / Register
@@ -237,6 +398,9 @@ const Navbar = (props: { switchRef?: React.RefObject<HTMLDivElement> }) => {
             menuRef={menuRef}
             session={session}
             status={status}
+            isDarkTheme={isDarkTheme}
+            currentTabSetter={currentTabSetter}
+            setSelectedInnerTab={setSelectedInnerTab}
           />
         ) : null}
       </nav>

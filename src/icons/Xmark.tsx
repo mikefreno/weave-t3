@@ -1,6 +1,6 @@
 import React from "react";
 
-function Xmark(props: { className: string | undefined }) {
+function Xmark(props: { className: string | undefined; color?: string }) {
   return (
     <div>
       <svg
@@ -8,7 +8,7 @@ function Xmark(props: { className: string | undefined }) {
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth={1.5}
-        stroke="currentColor"
+        stroke={props.color ? props.color : "currentColor"}
         className={props.className}
       >
         <path
