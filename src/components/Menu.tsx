@@ -18,7 +18,13 @@ const Menu = (props: {
   setSelectedInnerTab?: (innerTab: string) => void;
 }) => {
   const pathname = usePathname();
-  const { session, status, isDarkTheme } = props;
+  const {
+    session,
+    status,
+    isDarkTheme,
+    currentTabSetter,
+    setSelectedInnerTab,
+  } = props;
   const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoModalRef = useRef<HTMLDivElement>(null);
@@ -57,11 +63,13 @@ const Menu = (props: {
           {session ? (
             <>
               <li className="flex justify-center text-lg">
-                {pathname === "/app" ? (
+                {pathname === "/app" &&
+                setSelectedInnerTab &&
+                currentTabSetter ? (
                   <button
                     onClick={() => {
-                      props.currentTabSetter("DMS");
-                      props.setSelectedInnerTab("AccountOverview");
+                      currentTabSetter("DMS");
+                      setSelectedInnerTab("AccountOverview");
                     }}
                     className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-zinc-700 dark:text-zinc-300"
                   >
@@ -84,7 +92,7 @@ const Menu = (props: {
             <li className="my-auto text-lg">
               <button
                 onClick={props.openLogin}
-                className="hover:bg-zinc-7000 w-28 rounded-lg p-2 text-center text-lg text-zinc-100"
+                className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-zinc-700 dark:text-zinc-300"
               >
                 Login / Register
               </button>
@@ -176,7 +184,7 @@ const Menu = (props: {
                 <div className="rounded p-2 hover:bg-zinc-700">
                   <div className="text-lg text-zinc-100">Roadmap</div>
                   <p className="text-center text-sm text-zinc-400">
-                    See what's coming to Weave next!
+                    See what&apos;s coming to Weave next!
                   </p>
                 </div>
               </Link>

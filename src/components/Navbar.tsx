@@ -237,7 +237,7 @@ const Navbar = (props: {
                                   Roadmap
                                 </div>
                                 <p className="text-center text-sm text-zinc-400">
-                                  See what's coming to Weave next!
+                                  See what&apos;s coming to Weave next!
                                 </p>
                               </div>
                             </Link>
