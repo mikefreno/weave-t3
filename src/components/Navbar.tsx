@@ -189,7 +189,7 @@ const Navbar = (props: {
               </li>
               {session ? (
                 <>
-                  {/* <li className="z-50 my-auto">
+                  <li className="z-50 my-auto">
                     {pathname == "/user-settings" ? null : (
                       <Link
                         href="/user-settings"
@@ -198,7 +198,7 @@ const Navbar = (props: {
                         User Settings
                       </Link>
                     )}
-                  </li> */}
+                  </li>
                   <li className="z-50 my-auto pr-2">
                     <button
                       className="underline-offset-[6px] hover:underline"
