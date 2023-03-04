@@ -82,7 +82,7 @@ const LoginModal = (props: {
         className="fade-in dark:text- fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200  p-4 text-zinc-800
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3"
       >
-        <div className="-mb-6 pl-2 text-2xl">
+        <div className="-mb-6 max-w-[20vw] pl-2 text-2xl">
           <span className="border-b-2 border-zinc-800">
             {router == "/login" ? "Login" : "Login / Register"}
           </span>
@@ -119,23 +119,24 @@ const LoginModal = (props: {
             <div className="w-min">{loginSubmitButton()}</div>
           </form>
           <div className="my-2">
-            <div className="mb-4 text-center">Or</div>
+            <div className="rule-around mb-4 text-center">Or</div>
             <div className="-mx-2 mb-4 flex justify-around">
               <button
                 className="flex flex-row rounded bg-zinc-100 px-4 py-2 text-black hover:bg-zinc-300 active:bg-zinc-400"
                 onClick={googleLogin}
               >
                 Sign in with Google
-                <span className="ml-4 -mr-2">
+                <span className="my-auto ml-4 -mr-2">
                   <GoogleLogo height={24} width={24} />
                 </span>
               </button>
+              <div className="px-4"></div>
               <button
                 className="flex flex-row rounded bg-zinc-600 px-4 py-2 text-white hover:bg-zinc-700 active:bg-zinc-900"
                 onClick={githubLogin}
               >
                 Sign in with Github
-                <span className="ml-4 -mr-2">
+                <span className="my-auto ml-4 -mr-2">
                   <GitHub height={24} width={24} fill={"white"} />
                 </span>
               </button>

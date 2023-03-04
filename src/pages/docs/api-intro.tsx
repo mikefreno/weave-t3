@@ -1,14 +1,12 @@
 import Navbar from "@/src/components/Navbar";
 import React, { useRef } from "react";
 
-const WhatIsWeave = () => {
+export default function ApiIntro() {
   const switchRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div>
+    <>
       <Navbar switchRef={switchRef} />
-    </div>
+    </>
   );
-};
-
-export default WhatIsWeave;
+}

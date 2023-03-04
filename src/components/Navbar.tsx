@@ -21,6 +21,7 @@ import { useSession, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import useOnClickOutside from "./ClickOutsideHook";
 import FlipMessageIcon from "../icons/FilpMessage";
+import InfoModalContent from "./InfoModalContent";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
 
@@ -175,136 +176,12 @@ const Navbar = (props: {
                 </button>
                 {infoDropdownShowing ? (
                   <div
-                    className="fade-in absolute mx-auto p-2"
+                    className="fade-in absolute -ml-1 p-2"
                     ref={infoModalRef}
                   >
-                    <div className="mt-8 ml-2 rounded-b-3xl rounded-tr-3xl rounded-tl-sm border border-zinc-500 bg-zinc-900 shadow-xl">
+                    <div className="-ml-40 mt-8 rounded-b-3xl rounded-tr-sm rounded-tl-3xl border border-zinc-500 bg-zinc-900 shadow-xl">
                       <div className="p-1">
-                        <Tooltip
-                          content={"Coming Soon!"}
-                          trigger="click"
-                          color={"secondary"}
-                          placement="top"
-                        >
-                          <div className="w-48 p-2">
-                            {pathname == "/downloads" ? (
-                              <div className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]">
-                                <div className="rounded-b rounded-tr-2xl rounded-tl-sm bg-zinc-700 p-2">
-                                  <div className="text-lg text-zinc-100">
-                                    Downloads
-                                  </div>
-                                  <p className="text-center text-sm text-zinc-400">
-                                    Coming soon
-                                  </p>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]">
-                                <div className="rounded-b rounded-tr-2xl rounded-tl-sm p-2 hover:bg-zinc-700">
-                                  <div className="text-lg text-zinc-100">
-                                    Downloads
-                                  </div>
-                                  <p className="text-center text-sm text-zinc-400">
-                                    Coming soon
-                                  </p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </Tooltip>
-                        <div className="w-48 p-2">
-                          {pathname == "/roadmap" ? (
-                            <Link
-                              href="/roadmap"
-                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                            >
-                              <div className="rounded bg-zinc-700 p-2">
-                                <div className="text-lg text-zinc-100">
-                                  Roadmap
-                                </div>
-                                <p className="text-center text-sm text-zinc-400">
-                                  See whats coming to Weave
-                                </p>
-                              </div>
-                            </Link>
-                          ) : (
-                            <Link
-                              href="/roadmap"
-                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                            >
-                              <div className="rounded p-2 hover:bg-zinc-700">
-                                <div className="text-lg text-zinc-100">
-                                  Roadmap
-                                </div>
-                                <p className="text-center text-sm text-zinc-400">
-                                  See what&apos;s coming to Weave next!
-                                </p>
-                              </div>
-                            </Link>
-                          )}
-                        </div>
-                        <div className="w-48 p-2">
-                          {pathname == "/what-is-weave" ? (
-                            <Link
-                              href="/what-is-weave"
-                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                            >
-                              <div className="rounded rounded-t rounded-br-2xl bg-zinc-700 p-2">
-                                <div className="text-lg text-zinc-100">
-                                  What is Weave?
-                                </div>
-                                <p className="text-center text-sm text-zinc-400">
-                                  An explainer
-                                </p>
-                              </div>
-                            </Link>
-                          ) : (
-                            <Link
-                              href="/what-is-weave"
-                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                            >
-                              <div className="rounded p-2 hover:bg-zinc-700">
-                                <div className="text-lg text-zinc-100">
-                                  What is Weave?
-                                </div>
-                                <p className="text-center text-sm text-zinc-400">
-                                  An explainer
-                                </p>
-                              </div>
-                            </Link>
-                          )}
-                        </div>
-                        <div className="w-48 p-2">
-                          {pathname == "/why-weave" ? (
-                            <Link
-                              href="/why-weave"
-                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                            >
-                              <div className="rounded- rounded-t-sm rounded-br-2xl bg-zinc-700 p-2">
-                                <div className="text-lg text-zinc-100">
-                                  Why Weave?
-                                </div>
-                                <p className="text-center text-sm text-zinc-400">
-                                  And how to use
-                                </p>
-                              </div>
-                            </Link>
-                          ) : (
-                            <Link
-                              href="/why-weave"
-                              className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-                            >
-                              <div className="rounded-b-3xl rounded-t-sm p-2 hover:bg-zinc-700">
-                                <div className="text-lg text-zinc-100">
-                                  Why Weave?
-                                </div>
-                                <p className="text-center text-sm text-zinc-400">
-                                  And how to use
-                                </p>
-                              </div>
-                            </Link>
-                          )}
-                        </div>
+                        <InfoModalContent />
                       </div>
                     </div>
                   </div>
@@ -312,7 +189,7 @@ const Navbar = (props: {
               </li>
               {session ? (
                 <>
-                  <li className="z-50 my-auto">
+                  {/* <li className="z-50 my-auto">
                     {pathname == "/user-settings" ? null : (
                       <Link
                         href="/user-settings"
@@ -321,7 +198,7 @@ const Navbar = (props: {
                         User Settings
                       </Link>
                     )}
-                  </li>
+                  </li> */}
                   <li className="z-50 my-auto pr-2">
                     <button
                       className="underline-offset-[6px] hover:underline"
@@ -332,7 +209,7 @@ const Navbar = (props: {
                   </li>
                 </>
               ) : (
-                <li className="z-50 mx-2 my-auto">
+                <li className="z-50 my-auto pr-2">
                   <button
                     className="underline-offset-[6px] hover:underline"
                     onClick={loginToggle}
@@ -401,6 +278,7 @@ const Navbar = (props: {
             isDarkTheme={isDarkTheme}
             currentTabSetter={currentTabSetter}
             setSelectedInnerTab={setSelectedInnerTab}
+            setMenuOpen={setMenuOpen}
           />
         ) : null}
       </nav>

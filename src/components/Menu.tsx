@@ -5,6 +5,7 @@ import { Button, Tooltip } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import BackArrow from "../icons/BackArrow";
+import InfoModalContent from "./InfoModalContent";
 
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
@@ -16,6 +17,7 @@ const Menu = (props: {
   isDarkTheme: boolean;
   currentTabSetter?: (tab: string) => void;
   setSelectedInnerTab?: (innerTab: string) => void;
+  setMenuOpen: (open: boolean) => void;
 }) => {
   const pathname = usePathname();
   const {
@@ -70,6 +72,7 @@ const Menu = (props: {
                     onClick={() => {
                       currentTabSetter("DMS");
                       setSelectedInnerTab("AccountOverview");
+                      props.setMenuOpen(false);
                     }}
                     className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-zinc-700 dark:text-zinc-300"
                   >
@@ -125,8 +128,11 @@ const Menu = (props: {
       );
     } else {
       return (
-        <ul className="pb-4 pt-8">
-          <button className="absolute -mt-7 flex" onClick={infoDropdownToggle}>
+        <ul className="pt-8">
+          <button
+            className="absolute -mt-7 flex rounded-md px-2 py-1 hover:bg-zinc-600"
+            onClick={infoDropdownToggle}
+          >
             <BackArrow
               height={24}
               width={24}
@@ -135,115 +141,7 @@ const Menu = (props: {
             />
             <div className="pl-2">Back</div>
           </button>
-          <Tooltip
-            content={"Coming Soon!"}
-            trigger="click"
-            color={"secondary"}
-            placement="top"
-          >
-            <div className="w-48 p-2">
-              {pathname == "/downloads" ? (
-                <div className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]">
-                  <div className="rounded-b rounded-tl-2xl rounded-tr-sm bg-zinc-700 p-2">
-                    <div className="text-lg text-zinc-100">Downloads</div>
-                    <p className="text-center text-sm text-zinc-400">
-                      Coming soon
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]">
-                  <div className="rounded-b rounded-tl-2xl rounded-tr-sm p-2 hover:bg-zinc-700">
-                    <div className="text-lg text-zinc-100">Downloads</div>
-                    <p className="text-center text-sm text-zinc-400">
-                      Coming soon
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </Tooltip>
-          <div className="w-48 p-2">
-            {pathname == "/roadmap" ? (
-              <Link
-                href="/roadmap"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded bg-zinc-700 p-2">
-                  <div className="text-lg text-zinc-100">Roadmap</div>
-                  <p className="text-center text-sm text-zinc-400">
-                    See whats coming to Weave
-                  </p>
-                </div>
-              </Link>
-            ) : (
-              <Link
-                href="/roadmap"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded p-2 hover:bg-zinc-700">
-                  <div className="text-lg text-zinc-100">Roadmap</div>
-                  <p className="text-center text-sm text-zinc-400">
-                    See what&apos;s coming to Weave next!
-                  </p>
-                </div>
-              </Link>
-            )}
-          </div>
-          <div className="w-48 p-2">
-            {pathname == "/what-is-weave" ? (
-              <Link
-                href="/what-is-weave"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded rounded-t rounded-br-2xl bg-zinc-700 p-2">
-                  <div className="text-lg text-zinc-100">What is Weave?</div>
-                  <p className="text-center text-sm text-zinc-400">
-                    An explainer
-                  </p>
-                </div>
-              </Link>
-            ) : (
-              <Link
-                href="/what-is-weave"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded p-2 hover:bg-zinc-700">
-                  <div className="text-lg text-zinc-100">What is Weave?</div>
-                  <p className="text-center text-sm text-zinc-400">
-                    An explainer
-                  </p>
-                </div>
-              </Link>
-            )}
-          </div>
-          <div className="w-48 p-2">
-            {pathname == "/why-weave" ? (
-              <Link
-                href="/why-weave"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded- rounded-t-sm rounded-br-2xl bg-zinc-700 p-2">
-                  <div className="text-lg text-zinc-100">Why Weave?</div>
-                  <p className="text-center text-sm text-zinc-400">
-                    And how to use
-                  </p>
-                </div>
-              </Link>
-            ) : (
-              <Link
-                href="/why-weave"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded-b-3xl rounded-t-sm p-2 hover:bg-zinc-700">
-                  <div className="text-lg text-zinc-100">Why Weave?</div>
-                  <p className="text-center text-sm text-zinc-400">
-                    And how to use
-                  </p>
-                </div>
-              </Link>
-            )}
-          </div>
+          <InfoModalContent />
         </ul>
       );
     }

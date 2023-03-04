@@ -53,17 +53,26 @@ const SideNav = (props: {
         >
           <button
             id="DMS"
-            className="logoSpinner z-50"
+            className="z-50"
             onClick={() => {
               props.currentTabSetter("DMS");
               props.setSelectedInnerTab("AccountOverview");
             }}
           >
             <Image
-              src={isDarkTheme ? DarkLogo : LightLogo}
+              src={
+                currentUser.image
+                  ? currentUser.image
+                  : currentUser.psuedonym_image
+                  ? currentUser.psuedonym_image
+                  : isDarkTheme
+                  ? DarkLogo
+                  : LightLogo
+              }
               alt="logo"
               width={50}
               height={50}
+              className="rounded-full"
             />
           </button>
         </Tooltip>
