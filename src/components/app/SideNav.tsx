@@ -44,10 +44,6 @@ const SideNav = (props: {
   const { currentUser, usersServers, toggleInnerNav, timestamp } = props;
   const [innerHiddenRotate, setInnerHiddenRotate] = useState(false);
 
-  useEffect(() => {
-    console.log(currentUser.image);
-  }, []);
-
   return (
     <aside className="stopIT fixed h-screen w-20 border-r border-zinc-200 bg-purple-700 dark:border-zinc-400 dark:bg-zinc-900">
       <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">

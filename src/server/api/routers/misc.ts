@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import S3 from "aws-sdk/clients/s3";
 
@@ -22,7 +22,7 @@ export const miscRouter = createTRPCRouter({
       });
       const Key = `${input.category}/${input.id}/${input.type}.${input.ext}`;
       const s3params = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Bucket: process.env.AWS_S3_BUCKET_NAME as string,
         Key,
         Expires: 120,
         ContentType: `image/${input.ext}`,
