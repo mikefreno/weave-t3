@@ -25,6 +25,7 @@ import {
 } from "@prisma/client";
 import React, {
   Dispatch,
+  MouseEventHandler,
   RefObject,
   useContext,
   useRef,
@@ -35,6 +36,7 @@ import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
 import { api } from "@/src/utils/api";
 import LoadingOverlay from "./LoadingOverlay";
+import SideNavSmallScreen from "./SideNavSmallScreen";
 
 type ServerIncludingChannel = {
   id: number;
@@ -48,6 +50,12 @@ type ServerIncludingChannel = {
 };
 
 const InnerNav = (props: {
+  serverModalToggle: MouseEventHandler<HTMLButtonElement>;
+
+  botButtonRef: RefObject<HTMLButtonElement>;
+  serverButtonRef: RefObject<HTMLButtonElement>;
+  timestamp: number;
+  currentTabSetter(id: string): void;
   currentTab: string;
   directMessageButtonRef: RefObject<HTMLButtonElement>;
   dmModalToggle: React.MouseEventHandler<HTMLButtonElement>;
@@ -56,8 +64,10 @@ const InnerNav = (props: {
   usersServers: ServerIncludingChannel[];
   selectedInnerTabID: number;
   selectedChannel: Server_Channel | null;
-  setSelectedChannel: any;
+  setSelectedChannel: Dispatch<React.SetStateAction<Server_Channel | null>>;
   refreshUserServers: any;
+  botModalToggle: MouseEventHandler<HTMLButtonElement>;
+  setSelectedInnerTabID: (id: number) => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -67,6 +77,7 @@ const InnerNav = (props: {
   serverRefetch: () => void;
 }) => {
   const {
+    currentTabSetter,
     currentTab,
     selectedInnerTab,
     setSelectedInnerTab,
@@ -76,6 +87,9 @@ const InnerNav = (props: {
     usersServers,
     loadingOverlaySetter,
     serverRefetch,
+    timestamp,
+    setSelectedInnerTabID,
+    setSelectedChannel,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
@@ -128,7 +142,23 @@ const InnerNav = (props: {
 
   if (currentTab == "DMS") {
     return (
-      <div className="fixed h-screen w-52 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800">
+      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+        <SideNavSmallScreen
+          isDarkTheme={isDarkTheme}
+          currentTabSetter={currentTabSetter}
+          setSelectedInnerTab={setSelectedInnerTab}
+          currentUser={currentUser}
+          timestamp={timestamp}
+          usersServers={usersServers as unknown as Server[]}
+          setSelectedInnerTabID={setSelectedInnerTabID}
+          setSelectedChannel={setSelectedChannel}
+          serverModalToggle={props.serverModalToggle}
+          botButtonRef={props.botButtonRef}
+          serverButtonRef={props.serverButtonRef}
+          botModalToggle={props.botModalToggle}
+          selectedInnerTabID={props.selectedInnerTabID}
+          currentTab={props.currentTab}
+        />
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
             type="search"
@@ -235,7 +265,7 @@ const InnerNav = (props: {
             <span>Direct Messages</span>
             <button
               ref={props.directMessageButtonRef}
-              className="my-auto ml-6 mt-1"
+              className="my-auto mt-1 pl-2 md:pl-4"
               onClick={props.dmModalToggle}
             >
               <AddIcon
@@ -252,7 +282,24 @@ const InnerNav = (props: {
     );
   } else if (currentTab == "PublicServers") {
     return (
-      <div className="fixed h-screen w-52 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800">
+      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+        <SideNavSmallScreen
+          isDarkTheme={isDarkTheme}
+          currentTabSetter={currentTabSetter}
+          setSelectedInnerTab={setSelectedInnerTab}
+          currentUser={currentUser}
+          timestamp={timestamp}
+          usersServers={usersServers as unknown as Server[]}
+          setSelectedInnerTabID={setSelectedInnerTabID}
+          setSelectedChannel={setSelectedChannel}
+          serverModalToggle={props.serverModalToggle}
+          botButtonRef={props.botButtonRef}
+          serverButtonRef={props.serverButtonRef}
+          botModalToggle={props.botModalToggle}
+          selectedInnerTabID={props.selectedInnerTabID}
+          currentTab={props.currentTab}
+        />
+
         <span className="justify-left flex pl-4 pt-4 text-xl font-bold">
           Public Servers
         </span>
@@ -394,7 +441,23 @@ const InnerNav = (props: {
   } else if (currentTab == "server") {
     return (
       <div>
-        <div className="fixed h-screen w-52 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800">
+        <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+          <SideNavSmallScreen
+            isDarkTheme={isDarkTheme}
+            currentTabSetter={currentTabSetter}
+            setSelectedInnerTab={setSelectedInnerTab}
+            currentUser={currentUser}
+            timestamp={timestamp}
+            usersServers={usersServers as unknown as Server[]}
+            setSelectedInnerTabID={setSelectedInnerTabID}
+            setSelectedChannel={setSelectedChannel}
+            serverModalToggle={props.serverModalToggle}
+            botButtonRef={props.botButtonRef}
+            serverButtonRef={props.serverButtonRef}
+            botModalToggle={props.botModalToggle}
+            selectedInnerTabID={props.selectedInnerTabID}
+            currentTab={props.currentTab}
+          />
           <button
             className="justify-left flex pl-4 pt-4 text-xl font-bold"
             onClick={() => {

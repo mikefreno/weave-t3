@@ -24,11 +24,11 @@ const InnerNavOverlay = (props: {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
-    <div className="fixed bottom-0 w-52 border-r border-zinc-700 bg-purple-900 text-zinc-200 dark:border-zinc-500 dark:bg-zinc-900">
-      <div className="flex w-52 justify-between">
+    <div className="fixed bottom-0 -ml-20 w-44 border-r border-zinc-700 bg-purple-900 text-zinc-200 dark:border-zinc-500 dark:bg-zinc-900 md:ml-0 md:w-52">
+      <div className="flex justify-between">
         <div className="flex justify-start">
           <div className="flex flex-row p-2">
-            <div className="mr- flex items-center">
+            <div className="flex items-center">
               {currentUser?.image ? (
                 <button
                   onClick={() => {
@@ -38,7 +38,7 @@ const InnerNavOverlay = (props: {
                 >
                   <img
                     src={`${currentUser.image}?t=${timestamp}`}
-                    className="stopIT h-8 w-8 rounded-full"
+                    className="stopIT h-10 w-10 rounded-full"
                   />
                 </button>
               ) : (
@@ -54,7 +54,7 @@ const InnerNavOverlay = (props: {
                 </button>
               )}
             </div>
-            <div className="my-auto flex flex-col pl-3">
+            <div className="my-auto flex flex-1 flex-col pl-3">
               <div className="">
                 <button
                   className="flex text-left"
@@ -79,8 +79,8 @@ const InnerNavOverlay = (props: {
             </div>
           </div>
         </div>
-        <div className="flex w-12 justify-between pr-2">
-          <button onClick={props.audioToggle}>
+        <div className="flex justify-between pr-2">
+          <button onClick={props.audioToggle} className="pr-2">
             {props.audioState ? (
               <SpeakerOn
                 height={16}
@@ -97,7 +97,7 @@ const InnerNavOverlay = (props: {
               />
             )}
           </button>
-          <button onClick={props.microphoneToggle}>
+          <button onClick={props.microphoneToggle} className="pr-1">
             {props.microphoneState ? (
               <MicIcon color={"#e4e4e7"} height={16} width={16} />
             ) : (

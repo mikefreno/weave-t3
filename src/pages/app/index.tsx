@@ -35,7 +35,7 @@ const App = () => {
   const [microphoneState, setMicrophoneState] = useState(false);
   const [audioState, setAudioState] = useState(true);
   const [currentTab, setCurrentTab] = useState("DMS");
-  const [selectedInnerTab, setSelectedInnerTab] = useState("");
+  const [selectedInnerTab, setSelectedInnerTab] = useState("AccountOverview");
   const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
   const [direcMessageModalShowing, setDirecMessageModalShowing] =
     useState(false);
@@ -177,9 +177,6 @@ const App = () => {
   const refreshUserServers = async () => {
     await usersServers.refetch();
   };
-  const toggleInnerNav = () => {
-    setInnerNavShowing(!innerNavShowing);
-  };
 
   return (
     <div className="bg-zinc-100 dark:bg-zinc-700">
@@ -208,7 +205,6 @@ const App = () => {
             setSelectedInnerTabID={setSelectedInnerTabID}
             usersServers={usersServers.data}
             selectedInnerTabID={selectedInnerTabID}
-            toggleInnerNav={toggleInnerNav}
             timestamp={timestamp}
           />
         </div>
@@ -217,12 +213,18 @@ const App = () => {
           className={`${innerNavShowing ? "ml-20" : "hidden"}`}
         >
           <InnerNav
+            botModalToggle={botModalToggle}
+            botButtonRef={botButtonRef}
+            serverModalToggle={serverModalToggle}
+            serverButtonRef={serverButtonRef}
+            currentTabSetter={currentTabSetter}
+            setSelectedInnerTab={setSelectedInnerTab}
             refreshUserServers={refreshUserServers}
             currentTab={currentTab}
             directMessageButtonRef={directMessageButtonRef}
             dmModalToggle={dmModalToggle}
             selectedInnerTab={selectedInnerTab}
-            setSelectedInnerTab={setSelectedInnerTab}
+            setSelectedInnerTabID={setSelectedInnerTabID}
             currentUser={currentUser}
             selectedInnerTabID={selectedInnerTabID}
             usersServers={usersServers.data as any}
@@ -230,6 +232,7 @@ const App = () => {
             selectedChannel={selectedChannel}
             loadingOverlaySetter={loadingOverlaySetter}
             serverRefetch={serverRefetch}
+            timestamp={timestamp}
           />
           <InnerNavOverlay
             setSelectedInnerTab={setSelectedInnerTab}
@@ -245,7 +248,7 @@ const App = () => {
         <div
           id="center-page"
           ref={scrollableRef}
-          className={`flex-1 ${innerNavShowing ? "pl-52" : "pl-20"}`}
+          className={`flex-1 pl-24 md:pl-52`}
         >
           {selectedInnerTab === "AccountOverview" ? (
             <AccountPage
