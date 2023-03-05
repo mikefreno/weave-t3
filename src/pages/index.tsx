@@ -23,10 +23,6 @@ const Home = () => {
   const switchRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
 
-  useEffect(() => {
-    document.getElementById("html")?.classList.remove("scollDisabled");
-  }, []);
-
   if (status === "loading") {
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }

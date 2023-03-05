@@ -122,6 +122,9 @@ const App = () => {
     if (storedValue === "false") {
       setAudioState(false);
     }
+    return () => {
+      document.getElementById("html")?.classList.remove("scollDisabled");
+    };
   }, []);
 
   const audioToggle = () => {

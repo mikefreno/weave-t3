@@ -28,8 +28,6 @@ export default function WhatIsWeave() {
   };
 
   useEffect(() => {
-    document.getElementById("html")?.classList.remove("scollDisabled");
-
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -76,7 +74,7 @@ export default function WhatIsWeave() {
   }, [scrollPosition]);
 
   return (
-    <div className="bg-zinc-900">
+    <div className="bg-zinc-100 dark:bg-zinc-900">
       <Navbar switchRef={switchRef} />
       <div className="fade-in">
         <div className="pt-20 text-center text-4xl tracking-wider">

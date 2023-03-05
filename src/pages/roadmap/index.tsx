@@ -105,7 +105,7 @@ const RoadMap = () => {
             showingAside ? "ml-[30vw] md:ml-[20vw] xl:ml-[15vw]" : null
           } overflow-y-scroll px-6 md:px-10 lg:px-16`}
         >
-          <div className="pb-16">
+          <div className="pt-16">
             <div className="text-3xl font-semibold tracking-wider">
               Weave Roadmap
             </div>
@@ -148,7 +148,7 @@ const RoadMap = () => {
             </p>
           </div>
           <div id="UI" className="absolute -mt-20"></div>
-          <div className="py-16">
+          <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">
               User Interface
             </div>
@@ -197,7 +197,7 @@ const RoadMap = () => {
             </ul>
           </div>
           <div id="useraccount" className="absolute -mt-20"></div>
-          <div>
+          <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">
               User / Account
             </div>
@@ -233,7 +233,7 @@ const RoadMap = () => {
             </ul>
           </div>
           <div id="server" className="absolute -mt-20"></div>
-          <div>
+          <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">Server</div>
             <p className="pt-12 tracking-wide">
               These features regard how servers function
@@ -262,7 +262,7 @@ const RoadMap = () => {
                 <div className="pl-2">Server Templates</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Voice Channels</div>
               </li>
               <li className="flex">
@@ -271,7 +271,7 @@ const RoadMap = () => {
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
-                <div className="pl-2">Real name vs Pseudonym</div>
+                <div className="pl-2">Real name vs Pseudonym Preferences</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
@@ -280,7 +280,7 @@ const RoadMap = () => {
             </ul>
           </div>
           <div id="bots" className="absolute -mt-20"></div>
-          <div>
+          <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">Bots</div>
             <p className="pt-12 tracking-wide">
               These features regard the usage of bots
@@ -297,7 +297,7 @@ const RoadMap = () => {
             </ul>
           </div>
           <div id="misc" className="absolute -mt-20"></div>
-          <div>
+          <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">
               Miscellaneous
             </div>
