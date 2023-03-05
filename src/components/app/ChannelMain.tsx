@@ -149,6 +149,9 @@ const ChannelMain = (props: {
                     : OtherCommentsClass
                 }
               >
+                <div className="-ml-3 -mt-3 text-xs font-semibold">
+                  {message.user.name}
+                </div>
                 <div className="relative">{message.message}</div>
                 {message.userId == currentUser.id ? null : (
                   <div>

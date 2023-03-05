@@ -18,7 +18,13 @@ import LoadingElement from "@/src/components/loading";
 import router from "next/router";
 import ServerMainScreen from "@/src/components/app/SeverMainScreen";
 import ChannelMain from "@/src/components/app/ChannelMain";
-import { Server, Server_Channel } from "@prisma/client";
+import {
+  Server,
+  Server_Admin,
+  Server_Channel,
+  Server_Member,
+  User,
+} from "@prisma/client";
 import LoadingOverlay from "@/src/components/app/LoadingOverlay";
 
 const App = () => {
@@ -33,6 +39,7 @@ const App = () => {
   const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
   const [direcMessageModalShowing, setDirecMessageModalShowing] =
     useState(false);
+  const [timestamp, setTimestamp] = useState(Date.now());
 
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
@@ -48,7 +55,15 @@ const App = () => {
   );
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
   const [innerNavShowing, setInnerNavShowing] = useState(true);
-  const currentUser = api.users.getCurrentUser.useQuery().data;
+
+  const currentUserReturn = api.users.getCurrentUser.useQuery();
+  const [currentUser, setCurrentUser] = useState<
+    User & {
+      servers: Server[];
+      memberships: Server_Member[];
+      adminships: Server_Admin[];
+    }
+  >();
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
 
@@ -63,6 +78,14 @@ const App = () => {
       socket.close();
     };
   }, []);
+
+  useEffect(() => {
+    setCurrentUser(currentUserReturn.data!);
+  }, [currentUserReturn]);
+
+  const triggerUserRefresh = async () => {
+    await currentUserReturn.refetch();
+  };
 
   useEffect(() => {
     if (scrollableRef.current) {
@@ -186,6 +209,7 @@ const App = () => {
             usersServers={usersServers.data}
             selectedInnerTabID={selectedInnerTabID}
             toggleInnerNav={toggleInnerNav}
+            timestamp={timestamp}
           />
         </div>
         <div
@@ -215,6 +239,7 @@ const App = () => {
             audioState={audioState}
             audioToggle={audioToggle}
             currentTabSetter={currentTabSetter}
+            timestamp={timestamp}
           />
         </div>
         <div
@@ -222,7 +247,14 @@ const App = () => {
           ref={scrollableRef}
           className={`flex-1 ${innerNavShowing ? "pl-52" : "pl-20"}`}
         >
-          {selectedInnerTab === "AccountOverview" ? <AccountPage /> : null}
+          {selectedInnerTab === "AccountOverview" ? (
+            <AccountPage
+              triggerUserRefresh={triggerUserRefresh}
+              currentUser={currentUser}
+              setTimestamp={setTimestamp}
+              timestamp={timestamp}
+            />
+          ) : null}
 
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
             <div className="">

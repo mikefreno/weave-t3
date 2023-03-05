@@ -7,6 +7,7 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import ThemeContext from "../ThemeContextProvider";
 
 const InnerNavOverlay = (props: {
+  timestamp: number;
   setSelectedInnerTab: Dispatch<SetStateAction<string>>;
   currentTabSetter: (id: string) => void;
   currentUser: User & {
@@ -19,7 +20,7 @@ const InnerNavOverlay = (props: {
   audioState: boolean;
   audioToggle: any;
 }) => {
-  const { currentUser } = props;
+  const { currentUser, timestamp } = props;
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
@@ -36,7 +37,7 @@ const InnerNavOverlay = (props: {
                   }}
                 >
                   <img
-                    src={currentUser.image}
+                    src={`${currentUser.image}?t=${timestamp}`}
                     className="stopIT h-8 w-8 rounded-full"
                   />
                 </button>

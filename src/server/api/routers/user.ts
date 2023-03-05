@@ -44,12 +44,15 @@ export const userRouter = createTRPCRouter({
   setUserImage: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-
-      return ctx.prisma.user.update({
-        where: { id: userId },
-        data: { image: `https://weaveimages.s3.amazonaws.com/${input}` },
-      });
+      const user = ctx.session.user;
+      if (user.image == `https://weaveimages.s3.amazonaws.com/${input}`) {
+        return;
+      } else {
+        return ctx.prisma.user.update({
+          where: { id: user.id },
+          data: { image: `https://weaveimages.s3.amazonaws.com/${input}` },
+        });
+      }
     }),
   setUserPsuedonymImage: protectedProcedure
     .input(z.string())

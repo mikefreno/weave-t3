@@ -1,7 +1,9 @@
 import React, {
+  Dispatch,
   MouseEventHandler,
   RefObject,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import LightLogo from "@/public/Logo - light.png";
@@ -19,6 +21,7 @@ import DoubleChevrons from "@/src/icons/DoubleChevrons";
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 
 const SideNav = (props: {
+  timestamp: number;
   setSelectedChannel: any;
   serverModalToggle: MouseEventHandler<HTMLButtonElement>;
   serverButtonRef: RefObject<HTMLButtonElement>;
@@ -38,9 +41,12 @@ const SideNav = (props: {
   toggleInnerNav: () => void;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-
-  const { currentUser, usersServers, toggleInnerNav } = props;
+  const { currentUser, usersServers, toggleInnerNav, timestamp } = props;
   const [innerHiddenRotate, setInnerHiddenRotate] = useState(false);
+
+  useEffect(() => {
+    console.log(currentUser.image);
+  }, []);
 
   return (
     <aside className="stopIT fixed h-screen w-20 border-r border-zinc-200 bg-purple-700 dark:border-zinc-400 dark:bg-zinc-900">
@@ -62,15 +68,13 @@ const SideNav = (props: {
             <img
               src={
                 currentUser.image
-                  ? currentUser.image
+                  ? `${currentUser.image}?t=${timestamp}`
                   : currentUser.psuedonym_image
-                  ? currentUser.psuedonym_image
+                  ? `${currentUser.psuedonym_image}?t=${timestamp}`
                   : ""
               }
               alt="logo"
-              width={50}
-              height={50}
-              className="rounded-full"
+              className="stopIT h-12 w-12 rounded-full"
             />
           </button>
         </Tooltip>
@@ -101,12 +105,10 @@ const SideNav = (props: {
                   >
                     {server.logo_url ? (
                       <div className="shaker">
-                        <Image
-                          src={server.logo_url}
+                        <img
+                          src={`${server.logo_url}?t=${timestamp}`}
                           alt={`${server.name} logo`}
-                          width={56}
-                          height={56}
-                          className="rounded-full"
+                          className="h-14 w-14 rounded-full"
                         />
                       </div>
                     ) : (

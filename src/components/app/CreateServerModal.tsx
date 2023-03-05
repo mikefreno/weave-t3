@@ -36,32 +36,6 @@ const resizeFile = (file: File, extension: string) =>
     );
   });
 
-async function uploadPicturesToS3(
-  id: string,
-  type: string,
-  ext: string,
-  picture: File
-) {
-  const category = "servers";
-  const data: any = await axios
-    .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
-    .catch((err) => {
-      console.log(err);
-    });
-  const { uploadURL, key } = data.data;
-  let resizedLogo;
-  if (type === "logo") {
-    resizedLogo = await resizeFile(picture, ext);
-  }
-
-  await axios
-    .put(uploadURL, type === "logo" ? resizedLogo : picture)
-    .catch((err) => {
-      console.log(err);
-    });
-  return key;
-}
-
 const CreateServerModal = (props: {
   serverModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   serverModalRef: RefObject<HTMLDivElement>;
@@ -93,6 +67,8 @@ const CreateServerModal = (props: {
   const [createButtonLoading, setCreateButtonLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [serverImageLoading, setServerImageLoading] = useState(false);
+
+  const s3TokenMutation = api.misc.returnS3Token.useMutation();
 
   const templateSetter = (event: React.MouseEvent<HTMLButtonElement>) => {
     setSpecifiedTemplate(event.currentTarget.id);
@@ -167,29 +143,38 @@ const CreateServerModal = (props: {
     setServerImageLoading(true);
     event.preventDefault();
     if (bannerImage) {
-      const key = await uploadPicturesToS3(
-        createServerMutation.data!.id.toString(),
-        "banner",
-        bannerImageExt as string,
-        bannerImage as File
-      );
+      const s3TokenReturn = await s3TokenMutation.mutateAsync({
+        id: createServerMutation.data!.id.toString(),
+        type: "banner",
+        ext: bannerImageExt as string,
+        category: "server",
+      });
       //update server with image url
+      await axios
+        .put(s3TokenReturn.uploadURL, bannerImage as File)
+        .catch((err) => {
+          console.log(err);
+        });
       serverBannerMutation.mutate({
         serverID: createServerMutation.data!.id,
-        url: key,
+        url: s3TokenReturn.key,
       });
     }
     if (logoImage) {
-      const key = await uploadPicturesToS3(
-        createServerMutation.data!.id.toString(),
-        "logo",
-        logoImageExt as string,
-        logoImage as File
-      );
-      //update server with image url
+      const s3TokenReturn = await s3TokenMutation.mutateAsync({
+        id: createServerMutation.data!.id.toString(),
+        type: "logo",
+        ext: logoImageExt as string,
+        category: "server",
+      });
+      await axios
+        .put(s3TokenReturn.uploadURL, logoImage as File)
+        .catch((err) => {
+          console.log(err);
+        });
       serverLogoMutation.mutate({
         serverID: createServerMutation.data!.id,
-        url: key,
+        url: s3TokenReturn.key,
       });
     }
     await props.refreshUserServers();

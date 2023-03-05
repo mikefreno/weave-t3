@@ -23,7 +23,13 @@ import {
   Server_Member,
   User,
 } from "@prisma/client";
-import React, { RefObject, useContext, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  RefObject,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import ThemeContext from "../ThemeContextProvider";
 import CreateChannelModal from "./CreateChannelModal";
 import InviteModal from "./InviteModal";
@@ -143,7 +149,7 @@ const InnerNav = (props: {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "friends"
-                ? "bg-zinc-400 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-500"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => setSelectedInnerTab("friends")}
@@ -160,7 +166,7 @@ const InnerNav = (props: {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "requests"
-                ? "bg-zinc-400 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-500"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => setSelectedInnerTab("requests")}
@@ -189,7 +195,9 @@ const InnerNav = (props: {
                   width={18}
                   stroke={
                     sortType == "Frequency"
-                      ? "#dc2626"
+                      ? isDarkTheme
+                        ? "#ef4444"
+                        : "#b91c1c"
                       : isDarkTheme
                       ? "#e4e4e7"
                       : "#27272a"
@@ -211,7 +219,9 @@ const InnerNav = (props: {
                   width={18}
                   stroke={
                     sortType == "Recent"
-                      ? "#0284c7"
+                      ? isDarkTheme
+                        ? "#0284c7"
+                        : "#0369a1"
                       : isDarkTheme
                       ? "#e4e4e7"
                       : "#27272a"

@@ -29,26 +29,6 @@ const resizeFile = (file: File, extension: string) =>
     );
   });
 
-async function uploadPicturesToS3(
-  id: string,
-  type: string,
-  ext: string,
-  picture: File
-) {
-  const category = "users";
-  const data: any = await axios
-    .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
-    .catch((err) => {
-      console.log(err);
-    });
-  const { uploadURL, key } = data.data;
-  const resizedFile = await resizeFile(picture, ext);
-  await axios.put(uploadURL, resizedFile).catch((err) => {
-    console.log(err);
-  });
-  return key;
-}
-
 const UserSetup = () => {
   const userQuery = api.users.getCurrentUser.useQuery();
   const [realNamePicture, setRealNamePicture] = useState<File | Blob | null>(
@@ -81,6 +61,8 @@ const UserSetup = () => {
   const [nameField, setNameField] = useState("-");
   const [psuedonymField, setPsuedonymField] = useState("-");
   const switchRef = useRef<HTMLDivElement | null>(null);
+
+  const s3TokenMutation = api.misc.returnS3Token.useMutation();
 
   const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {
@@ -129,25 +111,38 @@ const UserSetup = () => {
       const type = "image";
       const ext = realNamePictureExt;
       const id = userQuery.data!.id;
-      const key = await uploadPicturesToS3(
-        id,
-        type,
-        ext,
-        realNamePicture as File
-      );
-      imageMutation.mutate(key);
+      const s3TokenReturn = await s3TokenMutation.mutateAsync({
+        id: id,
+        type: type,
+        ext: ext,
+        category: "users",
+      });
+      const resizedFile = await resizeFile(realNamePicture as File, ext);
+
+      await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
+        console.log(err);
+      });
+
+      imageMutation.mutate(s3TokenReturn.key);
     }
     if (psuedonymPicture !== null) {
       const type = "psuedonym_image";
       const ext = psuedonymPictureExt;
       const id = userQuery.data!.id;
-      const key = await uploadPicturesToS3(
-        id,
-        type,
-        ext,
-        psuedonymPicture as File
-      );
-      psuedonymImageMutation.mutate(key);
+      const s3TokenReturn = await s3TokenMutation.mutateAsync({
+        id: id,
+        type: type,
+        ext: ext,
+        category: "users",
+      });
+
+      const resizedFile = await resizeFile(psuedonymPicture as File, ext);
+
+      await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
+        console.log(err);
+      });
+
+      psuedonymImageMutation.mutate(s3TokenReturn.key);
     }
 
     setStep(2);

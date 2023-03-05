@@ -25,12 +25,14 @@ const UserTooltip = (props: { user: User }) => {
         </div>
         <div className="my-auto pl-4">
           <div className="">{user.name}</div>
-          <div className="text-center text-sm text-zinc-300">
-            @{user.psuedonym}
-          </div>
+          {user.psuedonym ? (
+            <div className="text-center text-sm text-zinc-300">
+              @{user.psuedonym}
+            </div>
+          ) : null}
         </div>
       </div>
-      <div className="text-zinc-300">{user.bio}</div>
+      <div className="w-36 text-center text-zinc-300">{user.bio}</div>
       <div className="flex justify-evenly pt-2">
         <div className="px-1">
           <Button auto size={"sm"}>

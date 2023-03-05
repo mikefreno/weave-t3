@@ -1,9 +1,9 @@
 import PencilIcon from "@/src/icons/PencilIcon";
-import React, { useState, useRef, useContext } from "react";
+import React, { useState, useRef, useContext, Dispatch } from "react";
 import { Button, Input, Loading, Radio, Tooltip } from "@nextui-org/react";
 import { api } from "../../utils/api";
 import axios from "axios";
-import { User } from "@prisma/client";
+import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import Resizer from "react-image-file-resizer";
 import ThemeContext from "../ThemeContextProvider";
 
@@ -22,26 +22,18 @@ const resizeFile = (file: File, extension: string) =>
       "file"
     );
   });
-async function uploadPicturesToS3(
-  id: string,
-  type: string,
-  ext: string,
-  picture: File
-) {
-  const category = "users";
-  const data: any = await axios
-    .get(`/api/s3upload?category=${category}&id=${id}&type=${type}&ext=${ext}`)
-    .catch((err) => {
-      console.log(err);
-    });
-  const { uploadURL, key } = data.data;
-  const resizedFile = await resizeFile(picture, ext);
-  await axios.put(uploadURL, resizedFile).catch((err) => {
-    console.log(err);
-  });
-  return key;
-}
-const AccountPage = () => {
+
+const AccountPage = (props: {
+  setTimestamp: Dispatch<React.SetStateAction<number>>;
+  timestamp: number;
+  triggerUserRefresh: () => Promise<void>;
+  currentUser: User & {
+    servers: Server[];
+    memberships: Server_Member[];
+    adminships: Server_Admin[];
+  };
+}) => {
+  const { triggerUserRefresh, currentUser, timestamp, setTimestamp } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [settingsSelction, setSettingsSelction] = useState("User");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -63,13 +55,12 @@ const AccountPage = () => {
   const [realNameSetLoading, setRealNameSetLoading] = useState(false);
   const [psuedonymSetLoading, setPsuedonymSetLoading] = useState(false);
   const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
-  const currentUser = api.users.getCurrentUser.useQuery();
 
   const imageMutation = api.users.setUserImage.useMutation();
   const psuedonymImageMutation = api.users.setUserPsuedonymImage.useMutation();
 
   const deleteUser = api.users.deleteUser.useMutation();
-  const [timestamp, setTimestamp] = useState(Date.now());
+  const s3TokenMutation = api.misc.returnS3Token.useMutation();
 
   const handleFileInput = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -106,7 +97,7 @@ const AccountPage = () => {
     setPsuedonymSetLoading(true);
     if (psuedonym.current !== null) {
       await psuedonymMutation.mutateAsync(psuedonym.current.value);
-      await currentUser.refetch();
+      await triggerUserRefresh();
       psuedonym.current.value = "";
       setPsuedonymSetLoading(false);
     }
@@ -116,7 +107,7 @@ const AccountPage = () => {
     setRealNameSetLoading(true);
     if (realName.current !== null) {
       await nameMutation.mutateAsync(realName.current.value);
-      await currentUser.refetch();
+      await triggerUserRefresh();
       realName.current.value = "";
       setRealNameSetLoading(false);
     }
@@ -126,12 +117,22 @@ const AccountPage = () => {
     setImageConfirmLoading(true);
     const type = "image";
     const ext = realNamePictureExt as string;
-    const id = currentUser.data?.id as string;
-    const key = await uploadPicturesToS3(id, type, ext, realNameImage as File);
-    if (currentUser.data?.image == null) {
-      await imageMutation.mutateAsync(key);
-      await currentUser.refetch();
-    }
+    const id = currentUser.id as string;
+    const s3TokenReturn = await s3TokenMutation.mutateAsync({
+      id: id,
+      type: type,
+      ext: ext,
+      category: "users",
+    });
+
+    const resizedFile = await resizeFile(realNameImage as File, ext);
+
+    await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
+      console.log(err);
+    });
+
+    await imageMutation.mutateAsync(s3TokenReturn.key);
+    await triggerUserRefresh();
     setTimestamp(Date.now());
     setRealNameImageHolder(null);
     setRealNameImage(null);
@@ -143,12 +144,21 @@ const AccountPage = () => {
     setImageConfirmLoading(true);
     const type = "psuedonym_image";
     const ext = psuedonymPictureExt as string;
-    const id = currentUser.data?.id as string;
-    const key = await uploadPicturesToS3(id, type, ext, psuedonymImage as File);
-    if (currentUser.data?.psuedonym_image == null) {
-      await psuedonymImageMutation.mutateAsync(key);
-      await currentUser.refetch();
-    }
+    const id = currentUser.id as string;
+    const s3TokenReturn = await s3TokenMutation.mutateAsync({
+      id: id,
+      type: type,
+      ext: ext,
+      category: "users",
+    });
+
+    const resizedFile = await resizeFile(psuedonymImage as File, ext);
+
+    await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
+      console.log(err);
+    });
+    await psuedonymImageMutation.mutateAsync(s3TokenReturn.key);
+    await triggerUserRefresh();
     setTimestamp(Date.now());
     setPsuedonymImageHolder(null);
     setPsuedonymImage(null);
@@ -168,7 +178,7 @@ const AccountPage = () => {
       return (
         <>
           <div className="my-4">
-            <div className="my-4 underline">{currentUser.data?.email}</div>
+            <div className="my-4 underline">{currentUser.email}</div>
             {realNameImageHolder !== null || psuedonymImageHolder !== null ? (
               <div className="absolute z-10 mx-auto ml-36 rounded-lg bg-zinc-200 px-12 py-2 shadow-lg">
                 <img
@@ -220,7 +230,7 @@ const AccountPage = () => {
             <div className="flex justify-evenly">
               <div>
                 <img
-                  src={`${currentUser.data?.image}?t=${timestamp}`}
+                  src={`${currentUser.image}?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -242,7 +252,7 @@ const AccountPage = () => {
               </div>
               <div>
                 <img
-                  src={`${currentUser.data?.psuedonym_image}?t=${timestamp}`}
+                  src={`${currentUser.psuedonym_image}?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -295,8 +305,8 @@ const AccountPage = () => {
                         </div>
                         <div className="ml-16">
                           Currently:
-                          {currentUser.data?.name ? (
-                            <div>{currentUser.data?.name}</div>
+                          {currentUser.name ? (
+                            <div>{currentUser.name}</div>
                           ) : (
                             <div className="w-24 break-words">None Set</div>
                           )}
@@ -327,9 +337,9 @@ const AccountPage = () => {
                         </div>
                         <div className="ml-16">
                           Currently:
-                          {currentUser.data?.psuedonym ? (
+                          {currentUser.psuedonym ? (
                             <div className="w-24 break-words">
-                              {currentUser.data?.psuedonym}
+                              {currentUser.psuedonym}
                             </div>
                           ) : (
                             <div className="w-24 break-words">None Set</div>
@@ -354,7 +364,7 @@ const AccountPage = () => {
           <Radio.Group
             label="Real Name Usage"
             size="sm"
-            defaultValue={currentUser.data?.name_display_pref}
+            defaultValue={currentUser.name_display_pref}
             // onChange={changeRealNameUsage}
           >
             <Radio value="ask">
@@ -371,12 +381,12 @@ const AccountPage = () => {
           <Radio.Group
             label="Name Preferance"
             size="sm"
-            defaultValue={currentUser.data?.name_display_pref}
+            defaultValue={currentUser.name_display_pref}
             // onChange={changeNamePreferance}
           >
             <Tooltip content="No psuedonym is set" placement="top">
               <Radio
-                isDisabled={currentUser.data?.psuedonym ? false : true}
+                isDisabled={currentUser.psuedonym ? false : true}
                 value="psuedonym"
               >
                 Prefer Psuedonym
