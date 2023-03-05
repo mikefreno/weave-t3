@@ -110,7 +110,7 @@ const ChannelMain = (props: {
   const UsersCommentClass =
     "shadow-lg text-zinc-100 shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6";
   const OtherCommentsClass =
-    "bg-zinc-300 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
+    "bg-zinc-200 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
 
   return (
     <div className="">

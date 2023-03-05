@@ -10,7 +10,13 @@ const UserTooltip = (props: { user: User }) => {
       <div className="flex">
         <div className="">
           <img
-            src={user.image ? user.image : user.psuedonym_image}
+            src={
+              user.image
+                ? user.image
+                : user.psuedonym_image
+                ? user.psuedonym_image
+                : ""
+            }
             alt="user-image"
             height={40}
             width={40}
