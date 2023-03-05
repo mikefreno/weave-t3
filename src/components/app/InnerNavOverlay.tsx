@@ -23,7 +23,7 @@ const InnerNavOverlay = (props: {
   const { isDarkTheme } = useContext(ThemeContext);
 
   return (
-    <div className="fixed bottom-0 w-52 border-r border-zinc-700 bg-zinc-600 dark:border-zinc-500 dark:bg-zinc-900">
+    <div className="fixed bottom-0 w-52 border-r border-zinc-700 bg-purple-900 text-zinc-200 dark:border-zinc-500 dark:bg-zinc-900">
       <div className="flex w-52 justify-between">
         <div className="flex justify-start">
           <div className="flex flex-row p-2">
@@ -84,31 +84,23 @@ const InnerNavOverlay = (props: {
               <SpeakerOn
                 height={16}
                 width={16}
-                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                stroke={"#e4e4e7"}
                 strokeWidth={1.5}
               />
             ) : (
               <SpeakerOff
                 height={16}
                 width={16}
-                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                stroke={"#e4e4e7"}
                 strokeWidth={1.5}
               />
             )}
           </button>
           <button onClick={props.microphoneToggle}>
             {props.microphoneState ? (
-              <MicIcon
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                height={16}
-                width={16}
-              />
+              <MicIcon color={"#e4e4e7"} height={16} width={16} />
             ) : (
-              <MicSlashIcon
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                height={16}
-                width={16}
-              />
+              <MicSlashIcon color={"#e4e4e7"} height={16} width={16} />
             )}
           </button>
         </div>

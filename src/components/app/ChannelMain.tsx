@@ -17,6 +17,7 @@ import LoadingElement from "../loading";
 import ThemeContext from "../ThemeContextProvider";
 import AttachmentModal from "./AttachmentModal";
 import TopBanner from "./TopBanner";
+import UserTooltip from "./UserTooltip";
 
 type CommentWithUser = {
   id: number;
@@ -106,13 +107,15 @@ const ChannelMain = (props: {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
 
-  const UsersCommentClass = "bg-purple-900 rounded-2xl py-5 px-6";
-  const OtherCommentsClass = "bg-zinc-800 rounded-2xl py-5 px-6";
+  const UsersCommentClass =
+    "shadow-lg text-zinc-100 shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6";
+  const OtherCommentsClass =
+    "bg-zinc-300 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
 
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} />
-      <div className="chatScreen scollXDisabled overflow-y-scroll rounded bg-zinc-900">
+      <div className="chatScreen scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900">
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
             <button onClick={manualReconnect}>Connect</button>
@@ -152,12 +155,12 @@ const ChannelMain = (props: {
                     {/* <div className="pt-2 text-sm">{message.user.name}</div> */}
                     <div className="-ml-8 mt-1 -mb-12">
                       <Tooltip
-                        content={message.user.name}
-                        color="secondary"
+                        content={<UserTooltip user={message.user} />}
+                        color="default"
                         placement="topStart"
                       >
                         <button>
-                          <Image
+                          <img
                             src={message.user.image as string}
                             alt={`${message.user.name} - avi`}
                             width={36}
@@ -174,13 +177,14 @@ const ChannelMain = (props: {
           ))}
         </ul>
       </div>
-      <div className="bg-zinc-700">
+      <div className="bg-zinc-100 dark:bg-zinc-700">
         <div className="mx-2 pt-3 md:mx-6 lg:mx-8 xl:mx-12">
           <form onSubmit={sendMessage}>
             <Input
               ref={messageInputRef}
               css={{ width: "100%" }}
               contentClickable
+              status="secondary"
               contentRight={
                 <div className="-ml-6 flex">
                   <button

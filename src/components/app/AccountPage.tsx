@@ -1,10 +1,11 @@
 import PencilIcon from "@/src/icons/PencilIcon";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { Button, Input, Loading, Radio, Tooltip } from "@nextui-org/react";
 import { api } from "../../utils/api";
 import axios from "axios";
 import { User } from "@prisma/client";
 import Resizer from "react-image-file-resizer";
+import ThemeContext from "../ThemeContextProvider";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -41,6 +42,7 @@ async function uploadPicturesToS3(
   return key;
 }
 const AccountPage = () => {
+  const { isDarkTheme } = useContext(ThemeContext);
   const [settingsSelction, setSettingsSelction] = useState("User");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [realNameImage, setRealNameImage] = useState<File | null>(null);
@@ -273,7 +275,11 @@ const AccountPage = () => {
                   <div className="my-4 mx-4 flex flex-col">
                     <form onSubmit={setRealName}>
                       <div className="mb-4 w-48">
-                        <Input labelPlaceholder="Real Name" ref={realName} />
+                        <Input
+                          labelPlaceholder="Real Name"
+                          ref={realName}
+                          status={isDarkTheme ? "default" : "secondary"}
+                        />
                       </div>
                       <div className="flex flex-row">
                         <div className="w-4">
@@ -301,7 +307,11 @@ const AccountPage = () => {
                   <div className="my-4 mx-4 flex flex-col">
                     <form onSubmit={setPsuedonym}>
                       <div className="mb-4 w-48">
-                        <Input labelPlaceholder="Pseudonym" ref={psuedonym} />
+                        <Input
+                          labelPlaceholder="Pseudonym"
+                          ref={psuedonym}
+                          status={isDarkTheme ? "default" : "secondary"}
+                        />
                       </div>
                       <div className="flex flex-row">
                         <div className="w-4">
@@ -405,7 +415,7 @@ const AccountPage = () => {
   return (
     <div className="flex h-screen w-full">
       <div id="settings-tabs" className="">
-        <div className="w-34 rounded-br-md bg-zinc-400 px-6 py-4 dark:bg-zinc-600">
+        <div className="w-34 rounded-br-md bg-purple-200 px-6 py-4 dark:bg-zinc-800">
           <div className="text-xl tracking-wide underline underline-offset-4">
             Settings Menu
           </div>

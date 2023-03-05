@@ -179,7 +179,7 @@ const Navbar = (props: {
                     className="fade-in absolute -ml-1 p-2"
                     ref={infoModalRef}
                   >
-                    <div className="-ml-40 mt-8 rounded-b-3xl rounded-tr-sm rounded-tl-3xl border border-zinc-500 bg-zinc-900 shadow-xl">
+                    <div className="-ml-40 mt-8 rounded-b-3xl rounded-tr-sm rounded-tl-3xl border border-zinc-500 bg-zinc-200 shadow-xl dark:bg-zinc-900">
                       <div className="p-1">
                         <InfoModalContent />
                       </div>
@@ -189,16 +189,27 @@ const Navbar = (props: {
               </li>
               {session ? (
                 <>
-                  <li className="z-50 my-auto">
-                    {pathname == "/user-settings" ? null : (
-                      <Link
-                        href="/user-settings"
-                        className="border-[#171717] pr-4 text-[#171717] underline-offset-[6px] hover:underline dark:border-[#E2E2E2]  dark:text-[#E2E2E2]"
-                      >
-                        User Settings
-                      </Link>
-                    )}
-                  </li>
+                  <Tooltip
+                    content={"Coming Soon!"}
+                    trigger="click"
+                    color={"secondary"}
+                    placement="bottom"
+                  >
+                    <li className="z-50 my-auto">
+                      {pathname == "/user-settings" ? (
+                        <div className="cursor-pointer border-[#171717] pr-4 text-[#171717] underline underline-offset-[6px] dark:border-[#E2E2E2]  dark:text-[#E2E2E2]">
+                          User Settings
+                        </div>
+                      ) : (
+                        <div
+                          // href="/user-settings"
+                          className="cursor-pointer border-[#171717] pr-4 text-[#171717] underline-offset-[6px] hover:underline dark:border-[#E2E2E2]  dark:text-[#E2E2E2]"
+                        >
+                          User Settings
+                        </div>
+                      )}
+                    </li>
+                  </Tooltip>
                   <li className="z-50 my-auto pr-2">
                     <button
                       className="underline-offset-[6px] hover:underline"

@@ -50,6 +50,7 @@ model User {
   type              Json?
   real_name_use     String          @default("ask")
   name_display_pref String          @default("real")
+  bio               String? 
   comments          Comment[]
   account           Account[]
   WSConnection      WSConnection[]

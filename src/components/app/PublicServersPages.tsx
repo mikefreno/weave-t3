@@ -27,7 +27,7 @@ const PublicServersPages = (props: {
   }, [selectedInnerTab]);
 
   return (
-    <div className="bg-zinc-300 dark:bg-zinc-700">
+    <div className="bg-zinc-00 dark:bg-zinc-700">
       <div className="mx-auto h-96 rounded-md bg-[url('/Forest-painting.png')] bg-cover bg-center bg-no-repeat pt-24"></div>
       <div className="flex flex-col items-center text-center">
         <div className="text-2xl">
@@ -41,6 +41,7 @@ const PublicServersPages = (props: {
             className="z-0 text-xs"
             css={{ zIndex: 0 }}
             size="xl"
+            status="secondary"
             labelPlaceholder="Find your Community..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}

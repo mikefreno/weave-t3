@@ -43,12 +43,12 @@ const SideNav = (props: {
   const [innerHiddenRotate, setInnerHiddenRotate] = useState(false);
 
   return (
-    <aside className="stopIT fixed h-screen w-20 border-r border-zinc-400 bg-zinc-700 dark:bg-zinc-900">
-      <div className="flex justify-center border-b-2 border-zinc-400 py-4 dark:border-zinc-600">
+    <aside className="stopIT fixed h-screen w-20 border-r border-zinc-200 bg-purple-700 dark:border-zinc-400 dark:bg-zinc-900">
+      <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
         <Tooltip
           content={"Direct Messaging"}
           trigger="hover"
-          color={"secondary"}
+          color={isDarkTheme ? "secondary" : "default"}
           placement="rightEnd"
         >
           <button
@@ -59,15 +59,13 @@ const SideNav = (props: {
               props.setSelectedInnerTab("AccountOverview");
             }}
           >
-            <Image
+            <img
               src={
                 currentUser.image
                   ? currentUser.image
                   : currentUser.psuedonym_image
                   ? currentUser.psuedonym_image
-                  : isDarkTheme
-                  ? DarkLogo
-                  : LightLogo
+                  : ""
               }
               alt="logo"
               width={50}
@@ -79,7 +77,7 @@ const SideNav = (props: {
       </div>
       <div id="joined-server-list">
         <div id="users-owned-servers">
-          <div className="flex flex-col items-center border-b-2 border-zinc-400 py-2 dark:border-zinc-600">
+          <div className="flex flex-col items-center border-b border-zinc-200 py-2 dark:border-zinc-600">
             {usersServers?.map((server: Server) => (
               <div className="py-2" key={server.id}>
                 {props.selectedInnerTabID == server.id &&
@@ -89,7 +87,7 @@ const SideNav = (props: {
                 <Tooltip
                   content={server.name}
                   trigger="hover"
-                  color={"secondary"}
+                  color={isDarkTheme ? "secondary" : "default"}
                   placement="rightEnd"
                 >
                   <button
@@ -130,7 +128,7 @@ const SideNav = (props: {
           <Tooltip
             content={"Add a Server!"}
             trigger="hover"
-            color={"secondary"}
+            color={isDarkTheme ? "secondary" : "default"}
             placement="rightEnd"
           >
             <button
@@ -151,7 +149,7 @@ const SideNav = (props: {
           <Tooltip
             content={"Join Public Server!"}
             trigger="hover"
-            color={"secondary"}
+            color={isDarkTheme ? "secondary" : "default"}
             placement="rightEnd"
           >
             <button
@@ -175,11 +173,11 @@ const SideNav = (props: {
             <span className="absolute mr-20 mt-4 h-4 w-4 rounded-full bg-zinc-200" />
           ) : null}
         </div>
-        <div className="mt-4 flex justify-center border-t-2 border-zinc-400 py-4 dark:border-zinc-600">
+        <div className="mt-4 flex justify-center border-t border-zinc-200 py-4 dark:border-zinc-600">
           <Tooltip
             content={"Bot Services"}
             trigger="hover"
-            color={"secondary"}
+            color={isDarkTheme ? "secondary" : "default"}
             placement="rightEnd"
           >
             <button
@@ -195,7 +193,7 @@ const SideNav = (props: {
             </button>
           </Tooltip>
         </div>
-        <div className="flex justify-end p-2 align-bottom">
+        <div className="flex justify-center p-2 align-bottom">
           <button
             onClick={() => {
               toggleInnerNav();
@@ -206,7 +204,7 @@ const SideNav = (props: {
             <DoubleChevrons
               height={24}
               width={24}
-              stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
+              stroke="#f4f4f5"
               strokeWidth={1}
             />
           </button>

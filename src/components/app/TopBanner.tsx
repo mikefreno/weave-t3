@@ -11,7 +11,7 @@ const TopBanner = (props: { currentChannel?: Server_Channel }) => {
   const context = () => {
     if (currentChannel) {
       return (
-        <div className="top-0 my-auto h-14 bg-zinc-700">
+        <div className="top-0 my-auto h-14 bg-purple-400 dark:bg-zinc-700">
           <div className="flex items-center pl-6 pt-3 text-xl underline underline-offset-8">
             {currentChannel.type == "voice" ? (
               <HeadphonesIcon

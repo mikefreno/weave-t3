@@ -122,7 +122,7 @@ const InnerNav = (props: {
 
   if (currentTab == "DMS") {
     return (
-      <div className="fixed h-screen w-52 border-r border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
+      <div className="fixed h-screen w-52 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800">
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
             type="search"
@@ -143,8 +143,8 @@ const InnerNav = (props: {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "friends"
-                ? "bg-zinc-400 dark:bg-zinc-500"
-                : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+                ? "bg-zinc-400 dark:bg-purple-500"
+                : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => setSelectedInnerTab("friends")}
           >
@@ -160,8 +160,8 @@ const InnerNav = (props: {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "requests"
-                ? "bg-zinc-400 dark:bg-zinc-500"
-                : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+                ? "bg-zinc-400 dark:bg-purple-500"
+                : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => setSelectedInnerTab("requests")}
           >
@@ -179,7 +179,7 @@ const InnerNav = (props: {
             <Tooltip
               content={"Sort by most frequent"}
               trigger="hover"
-              color={"secondary"}
+              color={isDarkTheme ? "secondary" : "default"}
               placement="bottom"
               css={{ width: "min-content" }}
             >
@@ -201,7 +201,7 @@ const InnerNav = (props: {
             <Tooltip
               content={"Sort by most recent messages"}
               trigger="hover"
-              color={"secondary"}
+              color={isDarkTheme ? "secondary" : "default"}
               placement="bottom"
               css={{ width: "min-content" }}
             >
@@ -242,7 +242,7 @@ const InnerNav = (props: {
     );
   } else if (currentTab == "PublicServers") {
     return (
-      <div className="fixed h-screen w-52 border-r border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
+      <div className="fixed h-screen w-52 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800">
         <span className="justify-left flex pl-4 pt-4 text-xl font-bold">
           Public Servers
         </span>
@@ -265,8 +265,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Made By Weave"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Made By Weave")}
         >
@@ -279,8 +279,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Science & Technology"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Science & Technology")}
         >
@@ -297,8 +297,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Education"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Education")}
         >
@@ -314,8 +314,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Gaming"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Gaming")}
         >
@@ -331,8 +331,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Entertainment"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Entertainment")}
         >
@@ -348,8 +348,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Music"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Music")}
         >
@@ -365,8 +365,8 @@ const InnerNav = (props: {
         <button
           className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
             selectedInnerTab == "Finance & Economics"
-              ? "bg-zinc-400 dark:bg-zinc-500"
-              : "hover:bg-zinc-600 dark:hover:bg-zinc-700"
+              ? "bg-purple-200 dark:bg-purple-500"
+              : "hover:bg-purple-300 dark:hover:bg-zinc-700"
           }`}
           onClick={() => setSelectedInnerTab("Finance & Economics")}
         >
@@ -384,7 +384,7 @@ const InnerNav = (props: {
   } else if (currentTab == "server") {
     return (
       <div>
-        <div className="fixed h-screen w-52 border-r border-zinc-700 bg-zinc-500 dark:border-zinc-500 dark:bg-zinc-800">
+        <div className="fixed h-screen w-52 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800">
           <button
             className="justify-left flex pl-4 pt-4 text-xl font-bold"
             onClick={() => {

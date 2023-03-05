@@ -204,7 +204,7 @@ const CreateServerModal = (props: {
           <div
             ref={props.serverModalRef}
             id="serverModalContent"
-            className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+            className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
           >
             <div className="flex w-full justify-between">
               <button onClick={props.serverModalToggle}>
@@ -311,7 +311,7 @@ const CreateServerModal = (props: {
           <div
             ref={props.serverModalRef}
             id="serverModalContent"
-            className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-12 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+            className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-12 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
           >
             <div className="flex w-full justify-between">
               <button id="selector" onClick={templateSetter}>
@@ -331,6 +331,7 @@ const CreateServerModal = (props: {
                     clearable
                     size="xl"
                     labelPlaceholder="Enter invite link or code!"
+                    status={isDarkTheme ? "default" : "secondary"}
                   />
                 </div>
                 <div className="mt-4 flex justify-center">
@@ -358,7 +359,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
               <div className="flex w-full justify-between">
                 <button id="selector" onClick={templateSetter}>
@@ -382,12 +383,14 @@ const CreateServerModal = (props: {
                     required
                     size="xl"
                     labelPlaceholder="Desired Server Name"
+                    status={isDarkTheme ? "default" : "secondary"}
                   />
                   <Checkbox
                     className="my-4"
                     id="publicSet"
                     isSelected={serverPublic}
                     onChange={() => setServerPublic(!serverPublic)}
+                    color={isDarkTheme ? "default" : "secondary"}
                   >
                     Make Public?
                   </Checkbox>
@@ -396,7 +399,7 @@ const CreateServerModal = (props: {
                       <select
                         ref={serverSelectRef}
                         id="ServerSelect"
-                        className="custom-select mb-4 rounded-xl border-zinc-300 bg-zinc-900"
+                        className="custom-select mb-4 rounded-xl border-zinc-300 bg-purple-200 text-purple-700 dark:bg-zinc-900 dark:text-zinc-100"
                         onChange={handleServerTypeChange}
                         defaultValue={""}
                       >
@@ -431,7 +434,13 @@ const CreateServerModal = (props: {
                     placeholder="Community to discuss the..."
                     onChange={descriptionLengthReport}
                     size="xl"
-                    status={serverDescriptionLength > 100 ? "error" : "default"}
+                    status={
+                      serverDescriptionLength > 100
+                        ? "error"
+                        : isDarkTheme
+                        ? "default"
+                        : "secondary"
+                    }
                   />
                 </div>
                 <div className="flex justify-center pl-36">
@@ -469,7 +478,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
               <div>
                 <button onClick={props.serverModalToggle}>
@@ -517,7 +526,7 @@ const CreateServerModal = (props: {
                         <BackArrow
                           height={24}
                           width={24}
-                          stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                          stroke="#e4e4e7"
                           strokeWidth={1.5}
                         />
                       </div>
@@ -536,7 +545,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
               <div>
                 <button onClick={props.serverModalToggle}>
@@ -578,7 +587,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
             >
               <div>
                 <button onClick={props.serverModalToggle}>

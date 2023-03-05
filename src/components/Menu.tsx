@@ -41,21 +41,16 @@ const Menu = (props: {
         <ul className="px-1 pb-4 pt-6">
           <li className="pt-2 text-lg">
             {pathname == "/" ? null : (
-              <Link
-                href="/"
-                className="border-[#171717] text-[#171717] dark:border-[#E2E2E2] dark:text-[#E2E2E2]"
-              >
-                <div className="rounded-lg p-2 hover:bg-zinc-700">
-                  <div className="px-4 text-center text-lg text-zinc-100">
-                    Home
-                  </div>
+              <Link href="/">
+                <div className="rounded-lg p-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-100 dark:hover:bg-zinc-700">
+                  Home
                 </div>
               </Link>
             )}
           </li>
           <li className="flex justify-center text-lg">
             <button
-              className="w-28 rounded-lg p-2 text-center text-lg text-zinc-100 hover:bg-zinc-700"
+              className="w-28 rounded-lg p-2 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-100 dark:hover:bg-zinc-700"
               ref={infoButtonRef}
               onClick={infoDropdownToggle}
             >
@@ -74,18 +69,23 @@ const Menu = (props: {
                       setSelectedInnerTab("AccountOverview");
                       props.setMenuOpen(false);
                     }}
-                    className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-zinc-700 dark:text-zinc-300"
+                    className="text-zinc-800hover:bg-purple-400 w-28 rounded-lg py-2 px-4 text-center text-lg hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     User Settings
                   </button>
-                ) : (
-                  <Link href={"/user-settings"}></Link>
+                ) : pathname === "/user-settings" ? null : (
+                  <Link
+                    className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    href={"/user-settings"}
+                  >
+                    User Settings
+                  </Link>
                 )}
               </li>
               <li className="flex justify-center text-lg">
                 <button
                   onClick={() => signOut()}
-                  className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-zinc-700 dark:text-zinc-300"
+                  className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
                 >
                   Sign out
                 </button>
@@ -95,7 +95,7 @@ const Menu = (props: {
             <li className="my-auto text-lg">
               <button
                 onClick={props.openLogin}
-                className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-zinc-700 dark:text-zinc-300"
+                className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
               >
                 Login / Register
               </button>
@@ -130,7 +130,7 @@ const Menu = (props: {
       return (
         <ul className="pt-8">
           <button
-            className="absolute -mt-7 flex rounded-md px-2 py-1 hover:bg-zinc-600"
+            className="absolute -mt-7 flex rounded-full py-1 px-2 hover:bg-purple-400 dark:hover:bg-zinc-700"
             onClick={infoDropdownToggle}
           >
             <BackArrow

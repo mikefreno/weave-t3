@@ -57,13 +57,7 @@ const Home = () => {
                 <Parallax_2 isDarkTheme={isDarkTheme} />
               </div>
               <div className="flex justify-center pt-28">
-                <Image
-                  src={isDarkTheme ? DarkLogo : LightLogo}
-                  alt="logo"
-                  width={160}
-                  height={160}
-                  priority
-                />
+                <Image src={DarkLogo} alt="logo" width={160} height={160} />
               </div>
               <h1 className="pt-24 text-center text-5xl font-semibold tracking-widest text-zinc-800 dark:text-zinc-300">
                 Group Hangouts.
