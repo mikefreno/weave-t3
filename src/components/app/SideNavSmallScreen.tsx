@@ -92,10 +92,10 @@ const SideNavSmallScreen = (props: {
           <div className="my-auto">Navigation</div>
         </button>
         {navDropDownShowing ? (
-          <div className="stopIT fade-in fixed z-50 h-screen px-8 backdrop-blur">
+          <div className="stopIT fade-in absolute z-50 h-screen overflow-y-scroll px-8 backdrop-blur">
             <div
               ref={navDropdownRef}
-              className="mt-16 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
+              className="z-[100] mt-16 mb-4 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
             >
               <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
                 <Tooltip

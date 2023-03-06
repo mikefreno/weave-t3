@@ -178,6 +178,10 @@ const App = () => {
     await usersServers.refetch();
   };
 
+  const hideInnerNavToggle = () => {
+    setInnerNavShowing(!innerNavShowing);
+  };
+
   return (
     <div className="bg-zinc-100 dark:bg-zinc-700">
       <Head>
@@ -208,47 +212,46 @@ const App = () => {
             timestamp={timestamp}
           />
         </div>
-        <div
-          id="inner-nav"
-          className={`${innerNavShowing ? "ml-20" : "hidden"}`}
-        >
-          <InnerNav
-            botModalToggle={botModalToggle}
-            botButtonRef={botButtonRef}
-            serverModalToggle={serverModalToggle}
-            serverButtonRef={serverButtonRef}
-            currentTabSetter={currentTabSetter}
-            setSelectedInnerTab={setSelectedInnerTab}
-            refreshUserServers={refreshUserServers}
-            currentTab={currentTab}
-            directMessageButtonRef={directMessageButtonRef}
-            dmModalToggle={dmModalToggle}
-            selectedInnerTab={selectedInnerTab}
-            setSelectedInnerTabID={setSelectedInnerTabID}
-            currentUser={currentUser}
-            selectedInnerTabID={selectedInnerTabID}
-            usersServers={usersServers.data as any}
-            setSelectedChannel={setSelectedChannel}
-            selectedChannel={selectedChannel}
-            loadingOverlaySetter={loadingOverlaySetter}
-            serverRefetch={serverRefetch}
-            timestamp={timestamp}
-          />
-          <InnerNavOverlay
-            setSelectedInnerTab={setSelectedInnerTab}
-            currentUser={currentUser}
-            microphoneState={microphoneState}
-            microphoneToggle={microphoneToggle}
-            audioState={audioState}
-            audioToggle={audioToggle}
-            currentTabSetter={currentTabSetter}
-            timestamp={timestamp}
-          />
-        </div>
+        {innerNavShowing ? (
+          <div id="inner-nav" className="ml-20">
+            <InnerNav
+              botModalToggle={botModalToggle}
+              botButtonRef={botButtonRef}
+              serverModalToggle={serverModalToggle}
+              serverButtonRef={serverButtonRef}
+              currentTabSetter={currentTabSetter}
+              setSelectedInnerTab={setSelectedInnerTab}
+              refreshUserServers={refreshUserServers}
+              currentTab={currentTab}
+              directMessageButtonRef={directMessageButtonRef}
+              dmModalToggle={dmModalToggle}
+              selectedInnerTab={selectedInnerTab}
+              setSelectedInnerTabID={setSelectedInnerTabID}
+              currentUser={currentUser}
+              selectedInnerTabID={selectedInnerTabID}
+              usersServers={usersServers.data as any}
+              setSelectedChannel={setSelectedChannel}
+              selectedChannel={selectedChannel}
+              loadingOverlaySetter={loadingOverlaySetter}
+              serverRefetch={serverRefetch}
+              timestamp={timestamp}
+            />
+            <InnerNavOverlay
+              setSelectedInnerTab={setSelectedInnerTab}
+              currentUser={currentUser}
+              microphoneState={microphoneState}
+              microphoneToggle={microphoneToggle}
+              audioState={audioState}
+              audioToggle={audioToggle}
+              currentTabSetter={currentTabSetter}
+              timestamp={timestamp}
+            />
+          </div>
+        ) : null}
         <div
           id="center-page"
           ref={scrollableRef}
-          className={`flex-1 pl-24 md:pl-52`}
+          className={innerNavShowing ? `flex-1 pl-24 md:pl-52` : "flex-1"}
         >
           {selectedInnerTab === "AccountOverview" ? (
             <AccountPage
@@ -286,6 +289,8 @@ const App = () => {
                 currentUser={currentUser}
                 socket={socket as WebSocket}
                 setSocket={setSocket}
+                hideInnerNavToggle={hideInnerNavToggle}
+                innerNavShowing={innerNavShowing}
               />
             ) : (
               <ServerMainScreen

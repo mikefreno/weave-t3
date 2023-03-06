@@ -1,3 +1,4 @@
+import DoubleChevrons from "@/src/icons/DoubleChevrons";
 import PaperClip from "@/src/icons/PaperClip";
 import SendIcon from "@/src/icons/SendIcon";
 import { api } from "@/src/utils/api";
@@ -29,6 +30,7 @@ type CommentWithUser = {
 
 const ChannelMain = (props: {
   selectedChannel: Server_Channel;
+  hideInnerNavToggle: () => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -36,8 +38,15 @@ const ChannelMain = (props: {
   };
   socket: WebSocket;
   setSocket: any;
+  innerNavShowing: boolean;
 }) => {
-  const { selectedChannel, currentUser, socket, setSocket } = props;
+  const {
+    selectedChannel,
+    currentUser,
+    socket,
+    setSocket,
+    hideInnerNavToggle,
+  } = props;
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
@@ -115,6 +124,19 @@ const ChannelMain = (props: {
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} />
+      <div className="md:hidden">
+        <button
+          className={`absolute ${props.innerNavShowing ? null : "rotate-180"}`}
+          onClick={hideInnerNavToggle}
+        >
+          <DoubleChevrons
+            height={24}
+            width={24}
+            stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
+            strokeWidth={1}
+          />
+        </button>
+      </div>
       <div className="chatScreen scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900">
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
