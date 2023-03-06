@@ -12,7 +12,13 @@ import {
   User,
 } from "@prisma/client";
 import Image from "next/image";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import useOnClickOutside from "../ClickOutsideHook";
 import LoadingElement from "../loading";
 import ThemeContext from "../ThemeContextProvider";
@@ -39,6 +45,7 @@ const ChannelMain = (props: {
   socket: WebSocket;
   setSocket: any;
   innerNavShowing: boolean;
+  setInnerNavShowing: Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const {
     selectedChannel,
@@ -46,6 +53,7 @@ const ChannelMain = (props: {
     socket,
     setSocket,
     hideInnerNavToggle,
+    setInnerNavShowing,
   } = props;
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
@@ -56,18 +64,11 @@ const ChannelMain = (props: {
   const messageInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
   const getMessages = api.server.getChannelComments.useMutation({});
-  const [hasBottomNavBar, setHasBottomNavBar] = useState(false);
 
   const getComments = async () => {
     const comments = await getMessages.mutateAsync(selectedChannel.id);
     setMessages(comments);
   };
-
-  useEffect(() => {
-    const screenHeight = screen.height;
-    const windowHeight = window.innerHeight;
-    setHasBottomNavBar(screenHeight > windowHeight);
-  }, []);
 
   useEffect(() => {
     getComments();
@@ -122,6 +123,11 @@ const ChannelMain = (props: {
   const attachmentModalToggle = () => {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
+  useEffect(() => {
+    return () => {
+      setInnerNavShowing(true);
+    };
+  }, []);
 
   const UsersCommentClass =
     "shadow-lg text-zinc-100 shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6";
@@ -131,7 +137,7 @@ const ChannelMain = (props: {
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} />
-      <div className="md:hidden">
+      <div className={`${props.innerNavShowing ? "md:hidden" : ""}`}>
         <button
           className={`absolute ${props.innerNavShowing ? null : "rotate-180"}`}
           onClick={hideInnerNavToggle}
@@ -144,13 +150,7 @@ const ChannelMain = (props: {
           />
         </button>
       </div>
-      <div
-        className={`${
-          hasBottomNavBar
-            ? "chatScreenMobileWithBar"
-            : "chatScreenMobile md:h-[85vh]"
-        } scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900`}
-      >
+      <div className="chatScreenMobile scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900 md:h-[87vh]">
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
             <button onClick={manualReconnect}>Connect</button>

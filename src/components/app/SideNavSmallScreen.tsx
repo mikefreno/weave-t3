@@ -33,14 +33,14 @@ const SideNavSmallScreen = (props: {
   };
   serverButtonRef: RefObject<HTMLButtonElement>;
   botButtonRef: RefObject<HTMLButtonElement>;
-  botModalToggle: MouseEventHandler<HTMLButtonElement>;
+  botModalToggle: any;
   usersServers: Server[] | undefined;
   timestamp: number;
   selectedInnerTabID: number;
   currentTab: string;
   setSelectedInnerTabID: (id: number) => void;
   setSelectedChannel: Dispatch<React.SetStateAction<Server_Channel | null>>;
-  serverModalToggle: MouseEventHandler<HTMLButtonElement>;
+  serverModalToggle: any;
 }) => {
   const {
     isDarkTheme,
@@ -65,11 +65,11 @@ const SideNavSmallScreen = (props: {
   });
 
   const botModalTrigger = () => {
-    botModalToggle;
+    botModalToggle();
     setNavDropDownShowing(false);
   };
   const serverModalTrigger = () => {
-    serverModalToggle;
+    serverModalToggle();
     setNavDropDownShowing(false);
   };
 

@@ -181,7 +181,6 @@ const App = () => {
   const hideInnerNavToggle = () => {
     setInnerNavShowing(!innerNavShowing);
   };
-
   return (
     <div className="bg-zinc-100 dark:bg-zinc-700">
       <Head>
@@ -293,6 +292,7 @@ const App = () => {
                 setSocket={setSocket}
                 hideInnerNavToggle={hideInnerNavToggle}
                 innerNavShowing={innerNavShowing}
+                setInnerNavShowing={setInnerNavShowing}
               />
             ) : (
               <ServerMainScreen
