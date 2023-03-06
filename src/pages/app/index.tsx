@@ -194,7 +194,7 @@ const App = () => {
         currentTabSetter={currentTabSetter}
         setSelectedInnerTab={setSelectedInnerTab}
       />
-      <div id="app-body" className="flex h-screen w-screen">
+      <div id="app-body" className="flex h-[90vh] w-screen md:h-screen">
         <div id="outer-nav" className="flex">
           <SideNav
             setSelectedChannel={setSelectedChannel}
