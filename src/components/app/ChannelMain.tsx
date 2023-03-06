@@ -56,11 +56,27 @@ const ChannelMain = (props: {
   const messageInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
   const getMessages = api.server.getChannelComments.useMutation({});
+  const [hasBottomNavBar, setHasBottomNavBar] = useState(false);
 
   const getComments = async () => {
     const comments = await getMessages.mutateAsync(selectedChannel.id);
     setMessages(comments);
   };
+
+  useEffect(() => {
+    const mql = window.matchMedia("(display-mode: browser-ui)");
+    setHasBottomNavBar(mql.matches);
+
+    const handleMediaQueryChange = (event: MediaQueryListEvent) => {
+      setHasBottomNavBar(event.matches);
+    };
+
+    mql.addListener(handleMediaQueryChange);
+
+    return () => {
+      mql.removeListener(handleMediaQueryChange);
+    };
+  }, []);
 
   useEffect(() => {
     getComments();
@@ -137,7 +153,13 @@ const ChannelMain = (props: {
           />
         </button>
       </div>
-      <div className="chatScreenMobile md:chatScreen scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900">
+      <div
+        className={`${
+          hasBottomNavBar
+            ? "chatScreenMobileWithBar"
+            : "chatScreenMobile md:h-[85vh]"
+        } scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900`}
+      >
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
             <button onClick={manualReconnect}>Connect</button>

@@ -251,7 +251,9 @@ const App = () => {
         <div
           id="center-page"
           ref={scrollableRef}
-          className={innerNavShowing ? `flex-1 pl-24 md:pl-52` : "flex-1"}
+          className={
+            innerNavShowing ? `flex-1 pl-24 md:pl-52` : "flex-1 md:pl-52"
+          }
         >
           {selectedInnerTab === "AccountOverview" ? (
             <AccountPage
