@@ -64,18 +64,9 @@ const ChannelMain = (props: {
   };
 
   useEffect(() => {
-    const mql = window.matchMedia("(display-mode: browser-ui)");
-    setHasBottomNavBar(mql.matches);
-
-    const handleMediaQueryChange = (event: MediaQueryListEvent) => {
-      setHasBottomNavBar(event.matches);
-    };
-
-    mql.addListener(handleMediaQueryChange);
-
-    return () => {
-      mql.removeListener(handleMediaQueryChange);
-    };
+    const screenHeight = screen.height;
+    const windowHeight = window.innerHeight;
+    setHasBottomNavBar(screenHeight > windowHeight);
   }, []);
 
   useEffect(() => {
