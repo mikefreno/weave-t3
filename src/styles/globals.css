@@ -339,7 +339,10 @@ select {
   margin: 0 10px;
 }
 .chatScreen {
-  height: calc(100vh - 12em);
+  height: calc(100vh - 10em);
+}
+.chatScreenMobile {
+  height: calc(100vh - 15em);
 }
 .userCommentBGColor {
   background: rgba(76, 29, 149, 0.2);
