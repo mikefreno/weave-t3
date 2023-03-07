@@ -13,8 +13,8 @@ const UserTooltip = (props: { user: User }) => {
             src={
               user.image
                 ? user.image
-                : user.psuedonym_image
-                ? user.psuedonym_image
+                : user.pseudonym_image
+                ? user.pseudonym_image
                 : ""
             }
             alt="user-image"
@@ -25,9 +25,9 @@ const UserTooltip = (props: { user: User }) => {
         </div>
         <div className="my-auto pl-4">
           <div className="">{user.name}</div>
-          {user.psuedonym ? (
+          {user.pseudonym ? (
             <div className="text-center text-sm text-zinc-300">
-              @{user.psuedonym}
+              @{user.pseudonym}
             </div>
           ) : null}
         </div>

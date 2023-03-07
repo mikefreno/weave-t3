@@ -167,7 +167,12 @@ const AccountPage = (props: {
   };
 
   const deleteAccount = () => {
-    deleteUser.mutate();
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this user?"
+    );
+    if (confirmed) {
+      deleteUser.mutate();
+    }
   };
 
   // const changeRealNameUsage = () => {};
@@ -252,7 +257,7 @@ const AccountPage = (props: {
               </div>
               <div>
                 <img
-                  src={`${currentUser.psuedonym_image}?t=${timestamp}`}
+                  src={`${currentUser.pseudonym_image}?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -337,9 +342,9 @@ const AccountPage = (props: {
                         </div>
                         <div className="ml-16">
                           Currently:
-                          {currentUser.psuedonym ? (
+                          {currentUser.pseudonym ? (
                             <div className="w-24 break-words">
-                              {currentUser.psuedonym}
+                              {currentUser.pseudonym}
                             </div>
                           ) : (
                             <div className="w-24 break-words">None Set</div>
@@ -386,7 +391,7 @@ const AccountPage = (props: {
           >
             <Tooltip content="No psuedonym is set" placement="top">
               <Radio
-                isDisabled={currentUser.psuedonym ? false : true}
+                isDisabled={currentUser.pseudonym ? false : true}
                 value="psuedonym"
               >
                 Prefer Psuedonym

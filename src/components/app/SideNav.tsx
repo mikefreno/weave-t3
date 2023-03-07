@@ -70,8 +70,8 @@ const SideNav = (props: {
                 src={
                   currentUser.image
                     ? `${currentUser.image}?t=${timestamp}`
-                    : currentUser.psuedonym_image
-                    ? `${currentUser.psuedonym_image}?t=${timestamp}`
+                    : currentUser.pseudonym_image
+                    ? `${currentUser.pseudonym_image}?t=${timestamp}`
                     : ""
                 }
                 alt="logo"

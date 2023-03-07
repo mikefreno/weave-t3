@@ -73,7 +73,7 @@ const InnerNavOverlay = (props: {
                     props.currentTabSetter("DMS");
                   }}
                 >
-                  {currentUser.psuedonym}
+                  {currentUser.pseudonym}
                 </button>
               </div>
             </div>

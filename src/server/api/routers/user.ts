@@ -38,7 +38,7 @@ export const userRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
       return ctx.prisma.user.update({
         where: { id: userId },
-        data: { psuedonym: input },
+        data: { pseudonym: input },
       });
     }),
   setUserImage: protectedProcedure
@@ -61,7 +61,7 @@ export const userRouter = createTRPCRouter({
       return ctx.prisma.user.update({
         where: { id: userId },
         data: {
-          psuedonym_image: `https://weaveimages.s3.amazonaws.com/${input}`,
+          pseudonym_image: `https://weaveimages.s3.amazonaws.com/${input}`,
         },
       });
     }),
@@ -72,8 +72,9 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
-  deleteUser: protectedProcedure.mutation(({ ctx }) => {
+  deleteUser: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    ctx.prisma.user.delete({ where: { id: userId } });
+    const res = await ctx.prisma.user.update({ where: { id: userId }, data: { name: null, pseudonym: null, email: null } });
+    console.log(res);
   }),
 });

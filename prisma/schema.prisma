@@ -33,12 +33,12 @@ model Account {
 model User {
   id                String          @id @default(cuid())
   name              String?
-  psuedonym         String?
+  pseudonym         String?
   email             String?         @unique
   emailVerified     DateTime?
   registered_at     DateTime?       @default(now())
   image             String?
-  psuedonym_image   String?
+  pseudonym_image   String?
   servers           Server[]
   sessions          Session[]
   memberships       Server_Member[]
