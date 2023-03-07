@@ -80,23 +80,21 @@ const LoginModal = (props: {
   return (
     <div ref={props.loginRef} className="flex justify-center">
       <div
-        className="fade-in dark:text- fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200  p-4 text-zinc-800
-        shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3"
+        className="fade-in dark:text- fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200 p-4 text-zinc-800
+        shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/4 md:w-3/5 lg:w-2/5"
       >
-        <div className="-mb-6 max-w-[23vw] pl-2 text-2xl">
-          <span className="border-b-2 border-zinc-800">
-            {router == "/login" ? "Login" : "Login / Register"}
-          </span>
+        <div className="absolute z-50 -mb-6 max-w-[25vw] pl-2 text-2xl">
+          {router == "/login" ? "Login" : "Login / Register"}
         </div>
         {router == "/login" ? null : (
           <button
-            className="absolute right-4 -mt-4 w-10"
+            className="absolute right-4 -mt-2 w-10"
             onClick={props.onClose}
           >
             <Xmark className="text-zinc-800 dark:text-zinc-200" />
           </button>
         )}
-        <div className="-mb-12 flex justify-center">
+        <div className="z-0 -mb-12 flex justify-center">
           <Image
             src={isDarkTheme ? DarkLogo : LightLogo}
             alt="logo"
