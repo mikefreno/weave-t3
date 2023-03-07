@@ -1,11 +1,14 @@
 import React, { RefObject, useRef, useState } from "react";
 import Link from "next/link";
 import { Nunito } from "@next/font/google";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Button, Loading, Tooltip } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import BackArrow from "../icons/BackArrow";
 import InfoModalContent from "./InfoModalContent";
+import Image from "next/image";
+import LightLogo from "@/public/Logo - light.png";
+import DarkLogo from "@/public/Logo - dark.png";
 
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
@@ -57,50 +60,63 @@ const Menu = (props: {
               Info
             </button>
           </li>
-          {session ? (
-            <>
-              <li className="flex justify-center text-lg">
-                {pathname === "/app" &&
-                setSelectedInnerTab &&
-                currentTabSetter ? (
+          {status !== "loading" ? (
+            session ? (
+              <>
+                <li className="flex justify-center text-lg">
+                  {pathname === "/app" &&
+                  setSelectedInnerTab &&
+                  currentTabSetter ? (
+                    <button
+                      onClick={() => {
+                        currentTabSetter("DMS");
+                        setSelectedInnerTab("AccountOverview");
+                        props.setMenuOpen(false);
+                      }}
+                      className="text-zinc-800hover:bg-purple-400 w-28 rounded-lg py-2 px-4 text-center text-lg hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    >
+                      User Settings
+                    </button>
+                  ) : pathname === "/user-settings" ? null : (
+                    <Link
+                      className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      href={"/user-settings"}
+                    >
+                      User Settings
+                    </Link>
+                  )}
+                </li>
+                <li className="flex justify-center text-lg">
                   <button
-                    onClick={() => {
-                      currentTabSetter("DMS");
-                      setSelectedInnerTab("AccountOverview");
-                      props.setMenuOpen(false);
-                    }}
-                    className="text-zinc-800hover:bg-purple-400 w-28 rounded-lg py-2 px-4 text-center text-lg hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  >
-                    User Settings
-                  </button>
-                ) : pathname === "/user-settings" ? null : (
-                  <Link
+                    onClick={() => signOut()}
                     className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                    href={"/user-settings"}
                   >
-                    User Settings
-                  </Link>
-                )}
-              </li>
-              <li className="flex justify-center text-lg">
+                    Sign out
+                  </button>
+                </li>
+              </>
+            ) : pathname !== "/login" ? (
+              <li className="my-auto text-lg">
                 <button
-                  onClick={() => signOut()}
+                  onClick={props.openLogin}
                   className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
                 >
-                  Sign out
+                  Login / Register
                 </button>
               </li>
-            </>
-          ) : pathname !== "/login" ? (
-            <li className="my-auto text-lg">
-              <button
-                onClick={props.openLogin}
-                className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
-              >
-                Login / Register
-              </button>
-            </li>
-          ) : null}
+            ) : null
+          ) : (
+            <div className="my-auto flex justify-center pr-2">
+              <Loading size="lg" />
+              <div className="absolute mt-1">
+                {isDarkTheme ? (
+                  <Image src={DarkLogo} alt={"logo"} width="36" />
+                ) : (
+                  <Image src={LightLogo} alt={"logo"} width="36" />
+                )}
+              </div>
+            </div>
+          )}
           {pathname == "/app" ? null : (
             <li className="mt-4 flex justify-center pt-2 text-lg">
               {status == "authenticated" ? (
@@ -116,9 +132,7 @@ const Menu = (props: {
                   color={"secondary"}
                 >
                   <Button shadow color="gradient" auto size={"md"}>
-                    <Link href={"/"} className="text-[#E2E2E2]">
-                      Web App
-                    </Link>
+                    Web App
                   </Button>
                 </Tooltip>
               )}

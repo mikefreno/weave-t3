@@ -14,7 +14,7 @@ import Menu from "./Menu";
 import LoginModal from "./loginModal";
 import { SunIcon } from "@/src/icons/SunIcon";
 import { MoonIcon } from "@/src/icons/MoonIcon";
-import { Switch, Button, Tooltip } from "@nextui-org/react";
+import { Switch, Button, Tooltip, Loading } from "@nextui-org/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -187,47 +187,60 @@ const Navbar = (props: {
                   </div>
                 ) : null}
               </li>
-              {session ? (
-                <>
-                  <Tooltip
-                    content={"Coming Soon!"}
-                    trigger="click"
-                    color={"secondary"}
-                    placement="bottom"
-                  >
-                    <li className="z-50 my-auto">
-                      {pathname == "/user-settings" ? (
-                        <div className="cursor-pointer border-[#171717] pr-4 text-[#171717] underline underline-offset-[6px] dark:border-[#E2E2E2]  dark:text-[#E2E2E2]">
-                          User Settings
-                        </div>
-                      ) : (
-                        <div
-                          // href="/user-settings"
-                          className="cursor-pointer border-[#171717] pr-4 text-[#171717] underline-offset-[6px] hover:underline dark:border-[#E2E2E2]  dark:text-[#E2E2E2]"
-                        >
-                          User Settings
-                        </div>
-                      )}
+              {status !== "loading" ? (
+                session ? (
+                  <>
+                    <Tooltip
+                      content={"Coming Soon!"}
+                      trigger="click"
+                      color={"secondary"}
+                      placement="bottom"
+                    >
+                      <li className="z-50 my-auto">
+                        {pathname == "/user-settings" ? (
+                          <div className="cursor-pointer border-[#171717] pr-4 text-[#171717] underline underline-offset-[6px] dark:border-[#E2E2E2]  dark:text-[#E2E2E2]">
+                            User Settings
+                          </div>
+                        ) : (
+                          <div
+                            // href="/user-settings"
+                            className="cursor-pointer border-[#171717] pr-4 text-[#171717] underline-offset-[6px] hover:underline dark:border-[#E2E2E2]  dark:text-[#E2E2E2]"
+                          >
+                            User Settings
+                          </div>
+                        )}
+                      </li>
+                    </Tooltip>
+                    <li className="z-50 my-auto pr-2">
+                      <button
+                        className="underline-offset-[6px] hover:underline"
+                        onClick={() => signOut()}
+                      >
+                        Sign out
+                      </button>
                     </li>
-                  </Tooltip>
+                  </>
+                ) : (
                   <li className="z-50 my-auto pr-2">
                     <button
                       className="underline-offset-[6px] hover:underline"
-                      onClick={() => signOut()}
+                      onClick={loginToggle}
                     >
-                      Sign out
+                      Login / Register
                     </button>
                   </li>
-                </>
+                )
               ) : (
-                <li className="z-50 my-auto pr-2">
-                  <button
-                    className="underline-offset-[6px] hover:underline"
-                    onClick={loginToggle}
-                  >
-                    Login / Register
-                  </button>
-                </li>
+                <div className="my-auto flex pr-2">
+                  <Loading size="md" />
+                  <div className="absolute mt-1 ml-1">
+                    {isDarkTheme ? (
+                      <Image src={DarkLogo} alt={"logo"} width="24" />
+                    ) : (
+                      <Image src={LightLogo} alt={"logo"} width="24" />
+                    )}
+                  </div>
+                </div>
               )}
               <li className="mx-2 my-auto text-sm ">
                 {status === "authenticated" ? (
@@ -243,9 +256,7 @@ const Navbar = (props: {
                     color={"secondary"}
                   >
                     <Button shadow color="gradient" auto size={"sm"}>
-                      <Link href={"/"} className="text-[#E2E2E2]">
-                        Web App
-                      </Link>
+                      Web App
                     </Button>
                   </Tooltip>
                 )}

@@ -23,10 +23,6 @@ const Home = () => {
   const switchRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
 
-  if (status === "loading") {
-    return <LoadingElement isDarkTheme={isDarkTheme} />;
-  }
-
   return (
     <div className="bannerBGColor w-screen">
       <div
