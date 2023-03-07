@@ -273,6 +273,17 @@ const RoadMap = () => {
                 <div className="pl-2">Message Attachments</div>
               </li>
               <li className="flex">
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
+                <div className="pl-2">Code Blocks in Messages</div>
+              </li>
+              <li className="flex">
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="pl-2">
+                  Syntactical Highlighting in code blocks - language will need
+                  to be declared for this
+                </div>
+              </li>
+              <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
                 <div className="pl-2">
                   Server Aesthetics defined by owner / admin

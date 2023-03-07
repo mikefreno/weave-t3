@@ -21,7 +21,6 @@ const inter = Inter({ subsets: ["latin"] });
 const Home = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   const switchRef = useRef<HTMLDivElement>(null);
-  const { data: session, status } = useSession();
 
   return (
     <div className="bannerBGColor w-screen">

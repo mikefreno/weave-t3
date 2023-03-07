@@ -8,7 +8,7 @@ import React, {
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
-import { Nunito, Raleway } from "@next/font/google";
+import { Raleway } from "@next/font/google";
 import MenuBars from "@/src/icons/MenuBars";
 import Menu from "./Menu";
 import LoginModal from "./loginModal";
@@ -20,7 +20,6 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import useOnClickOutside from "./ClickOutsideHook";
-import FlipMessageIcon from "../icons/FilpMessage";
 import InfoModalContent from "./InfoModalContent";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
