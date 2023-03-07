@@ -18,9 +18,15 @@ const StageBanner = (props: { isDarkTheme: boolean }) => {
           color={props.isDarkTheme ? "#e4e4e7" : "#27272a"}
         />
       </button>
-      <div className="my-auto pl-12">
+      <div className="my-auto pl-12 text-white">
         This app is currently in an alpha stage, some core feature have yet to
-        be deployed. Read more <Link href={"/roadmap"}>here</Link>
+        be deployed. Read more{" "}
+        <Link
+          href={"/roadmap"}
+          className="text-blue-400 underline underline-offset-4"
+        >
+          here
+        </Link>
       </div>
     </div>
   );
