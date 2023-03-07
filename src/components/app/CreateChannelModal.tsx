@@ -137,7 +137,7 @@ const CreateChannelModal = (props: {
           <div>
             <div className="text-center text-xl">Finish Setup</div>
             <div className="text-center">
-              Give it a subtitile or short description
+              Give it a subtitle or short description
             </div>
             <form onSubmit={createChannelRequest}>
               <div className="mt-4 flex justify-center">

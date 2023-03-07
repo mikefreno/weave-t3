@@ -150,7 +150,7 @@ const ChannelMain = (props: {
           />
         </button>
       </div>
-      <div className="chatScreenMobile scollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900 md:h-[87vh]">
+      <div className="chatScreenMobile scrollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900 md:h-[87vh]">
         {socket.readyState == 0 ? (
           <div className="flex flex-col items-center justify-center pt-[30vh]">
             <button onClick={manualReconnect}>Connect</button>

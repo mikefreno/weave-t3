@@ -267,10 +267,10 @@ ul.icons li a:active {
 .shaker:hover {
   animation: shaker 0.5s ease;
 }
-.scollDisabled {
+.scrollDisabled {
   overflow: hidden;
 }
-.scollXDisabled {
+.scrollXDisabled {
   overflow-x: hidden;
 }
 .modal-open {

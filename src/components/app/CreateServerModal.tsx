@@ -122,7 +122,7 @@ const CreateServerModal = (props: {
     setCreateButtonLoading(true);
 
     event.preventDefault();
-    // first create server, then uplaod images to s3, then update server with image urls
+    // first create server, then upload images to s3, then update server with image urls
     const serverName = serverNameRef.current?.value;
     const serverDescription = serverDescriptionRef.current?.value;
     if (serverName) {
@@ -263,7 +263,7 @@ const CreateServerModal = (props: {
                 Gaming Centric
                 <div className="text-sm">
                   Text, and voice channels. Currently playing tooltips and
-                  in-game overalys.
+                  in-game overlays.
                 </div>
               </div>
             </button>

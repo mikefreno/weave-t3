@@ -35,7 +35,7 @@ const AccountPage = (props: {
 }) => {
   const { triggerUserRefresh, currentUser, timestamp, setTimestamp } = props;
   const { isDarkTheme } = useContext(ThemeContext);
-  const [settingsSelction, setSettingsSelction] = useState("User");
+  const [settingsSelection, setSettingsSelection] = useState("User");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [realNameImage, setRealNameImage] = useState<File | null>(null);
   const [realNameImageHolder, setRealNameImageHolder] = useState<
@@ -43,21 +43,21 @@ const AccountPage = (props: {
   >(null);
   const [realNamePictureExt, setRealNamePictureExt] = useState<string>();
 
-  const [psuedonymImage, setPsuedonymImage] = useState<File | null>(null);
-  const [psuedonymImageHolder, setPsuedonymImageHolder] = useState<
+  const [pseudonymImage, setPseudonymImage] = useState<File | null>(null);
+  const [pseudonymImageHolder, setPseudonymImageHolder] = useState<
     string | ArrayBuffer | null
   >(null);
-  const [psuedonymPictureExt, setPsuedonymPictureExt] = useState<string>();
+  const [pseudonymPictureExt, setPseudonymPictureExt] = useState<string>();
   const realName = useRef<HTMLInputElement>(null);
-  const psuedonym = useRef<HTMLInputElement>(null);
+  const pseudonym = useRef<HTMLInputElement>(null);
   const nameMutation = api.users.setUserName.useMutation();
-  const psuedonymMutation = api.users.setUserPsuedonym.useMutation();
+  const pseudonymMutation = api.users.setUserPseudonym.useMutation();
   const [realNameSetLoading, setRealNameSetLoading] = useState(false);
-  const [psuedonymSetLoading, setPsuedonymSetLoading] = useState(false);
+  const [pseudonymSetLoading, setPseudonymSetLoading] = useState(false);
   const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
 
   const imageMutation = api.users.setUserImage.useMutation();
-  const psuedonymImageMutation = api.users.setUserPsuedonymImage.useMutation();
+  const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
 
   const deleteUser = api.users.deleteUser.useMutation();
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
@@ -80,26 +80,26 @@ const AccountPage = (props: {
       }
     } else {
       if (event.target.files && event.target.files[0]) {
-        setPsuedonymImage(event.target.files[0]);
+        setPseudonymImage(event.target.files[0]);
         const ext = event.target.files[0].type.split("/")[1];
-        setPsuedonymPictureExt(ext);
+        setPseudonymPictureExt(ext);
         const reader = new FileReader();
         reader.onload = () => {
           const str = reader.result;
-          setPsuedonymImageHolder(str);
+          setPseudonymImageHolder(str);
         };
         reader.readAsDataURL(event.target.files[0]);
       }
     }
   };
-  const setPsuedonym = async (e: { preventDefault: () => void }) => {
+  const setPseudonym = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    setPsuedonymSetLoading(true);
-    if (psuedonym.current !== null) {
-      await psuedonymMutation.mutateAsync(psuedonym.current.value);
+    setPseudonymSetLoading(true);
+    if (pseudonym.current !== null) {
+      await pseudonymMutation.mutateAsync(pseudonym.current.value);
       await triggerUserRefresh();
-      psuedonym.current.value = "";
-      setPsuedonymSetLoading(false);
+      pseudonym.current.value = "";
+      setPseudonymSetLoading(false);
     }
   };
   const setRealName = async (e: { preventDefault: () => void }) => {
@@ -140,10 +140,10 @@ const AccountPage = (props: {
     setImageConfirmLoading(false);
   };
 
-  const updatePsuedonymImage = async () => {
+  const updatePseudonymImage = async () => {
     setImageConfirmLoading(true);
-    const type = "psuedonym_image";
-    const ext = psuedonymPictureExt as string;
+    const type = "pseudonym_image";
+    const ext = pseudonymPictureExt as string;
     const id = currentUser.id as string;
     const s3TokenReturn = await s3TokenMutation.mutateAsync({
       id: id,
@@ -152,16 +152,16 @@ const AccountPage = (props: {
       category: "users",
     });
 
-    const resizedFile = await resizeFile(psuedonymImage as File, ext);
+    const resizedFile = await resizeFile(pseudonymImage as File, ext);
 
     await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
       console.log(err);
     });
-    await psuedonymImageMutation.mutateAsync(s3TokenReturn.key);
+    await pseudonymImageMutation.mutateAsync(s3TokenReturn.key);
     await triggerUserRefresh();
     setTimestamp(Date.now());
-    setPsuedonymImageHolder(null);
-    setPsuedonymImage(null);
+    setPseudonymImageHolder(null);
+    setPseudonymImage(null);
     fileInputRef.current!.value = "";
     setImageConfirmLoading(false);
   };
@@ -176,27 +176,27 @@ const AccountPage = (props: {
   };
 
   // const changeRealNameUsage = () => {};
-  // const changeNamePreferance = () => {};
+  // const changeNamePreference = () => {};
 
   const renderSettingsSelection = () => {
-    if (settingsSelction === "User") {
+    if (settingsSelection === "User") {
       return (
         <>
           <div className="my-4">
             <div className="my-4 underline">{currentUser.email}</div>
-            {realNameImageHolder !== null || psuedonymImageHolder !== null ? (
+            {realNameImageHolder !== null || pseudonymImageHolder !== null ? (
               <div className="absolute z-10 mx-auto ml-36 rounded-lg bg-zinc-200 px-12 py-2 shadow-lg">
                 <img
                   src={
                     realNameImageHolder !== null
                       ? (realNameImageHolder as string)
-                      : (psuedonymImageHolder as string)
+                      : (pseudonymImageHolder as string)
                   }
                   className="mx-auto h-32 w-32 rounded-full"
                 />
                 <div className="text-center text-zinc-800">
                   Confirm New Image to{" "}
-                  {realNameImageHolder !== null ? "Real Name" : "Psuedonym"}?
+                  {realNameImageHolder !== null ? "Real Name" : "Pseudonym"}?
                 </div>
                 <div className="-mx-6 flex justify-around py-4">
                   {imageConfirmLoading ? (
@@ -208,7 +208,7 @@ const AccountPage = (props: {
                       onClick={
                         realNameImageHolder !== null
                           ? updateRealNameImage
-                          : updatePsuedonymImage
+                          : updatePseudonymImage
                       }
                       color={"primary"}
                       auto
@@ -221,8 +221,8 @@ const AccountPage = (props: {
                       setRealNameImageHolder(null);
                       setRealNameImage(null);
                       fileInputRef.current!.value = "";
-                      setPsuedonymImageHolder(null);
-                      setPsuedonymImage(null);
+                      setPseudonymImageHolder(null);
+                      setPseudonymImage(null);
                     }}
                     color={"error"}
                     auto
@@ -261,7 +261,7 @@ const AccountPage = (props: {
                   className="h-32 w-32 rounded-full"
                 />
                 <label
-                  htmlFor="uploadPsuedonym"
+                  htmlFor="uploadPseudonym"
                   className="absolute -mt-6 h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
                 >
                   <span className="mt-1 flex justify-center">
@@ -272,8 +272,8 @@ const AccountPage = (props: {
                   ref={fileInputRef}
                   type={"file"}
                   hidden
-                  id="uploadPsuedonym"
-                  onChange={(e) => handleFileInput(e, "psuedonym")}
+                  id="uploadPseudonym"
+                  onChange={(e) => handleFileInput(e, "pseudonym")}
                   accept="image/png, image/jpeg"
                 />
               </div>
@@ -284,7 +284,7 @@ const AccountPage = (props: {
               <div className="w-full text-center md:w-3/4 lg:w-1/2 ">
                 <div>
                   Depending on the community they may require you to use your
-                  real name. Others allow you to use a psuedonym.
+                  real name. Others allow you to use a pseudonym.
                 </div>
                 <div className="mt-4 flex justify-center">
                   <div className="my-4 mx-4 flex flex-col">
@@ -320,17 +320,17 @@ const AccountPage = (props: {
                     </form>
                   </div>
                   <div className="my-4 mx-4 flex flex-col">
-                    <form onSubmit={setPsuedonym}>
+                    <form onSubmit={setPseudonym}>
                       <div className="mb-4 w-48">
                         <Input
                           labelPlaceholder="Pseudonym"
-                          ref={psuedonym}
+                          ref={pseudonym}
                           status={isDarkTheme ? "default" : "secondary"}
                         />
                       </div>
                       <div className="flex flex-row">
                         <div className="w-4">
-                          {psuedonymSetLoading ? (
+                          {pseudonymSetLoading ? (
                             <Button disabled auto bordered>
                               <Loading type="points" size="sm" />
                             </Button>
@@ -360,10 +360,10 @@ const AccountPage = (props: {
         </>
       );
     }
-    if (settingsSelction === "App") {
+    if (settingsSelection === "App") {
       return <div></div>;
     }
-    if (settingsSelction === "Privacy") {
+    if (settingsSelection === "Privacy") {
       return (
         <div>
           <Radio.Group
@@ -384,17 +384,17 @@ const AccountPage = (props: {
           </Radio.Group>
           <hr className="my-4" />
           <Radio.Group
-            label="Name Preferance"
+            label="Name Preference"
             size="sm"
             defaultValue={currentUser.name_display_pref}
-            // onChange={changeNamePreferance}
+            // onChange={changeNamePreference}
           >
-            <Tooltip content="No psuedonym is set" placement="top">
+            <Tooltip content="No pseudonym is set" placement="top">
               <Radio
                 isDisabled={currentUser.pseudonym ? false : true}
-                value="psuedonym"
+                value="pseudonym"
               >
-                Prefer Psuedonym
+                Prefer Pseudonym
               </Radio>
             </Tooltip>
             <Radio value="real">Prefer Real Name</Radio>
@@ -402,16 +402,16 @@ const AccountPage = (props: {
         </div>
       );
     }
-    if (settingsSelction === "Notification") {
+    if (settingsSelection === "Notification") {
       return <div></div>;
     }
-    if (settingsSelction === "Accessiblity") {
+    if (settingsSelection === "Accessibility") {
       return <div></div>;
     }
-    if (settingsSelction === "Community") {
+    if (settingsSelection === "Community") {
       return <div></div>;
     }
-    if (settingsSelction === "Other") {
+    if (settingsSelection === "Other") {
       return (
         <div>
           <hr />
@@ -436,33 +436,33 @@ const AccountPage = (props: {
           </div>
           <ul className="text-sm">
             <li>
-              <button onClick={() => setSettingsSelction("User")}>User</button>
+              <button onClick={() => setSettingsSelection("User")}>User</button>
             </li>
             <li>
-              <button onClick={() => setSettingsSelction("App")}>App</button>
+              <button onClick={() => setSettingsSelection("App")}>App</button>
             </li>
             <li>
-              <button onClick={() => setSettingsSelction("Privacy")}>
+              <button onClick={() => setSettingsSelection("Privacy")}>
                 Privacy
               </button>
             </li>
             <li>
-              <button onClick={() => setSettingsSelction("Notification")}>
+              <button onClick={() => setSettingsSelection("Notification")}>
                 Notification
               </button>
             </li>
             <li>
-              <button onClick={() => setSettingsSelction("Accessibility")}>
-                Accessiblity
+              <button onClick={() => setSettingsSelection("Accessibility")}>
+                Accessibility
               </button>
             </li>
             <li>
-              <button onClick={() => setSettingsSelction("Community")}>
+              <button onClick={() => setSettingsSelection("Community")}>
                 Community
               </button>
             </li>
             <li>
-              <button onClick={() => setSettingsSelction("Other")}>
+              <button onClick={() => setSettingsSelection("Other")}>
                 Other
               </button>
             </li>
@@ -472,7 +472,7 @@ const AccountPage = (props: {
       <div id="settingsMain" className="mt-24  ml-12">
         <div className="">
           <div className="pb-4 text-3xl underline underline-offset-2">
-            {settingsSelction} Settings
+            {settingsSelection} Settings
           </div>
           {renderSettingsSelection()}
         </div>

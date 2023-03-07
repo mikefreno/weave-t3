@@ -37,7 +37,7 @@ const App = () => {
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("AccountOverview");
   const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
-  const [direcMessageModalShowing, setDirecMessageModalShowing] =
+  const [directMessageModalShowing, setDirectMessageModalShowing] =
     useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
 
@@ -94,7 +94,7 @@ const App = () => {
   }, []);
 
   useOnClickOutside([directMessageModalRef, directMessageButtonRef], () => {
-    setDirecMessageModalShowing(false);
+    setDirectMessageModalShowing(false);
   });
 
   useOnClickOutside([serverModalRef, serverButtonRef], () => {
@@ -102,7 +102,7 @@ const App = () => {
   });
 
   function dmModalToggle() {
-    setDirecMessageModalShowing(!direcMessageModalShowing);
+    setDirectMessageModalShowing(!directMessageModalShowing);
   }
 
   function currentTabSetter(id: string) {
@@ -115,19 +115,19 @@ const App = () => {
     usersServers.refetch();
   };
   useEffect(() => {
-    document.getElementById("html")?.classList.add("scollDisabled");
+    document.getElementById("html")?.classList.add("scrollDisabled");
     document
       .getElementById("body")
       ?.setAttribute("class", "bg-zinc-300 dark:bg-zinc-700");
   }, []);
 
   useEffect(() => {
-    if (serverModalShowing || botModalShowing || direcMessageModalShowing) {
+    if (serverModalShowing || botModalShowing || directMessageModalShowing) {
       document.getElementById("app-body")?.classList.add("modal-open");
     } else {
       document.getElementById("app-body")?.classList.remove("modal-open");
     }
-  }, [serverModalShowing, botModalShowing, direcMessageModalShowing]);
+  }, [serverModalShowing, botModalShowing, directMessageModalShowing]);
 
   useEffect(() => {
     const storedValue = localStorage.getItem("microphoneState");
@@ -146,7 +146,7 @@ const App = () => {
       setAudioState(false);
     }
     return () => {
-      document.getElementById("html")?.classList.remove("scollDisabled");
+      document.getElementById("html")?.classList.remove("scrollDisabled");
     };
   }, []);
 
@@ -320,7 +320,7 @@ const App = () => {
             botModalToggle={botModalToggle}
           />
         ) : null}
-        {direcMessageModalShowing ? (
+        {directMessageModalShowing ? (
           <DirectMessageModal directMessageModalRef={directMessageModalRef} />
         ) : null}
       </div>

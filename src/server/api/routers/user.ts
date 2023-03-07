@@ -31,7 +31,7 @@ export const userRouter = createTRPCRouter({
         data: { name: input },
       });
     }),
-  setUserPsuedonym: protectedProcedure
+  setUserPseudonym: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
       console.log(input);
@@ -54,7 +54,7 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
-  setUserPsuedonymImage: protectedProcedure
+  setUserPseudonymImage: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
       const userId = ctx.session.user.id;
@@ -74,7 +74,10 @@ export const userRouter = createTRPCRouter({
   }),
   deleteUser: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.session.user.id;
-    const res = await ctx.prisma.user.update({ where: { id: userId }, data: { name: null, pseudonym: null, email: null } });
+    const res = await ctx.prisma.user.update({
+      where: { id: userId },
+      data: { name: null, pseudonym: null, email: null },
+    });
     console.log(res);
   }),
 });

@@ -38,28 +38,28 @@ const UserSetup = () => {
   const [realNamePicHolder, setRealNamePicHolder] = useState<
     string | ArrayBuffer | null
   >(null);
-  const [psuedonymPicture, setPsuedonymPicture] = useState<File | Blob | null>(
+  const [pseudonymPicture, setPseudonymPicture] = useState<File | Blob | null>(
     null
   );
-  const [psuedonymPictureExt, setPsuedonymPictureExt] = useState<string>("");
-  const [psuedonymPicHolder, setPsuedonymPicHolder] = useState<
+  const [pseudonymPictureExt, setPseudonymPictureExt] = useState<string>("");
+  const [pseudonymPicHolder, setPseudonymPicHolder] = useState<
     string | ArrayBuffer | null
   >(null);
   const [step, setStep] = useState(0);
   const realName = useRef<HTMLInputElement | null>(null);
-  const psuedonym = useRef<HTMLInputElement | null>(null);
+  const pseudonym = useRef<HTMLInputElement | null>(null);
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [buttonPassState, setButtonPassState] = useState(false);
   const { data: session, status } = useSession();
 
   const nameMutation = api.users.setUserName.useMutation();
-  const psuedonymMutation = api.users.setUserPsuedonym.useMutation();
+  const pseudonymMutation = api.users.setUserPseudonym.useMutation();
   const imageMutation = api.users.setUserImage.useMutation();
-  const psuedonymImageMutation = api.users.setUserPsuedonymImage.useMutation();
+  const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
 
   const [nameField, setNameField] = useState("-");
-  const [psuedonymField, setPsuedonymField] = useState("-");
+  const [pseudonymField, setPseudonymField] = useState("-");
   const switchRef = useRef<HTMLDivElement | null>(null);
 
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
@@ -79,15 +79,15 @@ const UserSetup = () => {
     });
   }, []);
 
-  const handlePsuedonymPictureDrop = useCallback((acceptedFiles: File[]) => {
+  const handlePseudonymPictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {
-      setPsuedonymPicture(file);
+      setPseudonymPicture(file);
       const ext = file.type.split("/")[1];
-      setPsuedonymPictureExt(ext as string);
+      setPseudonymPictureExt(ext as string);
       const reader = new FileReader();
       reader.onload = () => {
         const str = reader.result;
-        setPsuedonymPicHolder(str);
+        setPseudonymPicHolder(str);
       };
       reader.readAsDataURL(file);
     });
@@ -98,8 +98,8 @@ const UserSetup = () => {
     if (nameField !== "-") {
       nameMutation.mutate(realName.current!.value);
     }
-    if (psuedonymField !== "-") {
-      psuedonymMutation.mutate(psuedonym.current!.value);
+    if (pseudonymField !== "-") {
+      pseudonymMutation.mutate(pseudonym.current!.value);
     }
     setButtonLoading(false);
     setStep(1);
@@ -125,9 +125,9 @@ const UserSetup = () => {
 
       imageMutation.mutate(s3TokenReturn.key);
     }
-    if (psuedonymPicture !== null) {
-      const type = "psuedonym_image";
-      const ext = psuedonymPictureExt;
+    if (pseudonymPicture !== null) {
+      const type = "pseudonym_image";
+      const ext = pseudonymPictureExt;
       const id = userQuery.data!.id;
       const s3TokenReturn = await s3TokenMutation.mutateAsync({
         id: id,
@@ -136,13 +136,13 @@ const UserSetup = () => {
         category: "users",
       });
 
-      const resizedFile = await resizeFile(psuedonymPicture as File, ext);
+      const resizedFile = await resizeFile(pseudonymPicture as File, ext);
 
       await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
         console.log(err);
       });
 
-      psuedonymImageMutation.mutate(s3TokenReturn.key);
+      pseudonymImageMutation.mutate(s3TokenReturn.key);
     }
 
     setStep(2);
@@ -182,16 +182,16 @@ const UserSetup = () => {
             <div className="flex w-1/2 flex-col items-center border-l border-zinc-500">
               <div className="pt-8">
                 <Input
-                  id="psuedonym"
-                  ref={psuedonym}
-                  onChange={(e) => setPsuedonymField(e.target.value)}
-                  label="Psuedonym"
+                  id="pseudonym"
+                  ref={pseudonym}
+                  onChange={(e) => setPseudonymField(e.target.value)}
+                  label="Pseudonym"
                   required
                   clearable
                   underlined
                   color="secondary"
                   initialValue={
-                    userQuery.data?.psuedonym ? userQuery.data.psuedonym : ""
+                    userQuery.data?.pseudonym ? userQuery.data.pseudonym : ""
                   }
                 />
               </div>
@@ -253,12 +253,12 @@ const UserSetup = () => {
               </div>
               <div className="flex w-1/2 flex-col items-center border-l border-l-zinc-500">
                 <Dropzone
-                  onDrop={handlePsuedonymPictureDrop}
+                  onDrop={handlePseudonymPictureDrop}
                   acceptedFiles={"image/jpeg, image/png"}
-                  fileHolder={psuedonymPicHolder}
-                  preSet={userQuery.data?.psuedonym_image}
+                  fileHolder={pseudonymPicHolder}
+                  preSet={userQuery.data?.pseudonym_image}
                 />
-                Paired with Psuedonym
+                Paired with Pseudonym
               </div>
             </div>
             <div className="pt-4">

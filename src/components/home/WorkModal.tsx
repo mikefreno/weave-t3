@@ -26,7 +26,7 @@ const WorkModal = (props: { isDarkTheme: boolean }) => {
         <div className="text-[#171717] dark:text-[#E2E2E2]">
           <h3 className="text-md text-center">Easy Coordination</h3>
           <p className="text-center text-sm">
-            Be it in network heirarchy, current availabilty, real-name
+            Be it in network hierarchy, current availability, real-name
             enforcement, etc.
           </p>
         </div>
