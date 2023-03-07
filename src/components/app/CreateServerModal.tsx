@@ -147,7 +147,7 @@ const CreateServerModal = (props: {
         id: createServerMutation.data!.id.toString(),
         type: "banner",
         ext: bannerImageExt as string,
-        category: "server",
+        category: "servers",
       });
       //update server with image url
       await axios
@@ -165,7 +165,7 @@ const CreateServerModal = (props: {
         id: createServerMutation.data!.id.toString(),
         type: "logo",
         ext: logoImageExt as string,
-        category: "server",
+        category: "servers",
       });
       await axios
         .put(s3TokenReturn.uploadURL, logoImage as File)
