@@ -50,26 +50,26 @@ export default function WhatIsWeave() {
     if (scrollPosition >= 20) {
       secondHighlight.current?.classList.add("highlightLong");
     }
-    if (scrollPosition >= 190) {
+    if (scrollPosition >= 240) {
       thirdHighlight.current?.classList.add("highlightLong");
     }
 
-    if (scrollPosition >= 270) {
+    if (scrollPosition >= 320) {
       fourthHighlight.current?.classList.add("highlight");
     }
-    if (scrollPosition >= 310) {
+    if (scrollPosition >= 360) {
       fifthHighlight.current?.classList.add("highlightExtraLong");
     }
-    if (scrollPosition >= 385) {
+    if (scrollPosition >= 420) {
       sixthHighlight.current?.classList.add("highlightExtraLong");
     }
-    if (scrollPosition >= 440) {
+    if (scrollPosition >= 480) {
       seventhHighlight.current?.classList.add("highlightExtraLong");
     }
-    if (scrollPosition >= 440) {
+    if (scrollPosition >= 480) {
       eighthHighlight.current?.classList.add("highlightExtraLong");
     }
-    if (scrollPosition >= 440) {
+    if (scrollPosition >= 480) {
       ninthHighlight.current?.classList.add("highlightLong");
     }
   }, [scrollPosition]);
