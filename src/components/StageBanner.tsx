@@ -19,7 +19,7 @@ const StageBanner = (props: { isDarkTheme: boolean }) => {
         />
       </button>
       <div className="my-auto pl-12">
-        This app is currently in an alpha stage, many core feature have yet to
+        This app is currently in an alpha stage, some core feature have yet to
         be deployed. Read more <Link href={"/roadmap"}>here</Link>
       </div>
     </div>
