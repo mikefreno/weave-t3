@@ -76,8 +76,41 @@ export const userRouter = createTRPCRouter({
     const userId = ctx.session.user.id;
     const res = await ctx.prisma.user.update({
       where: { id: userId },
-      data: { name: null, pseudonym: null, email: null },
+      data: {
+        name: "User Deleted",
+        pseudonym: "User Deleted",
+        email: null,
+        emailVerified: null,
+        registered_at: null,
+        image: null,
+        pseudonym_image: null,
+        provider: null,
+        refresh_token: null,
+        access_token: null,
+        token_expiration: null,
+        type: undefined,
+        real_name_use: "",
+        name_display_pref: "",
+        bio: null,
+      },
     });
-    console.log(res);
+    const account = await ctx.prisma.account.findFirst({
+      where: { userId: userId },
+    });
+    if (account) {
+      const res2 = await ctx.prisma.account.update({
+        where: { id: account.id },
+        data: {
+          providerAccountId: "",
+          provider: "",
+          access_token: null,
+          token_type: null,
+          id_token: null,
+          scope: null,
+        },
+      });
+      console.log("ACCOUNT EFFECT: ", res2);
+    }
+    console.log("USER EFFECT: ", res);
   }),
 });

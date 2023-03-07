@@ -219,7 +219,7 @@ const Navbar = (props: {
                       </button>
                     </li>
                   </>
-                ) : (
+                ) : pathname !== "/login" ? (
                   <li className="z-50 my-auto pr-2">
                     <button
                       className="underline-offset-[6px] hover:underline"
@@ -228,7 +228,7 @@ const Navbar = (props: {
                       Login / Register
                     </button>
                   </li>
-                )
+                ) : null
               ) : (
                 <div className="my-auto flex pr-2">
                   <Loading size="md" />

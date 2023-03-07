@@ -73,6 +73,9 @@ const App = () => {
     const socket = new WebSocket(
       "wss://ho6sto5l50.execute-api.us-east-1.amazonaws.com/prod"
     );
+    socket.onopen = () => {
+      console.log("Socket opened");
+    };
     setSocket(socket);
     return () => {
       socket.close();

@@ -235,7 +235,11 @@ const AccountPage = (props: {
             <div className="flex justify-evenly">
               <div>
                 <img
-                  src={`${currentUser.image}?t=${timestamp}`}
+                  src={`${
+                    currentUser.image
+                      ? currentUser.image
+                      : currentUser.pseudonym_image
+                  }?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -254,10 +258,17 @@ const AccountPage = (props: {
                   onChange={(e) => handleFileInput(e, "realName")}
                   accept="image/png, image/jpeg"
                 />
+                <div className="flex justify-center pt-2 text-sm italic">
+                  Real Name image
+                </div>
               </div>
               <div>
                 <img
-                  src={`${currentUser.pseudonym_image}?t=${timestamp}`}
+                  src={`${
+                    currentUser.pseudonym_image
+                      ? currentUser.pseudonym_image
+                      : currentUser.image
+                  }?t=${timestamp}`}
                   className="h-32 w-32 rounded-full"
                 />
                 <label
@@ -276,6 +287,9 @@ const AccountPage = (props: {
                   onChange={(e) => handleFileInput(e, "pseudonym")}
                   accept="image/png, image/jpeg"
                 />
+                <div className="flex justify-center pt-2 text-sm italic">
+                  Pseudonym image
+                </div>
               </div>
             </div>
           </div>
@@ -413,9 +427,8 @@ const AccountPage = (props: {
     }
     if (settingsSelection === "Other") {
       return (
-        <div>
-          <hr />
-          <div className="danger-zone-bg h-64 w-full rounded-lg  p-4">
+        <div className="">
+          <div className="danger-zone-bg w-full rounded-lg p-4">
             <div className="text-3xl">
               <Button color={"error"} onClick={deleteAccount}>
                 Delete Account
@@ -428,40 +441,40 @@ const AccountPage = (props: {
   };
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="h-screen w-full md:flex">
       <div id="settings-tabs" className="">
-        <div className="w-34 rounded-br-md bg-purple-200 px-6 py-4 dark:bg-zinc-800">
+        <div className="rounded-br-md bg-purple-200 px-6 py-4 dark:bg-zinc-800">
           <div className="text-xl tracking-wide underline underline-offset-4">
             Settings Menu
           </div>
           <ul className="text-sm">
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("User")}>User</button>
             </li>
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("App")}>App</button>
             </li>
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("Privacy")}>
                 Privacy
               </button>
             </li>
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("Notification")}>
                 Notification
               </button>
             </li>
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("Accessibility")}>
                 Accessibility
               </button>
             </li>
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("Community")}>
                 Community
               </button>
             </li>
-            <li>
+            <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("Other")}>
                 Other
               </button>

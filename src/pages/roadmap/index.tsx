@@ -25,8 +25,8 @@ const RoadMap = () => {
           id="side"
           className={`${
             showingAside
-              ? "fixed h-screen w-[30vw] flex-col border-r border-zinc-900 pt-2 dark:border-zinc-200 md:w-[20vw] md:px-4 xl:w-[15vw]"
-              : "hidden"
+              ? "fixed h-screen w-[30vw] transform flex-col border-r border-zinc-900 pt-2 transition-all duration-700 ease-in-out dark:border-zinc-200 md:w-[20vw] md:px-4 xl:w-[15vw]"
+              : "fixed h-screen w-[30vw] -translate-x-full transform flex-col border-r border-zinc-900 pt-2 transition-all duration-700 ease-in-out dark:border-zinc-200 md:w-[20vw] md:px-4 xl:w-[15vw]"
           } `}
         >
           <div className="pl-2 text-xl font-semibold underline underline-offset-4">
@@ -87,17 +87,22 @@ const RoadMap = () => {
               </a>
             </li>
           </ul>
-          <button className="flex justify-end align-bottom" onClick={toggleNav}>
-            <DoubleChevrons
-              height={36}
-              width={36}
-              stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              strokeWidth={1}
-            />
-          </button>
         </aside>
-        <div className={showingAside ? "hidden" : "fixed"}>
-          <button className="rotate-180" onClick={toggleNav}>
+        <div
+          className={
+            showingAside
+              ? "fixed translate-x-full transform transition-all duration-500 ease-in-out md:w-[20vw] xl:w-[15vw]"
+              : "fixed transition-all duration-500 ease-in-out md:w-[20vw] xl:w-[15vw]"
+          }
+        >
+          <button
+            className={
+              showingAside
+                ? "transform transition-all duration-500 ease-in-out"
+                : "rotate-180 transform transition-all duration-500 ease-in-out"
+            }
+            onClick={toggleNav}
+          >
             <DoubleChevrons
               height={36}
               width={36}
@@ -244,7 +249,7 @@ const RoadMap = () => {
                 </div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
                 <div className="pl-2">Account Deletion</div>
               </li>
               <li className="flex">

@@ -3,12 +3,7 @@ import React, {
   MouseEventHandler,
   RefObject,
   useContext,
-  useEffect,
-  useState,
 } from "react";
-import LightLogo from "@/public/Logo - light.png";
-import DarkLogo from "@/public/Logo - dark.png";
-import Image from "next/image";
 import ThemeContext from "../ThemeContextProvider";
 import { Tooltip } from "@nextui-org/react";
 import AddIcon from "@/src/icons/AddIcon";
@@ -22,7 +17,6 @@ import {
   User,
 } from "@prisma/client";
 import { Raleway } from "@next/font/google";
-import DoubleChevrons from "@/src/icons/DoubleChevrons";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 
@@ -167,7 +161,7 @@ const SideNav = (props: {
                     height={30}
                     width={30}
                     fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
-                    strokeWidth={1}
+                    strokeWidth={1.5}
                   />
                 </div>
               </button>
