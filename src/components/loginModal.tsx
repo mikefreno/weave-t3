@@ -120,7 +120,7 @@ const LoginModal = (props: {
               <Tooltip
                 css={{ width: "180px", textAlign: "center" }}
                 content={
-                  "Weave uses a password-less login system, to login/register you will receive a link in you're email"
+                  "Weave uses a password-less login system, to login/register you will receive a link in your email"
                 }
               >
                 <InfoIcon height={16} width={16} fill={"#9333ea"} />
