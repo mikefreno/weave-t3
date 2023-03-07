@@ -5,6 +5,7 @@ import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
 import NamingsImage from "@/public/namings.jpg";
+import Head from "next/head";
 
 export default function WhatIsWeave() {
   const switchRef = useRef<HTMLDivElement>(null);
@@ -75,6 +76,10 @@ export default function WhatIsWeave() {
 
   return (
     <div className="bg-zinc-100 dark:bg-zinc-900">
+      <Head>
+        <title>What is Weave? | Weave</title>
+        <meta name="description" content="Weave explainer" />
+      </Head>
       <Navbar switchRef={switchRef} />
       <div className="fade-in">
         <div className="pt-20 text-center text-4xl tracking-wider">

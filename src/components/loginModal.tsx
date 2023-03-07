@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import Xmark from "@/src/icons/Xmark";
-import { Input, Button, Loading } from "@nextui-org/react";
+import { Input, Button, Loading, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
@@ -10,6 +10,7 @@ import GoogleLogo from "../icons/GoogleLogo";
 import GitHub from "../icons/GitHub";
 import axios from "axios";
 import { useRouter } from "next/router";
+import InfoIcon from "../icons/InfoIcon";
 
 const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
@@ -117,6 +118,16 @@ const LoginModal = (props: {
               />
             </div>
             <div className="w-min">{loginSubmitButton()}</div>
+            <div className="absolute ml-[100px] mt-[70px]">
+              <Tooltip
+                css={{ width: "180px", textAlign: "center" }}
+                content={
+                  "Weave uses a password-less login system, to login/register you will receive a link in you're email"
+                }
+              >
+                <InfoIcon height={16} width={16} fill={"#9333ea"} />
+              </Tooltip>
+            </div>
           </form>
           <div className="my-2">
             <div className="rule-around mb-4 text-center">Or</div>
