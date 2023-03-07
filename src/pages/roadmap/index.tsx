@@ -40,6 +40,14 @@ const RoadMap = () => {
           <ul>
             <li className="hvr-move-right">
               <a
+                href="#core"
+                className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100"
+              >
+                Core Features
+              </a>
+            </li>
+            <li className="hvr-move-right">
+              <a
                 href="#UI"
                 className="cursor-pointer text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100"
               >
@@ -147,6 +155,23 @@ const RoadMap = () => {
               </span>
             </p>
           </div>
+          <div id="core" className="absolute -mt-20"></div>
+          <div className="pt-16">
+            <div className="text-2xl font-semibold tracking-wider">
+              Core Features
+            </div>
+            <p className="pt-12 tracking-wide">The main feature of the app.</p>
+            <ul className="">
+              <li className="flex">
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>
+                <div className="pl-2">Chat Channels</div>
+              </li>
+              <li className="flex">
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>
+                <div className="pl-2">Voice Channels</div>
+              </li>
+            </ul>
+          </div>
           <div id="UI" className="absolute -mt-20"></div>
           <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">
@@ -158,7 +183,7 @@ const RoadMap = () => {
             </p>
             <ul className="">
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
                 <div className="pl-2">
                   Mobile experience improvements to web app
                 </div>
@@ -206,7 +231,7 @@ const RoadMap = () => {
             </p>
             <ul className="">
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
                 <div className="pl-2">
                   Getting Google authentication enabled
                 </div>
@@ -323,7 +348,7 @@ const RoadMap = () => {
                 <div className="pl-2">Desktop App</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Mobile Apps</div>
               </li>
               <li className="flex">
