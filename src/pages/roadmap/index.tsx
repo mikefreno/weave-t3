@@ -14,7 +14,7 @@ const RoadMap = () => {
   };
 
   useEffect(() => {
-    const handleClick = (e) => {
+    const handleClick = (e: any) => {
       e.preventDefault();
       document.querySelector(e.target.getAttribute("href")).scrollIntoView({
         behavior: "smooth",
