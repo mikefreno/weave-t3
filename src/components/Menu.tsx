@@ -107,7 +107,7 @@ const Menu = (props: {
             ) : null
           ) : (
             <div className="my-auto flex justify-center pr-2">
-              <Loading size="lg" />
+              <Loading size="lg" color={"secondary"} />
               <div className="absolute mt-1">
                 {isDarkTheme ? (
                   <Image src={DarkLogo} alt={"logo"} width="36" />

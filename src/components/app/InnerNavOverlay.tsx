@@ -55,27 +55,31 @@ const InnerNavOverlay = (props: {
               )}
             </div>
             <div className="my-auto flex flex-1 flex-col pl-3">
-              <div className="">
-                <button
-                  className="flex text-left"
-                  onClick={() => {
-                    props.setSelectedInnerTab("AccountOverview");
-                    props.currentTabSetter("DMS");
-                  }}
-                >
-                  {currentUser?.name}
-                </button>
-              </div>
-              <div>
-                <button
-                  onClick={() => {
-                    props.setSelectedInnerTab("AccountOverview");
-                    props.currentTabSetter("DMS");
-                  }}
-                >
-                  {currentUser.pseudonym}
-                </button>
-              </div>
+              {currentUser.name ? (
+                <div className="">
+                  <button
+                    className="flex text-left"
+                    onClick={() => {
+                      props.setSelectedInnerTab("AccountOverview");
+                      props.currentTabSetter("DMS");
+                    }}
+                  >
+                    {currentUser?.name}
+                  </button>
+                </div>
+              ) : null}
+              {currentUser.pseudonym ? (
+                <div>
+                  <button
+                    onClick={() => {
+                      props.setSelectedInnerTab("AccountOverview");
+                      props.currentTabSetter("DMS");
+                    }}
+                  >
+                    {currentUser.pseudonym}
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

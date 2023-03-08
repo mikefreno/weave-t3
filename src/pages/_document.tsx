@@ -11,7 +11,7 @@ export default function Document() {
           content="group chat, productivity, web app, team collaboration, real-time messaging, messaging app, online communication, chat app"
         />
       </Head>
-      <body className="transition-all duration-500">
+      <body className="">
         <Main />
         <NextScript />
       </body>

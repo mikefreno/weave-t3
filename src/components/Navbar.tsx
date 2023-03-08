@@ -231,7 +231,7 @@ const Navbar = (props: {
                 ) : null
               ) : (
                 <div className="my-auto flex pr-2">
-                  <Loading size="md" />
+                  <Loading size="md" color={"secondary"} />
                   <div className="absolute mt-1 ml-1">
                     {isDarkTheme ? (
                       <Image src={DarkLogo} alt={"logo"} width="24" />

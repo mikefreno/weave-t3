@@ -13,6 +13,26 @@ const RoadMap = () => {
     setShowingAside(!showingAside);
   };
 
+  useEffect(() => {
+    const handleClick = (e) => {
+      e.preventDefault();
+      document.querySelector(e.target.getAttribute("href")).scrollIntoView({
+        behavior: "smooth",
+      });
+    };
+
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    anchors.forEach((anchor) => {
+      anchor.addEventListener("click", handleClick);
+    });
+
+    return () => {
+      anchors.forEach((anchor) => {
+        anchor.removeEventListener("click", handleClick);
+      });
+    };
+  }, []);
+
   return (
     <div className="bg-zinc-100 dark:bg-zinc-900">
       <Head>
@@ -91,8 +111,8 @@ const RoadMap = () => {
         <div
           className={
             showingAside
-              ? "fixed translate-x-full transform transition-all duration-500 ease-in-out md:w-[20vw] xl:w-[15vw]"
-              : "fixed transition-all duration-500 ease-in-out md:w-[20vw] xl:w-[15vw]"
+              ? "fixed w-[30vw] translate-x-full transform transition-all duration-500 ease-in-out md:w-[20vw] xl:w-[15vw]"
+              : "fixed w-[30vw] transition-all duration-500 ease-in-out md:w-[20vw] xl:w-[15vw]"
           }
         >
           <button
@@ -116,7 +136,7 @@ const RoadMap = () => {
           id="content"
           className={`${
             showingAside ? "ml-[30vw] md:ml-[20vw] xl:ml-[15vw]" : null
-          } overflow-y-scroll px-6 md:px-10 lg:px-16`}
+          } scrollXDisabled transition-margin overflow-y-scroll px-6 text-zinc-900 duration-300 ease-in-out dark:text-zinc-100 md:px-10 lg:px-16`}
         >
           <div className="pt-16">
             <div className="text-3xl font-semibold tracking-wider">
