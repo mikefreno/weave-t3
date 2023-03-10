@@ -78,12 +78,15 @@ const Menu = (props: {
                       User Settings
                     </button>
                   ) : pathname === "/user-settings" ? null : (
-                    <Link
-                      className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                      href={"/user-settings"}
+                    <Tooltip
+                      content={"Coming Soon!"}
+                      placement="bottomStart"
+                      color={"secondary"}
                     >
-                      User Settings
-                    </Link>
+                      <div className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                        User Settings
+                      </div>
+                    </Tooltip>
                   )}
                 </li>
                 <li className="flex justify-center text-lg">
