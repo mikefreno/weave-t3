@@ -1,10 +1,8 @@
 import Navbar from "@/src/components/Navbar";
-import ThemeContext from "@/src/components/ThemeContextProvider";
 import Head from "next/head";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 
 const TermsOfService = () => {
-  const { isDarkTheme } = useContext(ThemeContext);
   const switchRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -14,7 +12,7 @@ const TermsOfService = () => {
         <meta name="description" content="Weave's ToS" />
       </Head>
       <Navbar switchRef={switchRef} />
-      <div className="min-h-screen py-36 px-24">
+      <div className="min-h-screen py-[8vh] px-[8vw]">
         <div className="pb-10 text-center text-3xl">Weave Terms of Service</div>
         <div className="text-2xl">Welcome to Weave!</div>
         <div className="py-4 text-lg">
@@ -25,7 +23,7 @@ const TermsOfService = () => {
         <ul>
           <li>
             <div className="text-xl underline underline-offset-4">Overview</div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               Weave is a group chatting and networking that allows users to
               communicate over text and voice. By using our website, you agree
               to these terms of service.
@@ -35,7 +33,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               User Conduct
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               You agree to use our website responsibly and not to engage in any
               of the following activities: Posting or transmitting any unlawful,
               threatening, abusive, harassing, defamatory, vulgar, obscene, or
@@ -50,7 +48,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               User Content
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               Weave is not for use of those under the age of 13, by using Weave
               you acknowledge this and affirm that you are above the age of 13.
               Additionally by posting or uploading any content to our website,
@@ -65,7 +63,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               Intellectual Property
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               All content and materials on our website, including but not
               limited to logos, trademarks, and copyrighted material, are the
               property of Weave and may not be used without our prior written
@@ -79,7 +77,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               Termination
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               We may terminate your access to our website at any time if you
               violate these terms of service or engage in any unlawful behavior.
             </p>
@@ -88,7 +86,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               Dispute Resolution
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               In the event of any disputes arising from or relating to these
               terms of service, you agree to first attempt to resolve the
               dispute informally by contacting us. If we are unable to resolve
@@ -101,7 +99,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               Governing Law
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               These terms of service will be governed by and construed in
               accordance with the laws of the state or country where Weave is
               headquartered, without giving effect to any principles of
@@ -112,7 +110,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               Modifications
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               We reserve the right to modify these terms of service at any time.
               You should check this page regularly to ensure that you are
               familiar with the current version of the terms. By continuing to
@@ -124,7 +122,7 @@ const TermsOfService = () => {
             <div className="text-xl underline underline-offset-4">
               Acknowledgment
             </div>
-            <p className="w-5/6 pl-4 pt-2 md:w-3/4">
+            <p className="w-[80vw] pl-4 pt-2 md:w-[65vw]">
               By using our website, you acknowledge that you have read these
               terms of service and agree to be bound by them. If you do not
               agree to these terms, you should not use our website.
