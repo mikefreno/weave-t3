@@ -11,6 +11,7 @@ import GitHub from "../icons/GitHub";
 import axios from "axios";
 import { useRouter } from "next/router";
 import InfoIcon from "../icons/InfoIcon";
+import Link from "next/link";
 
 const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
@@ -151,6 +152,12 @@ const LoginModal = (props: {
               </button>
             </div>
           </div>
+        </div>
+        <div className="text-center text-xs">
+          By Creating or Using a Weave Account, you agree with our{" "}
+          <Link href={"/terms-of-service"} className="hover:underline">
+            Terms of Service
+          </Link>
         </div>
       </div>
     </div>
