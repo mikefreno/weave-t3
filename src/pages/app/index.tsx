@@ -83,8 +83,9 @@ const App = () => {
       console.log("Socket opened");
     };
     setSocket(socket);
+
     return () => {
-      socket.close();
+      socket?.close();
     };
   }, []);
 

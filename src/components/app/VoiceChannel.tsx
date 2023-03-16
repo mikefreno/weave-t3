@@ -48,13 +48,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const [userJoined, setUserJoined] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
   const [usersInChannel, setUsersInChannel] = useState<User[]>();
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  // const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+  //   null
+  // );
   // const [stream, setStream] = useState<MediaStream | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [audioWorklet, setAudioWorklet] = useState<AudioWorklet | null>(null);
-  const [source, setSource] = useState<MediaStreamAudioSourceNode | null>(null);
+  // const [audioWorklet, setAudioWorklet] = useState<AudioWorklet | null>(null);
+  // const [source, setSource] = useState<MediaStreamAudioSourceNode | null>(null);
   const getUsersInChannel = api.server.getUsersInChannel.useQuery(
     selectedChannel.id
   );
@@ -72,8 +72,10 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       const res = getUsersInChannel.data.some((user) => user.id === userID);
       if (res) {
         setUserJoined(true);
+        console.log("true");
       } else {
         setUserJoined(false);
+        console.log("false");
       }
     }
   }, [getUsersInChannel]);
@@ -91,6 +93,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       socket.addEventListener("message", (event) => {
         // Handle the incoming audio data here
         const audioContext = new AudioContext();
+        console.log(event.data);
         playReceivedAudio(audioContext, event.data);
       });
     }
@@ -123,11 +126,8 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     await updateWS.mutateAsync(selectedChannel.id);
     await getUsersInChannel.refetch();
 
-    if (audioContext) {
-      const audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-      const audioSource = audioContext.createMediaStreamSource(audioStream);
+    if (audioContext && stream) {
+      const audioSource = audioContext.createMediaStreamSource(stream);
 
       const audioProcessorNode = new AudioWorkletNode(
         audioContext,
@@ -144,10 +144,10 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           senderID: currentUser.id,
           channelID: selectedChannel.id,
           channelUpdate: false,
-          message: audioData,
+          audio: audioData,
           audioChannelTag: true,
         };
-        socket.send(audioData);
+        socket.send(JSON.stringify(payload));
       };
     }
   };
@@ -167,15 +167,15 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   const playReceivedAudio = (
     audioContext: AudioContext,
-    audioData: ArrayBuffer
+    audioData: Float32Array
   ) => {
-    const buffer = new Float32Array(audioData);
+    // const buffer = new Float32Array(audioData);
     const audioBuffer = audioContext.createBuffer(
       1,
-      buffer.length,
+      audioData.length,
       audioContext.sampleRate
     );
-    audioBuffer.copyToChannel(buffer, 0);
+    audioBuffer.copyToChannel(audioData, 0);
     const bufferSource = audioContext.createBufferSource();
     bufferSource.buffer = audioBuffer;
     bufferSource.connect(audioContext.destination);
