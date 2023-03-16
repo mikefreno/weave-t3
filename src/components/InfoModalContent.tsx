@@ -97,7 +97,7 @@ const InfoModalContent = () => {
             <div
             // href="/docs/api-intro"
             >
-              <div className="rounded-b-2xl rounded-t-sm bg-purple-400 p-2 dark:bg-zinc-700">
+              <div className="rounded bg-purple-400 p-2 dark:bg-zinc-700">
                 <div className="text-lg text-zinc-800 dark:text-zinc-100">
                   API & Bots
                 </div>
@@ -110,7 +110,7 @@ const InfoModalContent = () => {
             <div
             // href="/docs/api-intro"
             >
-              <div className="rounded-b-2xl rounded-t-sm p-2 hover:bg-purple-400 dark:hover:bg-zinc-700">
+              <div className="rounded p-2 hover:bg-purple-400 dark:hover:bg-zinc-700">
                 <div className="text-lg text-zinc-800 dark:text-zinc-100">
                   API & Bots
                 </div>
@@ -122,6 +122,33 @@ const InfoModalContent = () => {
           )}
         </div>
       </Tooltip>
+      <div className="w-48 p-2">
+        {pathname == "/docs/terms-of-service" ? (
+          <div
+          // href="/docs/api-intro"
+          >
+            <div className="rounded-b-2xl rounded-t bg-purple-400 p-2 dark:bg-zinc-700">
+              <div className="text-lg text-zinc-800 dark:text-zinc-100">
+                Terms of Service
+              </div>
+              <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+                Check out the ToS
+              </p>
+            </div>
+          </div>
+        ) : (
+          <Link href="/docs/terms-of-service">
+            <div className="rounded-b-2xl rounded-t p-2 hover:bg-purple-400 dark:hover:bg-zinc-700">
+              <div className="text-lg text-zinc-800 dark:text-zinc-100">
+                Terms of Service
+              </div>
+              <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+                Check out the ToS
+              </p>
+            </div>
+          </Link>
+        )}
+      </div>
     </>
   );
 };

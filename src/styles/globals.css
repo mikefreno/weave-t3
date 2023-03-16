@@ -415,3 +415,9 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+.chatBar {
+  width: calc(100vw - 20rem);
+}
+.chatBarSmall {
+  width: calc(100vw - 10rem);
+}

@@ -285,4 +285,20 @@ export const serverRouter = createTRPCRouter({
         where: { id: input },
       });
     }),
+  getUsersInChannel: protectedProcedure
+    .input(z.number())
+    .query(async ({ input, ctx }): Promise<User[]> => {
+      const wsConnections = await ctx.prisma.wSConnection.findMany({
+        where: {
+          channelID: input,
+        },
+        include: {
+          user: true,
+        },
+      });
+      const Users = wsConnections.map((wsConnection) => {
+        return wsConnection.user ?? null;
+      });
+      return Users.filter(Boolean) as User[];
+    }),
 });

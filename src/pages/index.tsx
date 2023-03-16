@@ -40,6 +40,14 @@ const Home = () => {
               name="description"
               content="Weave Home | Powerful Group-Chatting Service"
             />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1"
+            />
+            <meta
+              name="keywords"
+              content="group chat, productivity, web app, team collaboration, real-time messaging, messaging app, online communication, chat app"
+            />
           </Head>
           <StageBanner isDarkTheme={isDarkTheme} />
           <Navbar switchRef={switchRef} />

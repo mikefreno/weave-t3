@@ -20,7 +20,6 @@ import React, {
   useState,
 } from "react";
 import useOnClickOutside from "../ClickOutsideHook";
-import LoadingElement from "../loading";
 import ThemeContext from "../ThemeContextProvider";
 import AttachmentModal from "./AttachmentModal";
 import TopBanner from "./TopBanner";
@@ -64,6 +63,15 @@ const ChannelMain = (props: {
   const messageInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
   const getMessages = api.server.getChannelComments.useMutation({});
+  const [width, setWidth] = useState<number>(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const getComments = async () => {
     const comments = await getMessages.mutateAsync(selectedChannel.id);
@@ -134,137 +142,163 @@ const ChannelMain = (props: {
   const OtherCommentsClass =
     "bg-zinc-200 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
 
+  const chatBarSizing = width > 768 ? `${width - 320}px` : `${width - 200}px`;
   return (
-    <div className="">
-      <TopBanner currentChannel={selectedChannel} />
-      <div className={`${props.innerNavShowing ? "md:hidden" : ""}`}>
-        <button
-          className={`absolute ${props.innerNavShowing ? null : "rotate-180"}`}
-          onClick={hideInnerNavToggle}
-        >
-          <DoubleChevrons
-            height={24}
-            width={24}
-            stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
-            strokeWidth={1}
+    <>
+      <div className="">
+        <div className="scrollXDisabled h-screen rounded bg-zinc-50 dark:bg-zinc-900">
+          <TopBanner
+            currentChannel={selectedChannel}
+            innerNavShowing={props.innerNavShowing}
           />
-        </button>
-      </div>
-      <div className="chatScreenMobile scrollXDisabled overflow-y-scroll rounded bg-zinc-50 dark:bg-zinc-900 md:h-[87vh]">
-        {socket.readyState == 0 ? (
-          <div className="flex flex-col items-center justify-center pt-[30vh]">
-            <button onClick={manualReconnect}>Connect</button>
-          </div>
-        ) : socket.readyState == 2 ? (
-          <div className="flex flex-col items-center justify-center pt-[30vh]">
-            Disconnected, click channel button to reconnect
+          <div className={`${props.innerNavShowing ? "md:hidden" : ""}`}>
             <button
-              className="mt-2 w-min rounded-sm border px-4 py-2"
-              onClick={manualReconnect}
+              className={`absolute mt-2 ${
+                props.innerNavShowing ? null : "rotate-180"
+              }`}
+              onClick={hideInnerNavToggle}
             >
-              Reconnect
+              <DoubleChevrons
+                height={24}
+                width={24}
+                stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
+                strokeWidth={1}
+              />
             </button>
           </div>
-        ) : null}
-        {/* messages */}
-        <ul className="w-full pt-6">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={
-                message.userId == currentUser.id
-                  ? "my-4 flex justify-end pr-9"
-                  : "my-4 flex pl-3"
-              }
-            >
-              <li
-                className={
-                  message.userId == currentUser.id
-                    ? UsersCommentClass
-                    : OtherCommentsClass
-                }
-              >
-                <div className="-ml-3 -mt-3 text-xs font-semibold">
-                  {message.user.name}
-                </div>
-                <div className="relative">{message.message}</div>
-                {message.userId == currentUser.id ? null : (
-                  <div>
-                    {/* <div className="pt-2 text-sm">{message.user.name}</div> */}
-                    <div className="-ml-8 mt-1 -mb-12">
-                      <Tooltip
-                        content={<UserTooltip user={message.user} />}
-                        color="default"
-                        placement="topStart"
-                      >
-                        <button>
-                          <img
-                            src={message.user.image as string}
-                            alt={`${message.user.name} - avi`}
-                            width={36}
-                            height={36}
-                            className="rounded-full"
-                          />
-                        </button>
-                      </Tooltip>
-                    </div>
-                  </div>
-                )}
-              </li>
-            </div>
-          ))}
-        </ul>
-      </div>
-      <div className="bg-zinc-100 dark:bg-zinc-700">
-        <div className="mx-2 pt-3 md:mx-6 lg:mx-8 xl:mx-12">
-          <form onSubmit={sendMessage}>
-            <Input
-              ref={messageInputRef}
-              css={{ width: "100%" }}
-              contentClickable
-              status="secondary"
-              contentRight={
-                <div className="-ml-6 flex">
-                  <button
-                    ref={attachmentButtonRef}
-                    className="rounded-full px-2"
-                    onClick={attachmentModalToggle}
-                    type="button"
+          <div className="overflow-y-scroll pt-8 pb-24">
+            <ul className="w-full pt-6">
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={
+                    message.userId == currentUser.id
+                      ? "my-4 flex justify-end pr-9"
+                      : "my-4 flex pl-3"
+                  }
+                >
+                  <li
+                    className={
+                      message.userId == currentUser.id
+                        ? UsersCommentClass
+                        : OtherCommentsClass
+                    }
                   >
-                    <PaperClip
-                      height={16}
-                      strokeWidth={1}
-                      width={16}
-                      stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                    />
-                  </button>
-                  <button type="submit">
-                    {messageSendLoading ? (
-                      <Loading size="xs" />
-                    ) : (
-                      <div className={iconClass}>
-                        <SendIcon
-                          height={16}
-                          strokeWidth={1}
-                          width={16}
-                          color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                        />
+                    <div className="-ml-3 -mt-3 text-xs font-semibold">
+                      {message.user.name}
+                    </div>
+                    <div
+                      className={`${
+                        message.user.id == currentUser.id ? "text-right" : ""
+                      } relative `}
+                    >
+                      {message.message}
+                    </div>
+                    {message.userId == currentUser.id ? null : (
+                      <div>
+                        <div className="-ml-8 mt-1 -mb-12">
+                          {message.user.name !== "User Deleted" ? (
+                            <Tooltip
+                              content={<UserTooltip user={message.user} />}
+                              color="default"
+                              placement="topStart"
+                            >
+                              <button>
+                                <img
+                                  src={message.user.image as string}
+                                  alt={`${message.user.name} - avi`}
+                                  width={36}
+                                  height={36}
+                                  className="rounded-full"
+                                />
+                              </button>
+                            </Tooltip>
+                          ) : (
+                            <div className="pb-10" />
+                          )}
+                        </div>
                       </div>
                     )}
-                  </button>
+                  </li>
                 </div>
-              }
-            />
-          </form>
+              ))}
+            </ul>
+          </div>
+          {socket.readyState == 0 ? (
+            <div className="flex flex-col items-center justify-center pt-[30vh]">
+              <button onClick={manualReconnect}>Connect</button>
+            </div>
+          ) : socket.readyState == 2 ? (
+            <div className="flex flex-col items-center justify-center pt-[30vh]">
+              Disconnected, click channel button to reconnect
+              <button
+                className="mt-2 w-min rounded-sm border px-4 py-2"
+                onClick={manualReconnect}
+              >
+                Reconnect
+              </button>
+            </div>
+          ) : null}
+
+          <div
+            className={`fixed bottom-0 ${
+              props.innerNavShowing ? "w-full" : "w-screen"
+            }`}
+          >
+            <div className="bg-zinc-100 pb-28 dark:bg-zinc-700 md:pb-0">
+              <div className="p-4">
+                <form onSubmit={sendMessage}>
+                  <Input
+                    css={{ width: chatBarSizing }}
+                    width={chatBarSizing}
+                    ref={messageInputRef}
+                    contentClickable
+                    status="secondary"
+                    contentRight={
+                      <div className="-ml-6 flex">
+                        <button
+                          ref={attachmentButtonRef}
+                          className="rounded-full px-2"
+                          onClick={attachmentModalToggle}
+                          type="button"
+                        >
+                          <PaperClip
+                            height={16}
+                            strokeWidth={1}
+                            width={16}
+                            stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                          />
+                        </button>
+                        <button type="submit">
+                          {messageSendLoading ? (
+                            <Loading size="xs" />
+                          ) : (
+                            <div className={iconClass}>
+                              <SendIcon
+                                height={16}
+                                strokeWidth={1}
+                                width={16}
+                                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                              />
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    }
+                  />
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
+        {attachmentModalShowing ? (
+          <AttachmentModal
+            toggle={attachmentModalToggle}
+            attachmentModalRef={attachmentModalRef}
+          />
+        ) : null}
       </div>
-      {attachmentModalShowing ? (
-        <AttachmentModal
-          toggle={attachmentModalToggle}
-          attachmentModalRef={attachmentModalRef}
-        />
-      ) : null}
-    </div>
+    </>
   );
 };
 

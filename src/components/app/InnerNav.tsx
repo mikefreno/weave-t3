@@ -509,7 +509,9 @@ const InnerNav = (props: {
                           />
                         </span>
                       )}
-                      <div className="my-auto ml-4">{channel.name}</div>
+                      <div className="my-auto ml-4 text-left">
+                        {channel.name}
+                      </div>
                     </button>
                   </div>
                 ))}

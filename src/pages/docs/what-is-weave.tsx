@@ -53,20 +53,16 @@ export default function WhatIsWeave() {
     if (scrollPosition >= 240) {
       thirdHighlight.current?.classList.add("highlightLong");
     }
-
-    if (scrollPosition >= 320) {
-      fourthHighlight.current?.classList.add("highlight");
-    }
     if (scrollPosition >= 360) {
-      fifthHighlight.current?.classList.add("highlightExtraLong");
+      fourthHighlight.current?.classList.add("highlightExtraLong");
     }
     if (scrollPosition >= 420) {
-      sixthHighlight.current?.classList.add("highlightExtraLong");
+      fifthHighlight.current?.classList.add("highlightExtraLong");
     }
-    if (scrollPosition >= 480) {
-      seventhHighlight.current?.classList.add("highlightExtraLong");
+    if (scrollPosition >= 720) {
+      seventhHighlight.current?.classList.add("highlightLong");
     }
-    if (scrollPosition >= 480) {
+    if (scrollPosition >= 900) {
       eighthHighlight.current?.classList.add("highlightExtraLong");
     }
     if (scrollPosition >= 480) {
@@ -127,54 +123,61 @@ export default function WhatIsWeave() {
             first impressions
           </span>{" "}
           dictate to a large degree how interactions will go. It is for this
-          reason that Weave allows for{" "}
+          reason that Weave allows for both real names and pseudonyms
           <span
             ref={fourthHighlight}
             className="highlightSpacings inline-block"
           >
-            both
-          </span>{" "}
-          real names and pseudonyms{" "}
-          <span ref={fifthHighlight} className="highlightSpacings inline-block">
             dictated at the server and channel level.
           </span>
         </p>
         <p className="mx-auto w-3/4 py-4 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
           Anonymity (or pseudonymity) can be leveraged{" "}
-          <span ref={sixthHighlight} className="highlightSpacings inline-block">
+          <span ref={fifthHighlight} className="highlightSpacings inline-block">
             for many important purposes,
           </span>{" "}
           including:
         </p>
-        <ul className="mx-auto w-3/4 pb-36 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
-          <li>
-            Voicing{" "}
-            <span
-              ref={seventhHighlight}
-              className="highlightSpacings inline-block"
-            >
-              unpopular opinions
-            </span>
-          </li>
-          <li>
-            <span
-              ref={eighthHighlight}
-              className="highlightSpacings inline-block"
-            >
-              Increasing participation
-            </span>{" "}
-            by reducing barriers
-          </li>
-          <li>
-            And the{" "}
-            <span
-              ref={ninthHighlight}
-              className="highlightSpacings inline-block"
-            >
-              protection of privacy
-            </span>
-          </li>
+        <ul className="mx-auto w-3/4 pb-4 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
+          <li>Increased willingness to voice unpopular opinions</li>
+          <li>Increasing participation by reducing barriers</li>
+          <li>And the protection of privacy</li>
         </ul>
+        <div className="pt-4 text-center text-2xl tracking-wide">
+          <span ref={sixthHighlight} className="highlightSpacings inline-block">
+            However...
+          </span>
+        </div>
+        <p className="mx-auto w-3/4 py-2 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
+          There are also some significant drawbacks to it anonymity as well that{" "}
+          <span
+            ref={seventhHighlight}
+            className="highlightSpacings inline-block"
+          >
+            can not
+          </span>{" "}
+          be overlooked.
+        </p>
+        <p className="mx-auto w-3/4 py-2 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
+          Such as:
+        </p>
+        <ul className="mx-auto w-3/4 pb-4 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
+          <li>Lack of empathy towards others</li>
+          <li>Increases in spam / harassment / misinformation</li>
+          <li>Decrease in community trust</li>
+          <li>Lack of accountability</li>
+        </ul>
+        <p className="mx-auto w-3/4 pb-36 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
+          And it is due to the conflict above that Weave allows for communities
+          to decide between pseudonymity and the use of real names.{" "}
+          <span
+            ref={eighthHighlight}
+            className="highlightSpacings inline-block"
+          >
+            It allows communities
+          </span>{" "}
+          to foster the environment they desire.
+        </p>
       </div>
     </div>
   );

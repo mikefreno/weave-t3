@@ -155,7 +155,7 @@ const LoginModal = (props: {
         </div>
         <div className="text-center text-xs">
           By Creating or Using a Weave Account, you agree with our{" "}
-          <Link href={"/terms-of-service"} className="hover:underline">
+          <Link href={"/docs/terms-of-service"} className="hover:underline">
             Terms of Service
           </Link>
         </div>
