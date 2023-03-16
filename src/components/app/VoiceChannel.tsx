@@ -224,6 +224,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                         : "/Logo - light.png"
                     }
                     alt={"user-logo"}
+                    className="rounded-full"
                   />
                 </div>
               </div>

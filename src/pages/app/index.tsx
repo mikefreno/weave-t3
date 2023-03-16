@@ -182,15 +182,11 @@ const App = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const storedValue = localStorage.getItem("audioState");
-  //   if (storedValue === "false") {
-  //     setAudioState(false);
-  //   }
-  //   return () => {
-  //     document.getElementById("html")?.classList.remove("scrollDisabled");
-  //   };
-  // }, []);
+  useEffect(() => {
+    return () => {
+      document.getElementById("html")?.classList.remove("scrollDisabled");
+    };
+  }, []);
 
   const audioToggle = () => {
     // localStorage.setItem("audioState", (!audioState).toString());
