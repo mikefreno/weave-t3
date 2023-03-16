@@ -30,8 +30,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    ".next/types/**/*.ts",
-    "audio-processor.js"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
