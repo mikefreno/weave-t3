@@ -19,7 +19,7 @@ const StageBanner = (props: { isDarkTheme: boolean }) => {
         This app is currently in an alpha stage, some core feature have yet to
         be deployed. Read more{" "}
         <Link
-          href={"/roadmap"}
+          href={"/docs/roadmap"}
           className="text-blue-400 underline underline-offset-4"
         >
           here
