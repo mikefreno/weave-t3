@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
         </Head>
         <Navbar switchRef={switchRef} />
         <div className="min-h-screen py-[8vh] px-[8vw]">
-          <div className="py-4 text-xl">Weave's Privacy Policy</div>
+          <div className="py-4 text-xl">Weave&apos;s Privacy Policy</div>
           <div className="py-2">Last Updated: March 23rd</div>
           <div className="py-2">
             At Weave, the privacy of our visitors is of the utmost importance to
@@ -48,12 +48,12 @@ export default function PrivacyPolicy() {
                 </div>
                 <div className="pb-2">
                   <div className="-ml-6">(c) Cookies and Web Beacons:</div> Like
-                  any other website, Weave uses 'cookies' to store information
-                  about visitors' preferences, to record user-specific
-                  information on which pages the site visitor accesses or
-                  visits, and to personalize or customize our web page content
-                  based on visitors' browser type or other information that the
-                  visitor sends via their browser.
+                  any other website, Weave uses &apos;cookies&apos; to store
+                  information about visitors&apos; preferences, to record
+                  user-specific information on which pages the site visitor
+                  accesses or visits, and to personalize or customize our web
+                  page content based on visitors&apos; browser type or other
+                  information that the visitor sends via their browser.
                 </div>
               </div>
             </li>
@@ -89,7 +89,7 @@ export default function PrivacyPolicy() {
               enforcement.
             </li>
             <li className="list-decimal">
-              <div className="pb-2 text-lg">Children's Information</div>
+              <div className="pb-2 text-lg">Children&apos;s Information</div>
               Weave does not knowingly collect any personally identifiable
               information from children under the age of 13. If you think that
               your child provided this kind of information on our website or
