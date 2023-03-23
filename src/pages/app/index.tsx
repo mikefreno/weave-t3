@@ -16,8 +16,8 @@ import { useSession } from "next-auth/react";
 import { api } from "@/src/utils/api";
 import LoadingElement from "@/src/components/loading";
 import router from "next/router";
-import ServerMainScreen from "@/src/components/app/SeverMainScreen";
-import ChannelMain from "@/src/components/app/ChannelMain";
+import ServerMainScreen from "@/src/components/app/ServerMainScreen";
+import ChannelMain from "@/src/components/app/ChatChannel";
 import {
   Server,
   Server_Admin,
@@ -266,12 +266,12 @@ const App = () => {
               setSelectedInnerTabID={setSelectedInnerTabID}
               currentUser={currentUser}
               selectedInnerTabID={selectedInnerTabID}
-              usersServers={usersServers.data as any}
               setSelectedChannel={setSelectedChannel}
               selectedChannel={selectedChannel}
               loadingOverlaySetter={loadingOverlaySetter}
               serverRefetch={serverRefetch}
               timestamp={timestamp}
+              usersServers={usersServers.data as any}
             />
             <InnerNavOverlay
               setSelectedInnerTab={setSelectedInnerTab}
@@ -351,7 +351,7 @@ const App = () => {
               )
             ) : (
               <ServerMainScreen
-                usersServers={usersServers.data as Server[]}
+                usersServers={usersServers.data}
                 selectedInnerTabID={selectedInnerTabID}
               />
             )

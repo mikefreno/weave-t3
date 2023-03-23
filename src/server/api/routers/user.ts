@@ -65,6 +65,18 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
+  setGravatarAsImage: protectedProcedure
+    .input(z.string())
+    .mutation(({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      return ctx.prisma.user.update({
+        where: { id: userId },
+        data: {
+          image: input,
+          pseudonym_image: input,
+        },
+      });
+    }),
   userCheck: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.user.findFirst({
       where: {

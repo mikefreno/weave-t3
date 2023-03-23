@@ -61,22 +61,36 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const disconnectWS = api.websocket.disconnectWsFromChannel.useMutation();
   const updateWS = api.websocket.updateWs.useMutation();
   const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
+  const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
+  const usersInCallQuery = api.websocket.usersInCall.useQuery(
+    selectedChannel.id
+  );
+  const [usersInCall, setUsersInCall] = useState<User[] | null>(null);
 
   useEffect(() => {
-    console.log(usersInChannel);
+    if (usersInCallQuery.data && usersInCallQuery.data !== "No users in call") {
+      setUsersInCall(usersInCallQuery.data);
+    }
+  }, [usersInCallQuery]);
+
+  useEffect(() => {
+    if (socket.readyState === 0) {
+      const newSocket = new WebSocket(
+        process.env.NEXT_PUBLIC_WEBSOCKET as string
+      );
+      setSocket(newSocket);
+    }
+    const payload = {
+      senderID: currentUser.id,
+      channelID: selectedChannel.id,
+      channelUpdate: true,
+    };
+    socket.send(JSON.stringify(payload));
+  }, [selectedChannel]);
+
+  useEffect(() => {
     if (getUsersInChannel) {
       setUsersInChannel(getUsersInChannel.data);
-    }
-    if (getUsersInChannel.data) {
-      const userID = currentUser.id;
-      const res = getUsersInChannel.data.some((user) => user.id === userID);
-      if (res) {
-        setUserJoined(true);
-        console.log("true");
-      } else {
-        setUserJoined(false);
-        console.log("false");
-      }
     }
   }, [getUsersInChannel]);
 
@@ -93,7 +107,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       socket.addEventListener("message", (event) => {
         // Handle the incoming audio data here
         const audioContext = new AudioContext();
-        console.log(event.data);
+        const receivedData = JSON.parse(event.data);
         playReceivedAudio(audioContext, event.data);
       });
     }
@@ -117,6 +131,8 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   // }, []);
 
   const joinCall = async () => {
+    await joinOrLeaveCallMutation.mutateAsync(true);
+    usersInCallQuery.refetch();
     if (microphoneState == false) {
       const res = confirm("Turn on Microphone?");
       if (res) {
@@ -153,6 +169,8 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   };
 
   const leaveCall = async () => {
+    await joinOrLeaveCallMutation.mutateAsync(false);
+    usersInCallQuery.refetch();
     if (microphoneState) {
       const res = confirm("Turn off Microphone?");
       if (res) {
@@ -163,19 +181,23 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     await getUsersInChannel.refetch();
   };
 
+  useEffect(() => {
+    return joinOrLeaveCallMutation.mutate(false);
+  }, []);
+
   ///audio streaming
 
   const playReceivedAudio = (
     audioContext: AudioContext,
-    audioData: Float32Array
+    audioData: ArrayBuffer
   ) => {
-    // const buffer = new Float32Array(audioData);
+    const buffer = new Float32Array(audioData);
     const audioBuffer = audioContext.createBuffer(
       1,
-      audioData.length,
+      buffer.length,
       audioContext.sampleRate
     );
-    audioBuffer.copyToChannel(audioData, 0);
+    audioBuffer.copyToChannel(buffer, 0);
     const bufferSource = audioContext.createBufferSource();
     bufferSource.buffer = audioBuffer;
     bufferSource.connect(audioContext.destination);
@@ -206,26 +228,31 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         style={{ width: bodySizing }}
       >
         <div className="pt-8 text-center text-lg">
-          {usersInChannel?.length !== 0
+          {usersInCall && usersInCall?.length !== 0
             ? "Currently in Channel:"
             : "No one's here... yet"}
         </div>
-        {usersInChannel ? (
+        {usersInCall ? (
           <div className={`grid grid-cols-5 justify-center`}>
-            {usersInChannel.map((user) => (
+            {usersInCall.map((user) => (
               <div className="px-4 py-6" key={user.id}>
                 <div className="flex h-24 w-24 rounded-full border md:h-36 md:w-36">
-                  <img
-                    src={
-                      user.image
-                        ? user.image
-                        : user.pseudonym_image
-                        ? user.pseudonym_image
-                        : "/Logo - light.png"
-                    }
-                    alt={"user-logo"}
-                    className="rounded-full"
-                  />
+                  <div className="flex flex-col">
+                    <button>
+                      <img
+                        src={
+                          user.image
+                            ? user.image
+                            : user.pseudonym_image
+                            ? user.pseudonym_image
+                            : "/Logo - light.png"
+                        }
+                        alt={"user-logo"}
+                        className="rounded-full"
+                      />
+                      <div className="pl-4">{user.name}</div>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

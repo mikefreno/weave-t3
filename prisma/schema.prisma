@@ -147,5 +147,6 @@ model WSConnection {
   user         User?   @relation(fields: [userId], references: [id])
   userId       String?
   channelID    Int?
+  inCall       Boolean  @default(false)
   @@index([userId])
 }

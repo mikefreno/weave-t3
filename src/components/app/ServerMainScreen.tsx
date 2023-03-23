@@ -1,15 +1,24 @@
 import { Server } from "@prisma/client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const ServerMainScreen = (props: {
-  usersServers: Server[];
+  usersServers: Server[] | undefined;
   selectedInnerTabID: number;
 }) => {
   const { usersServers } = props;
-  const thisServer = usersServers.find(
-    (server) => server.id === props.selectedInnerTabID
-  );
+  const [thisServer, setThisServer] = useState<Server | null>(null);
+
+  useEffect(() => {
+    if (usersServers) {
+      const serverMatch = usersServers.find(
+        (server) => server.id === props.selectedInnerTabID
+      );
+      if (serverMatch) {
+        setThisServer(serverMatch);
+      }
+    }
+  }, []);
 
   return (
     <div>

@@ -21,8 +21,16 @@ import { useSession, signOut } from "next-auth/react";
 import ThemeContext from "./ThemeContextProvider";
 import useOnClickOutside from "./ClickOutsideHook";
 import InfoModalContent from "./InfoModalContent";
+import { api } from "../utils/api";
+import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 
 const railway_300 = Raleway({ weight: "300", subsets: ["latin"] });
+
+type UserData = User & {
+  servers: Server[];
+  memberships: Server_Member[];
+  adminships: Server_Admin[];
+};
 
 const Navbar = (props: {
   switchRef?: React.RefObject<HTMLDivElement>;
@@ -42,6 +50,13 @@ const Navbar = (props: {
   const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoModalRef = useRef<HTMLDivElement>(null);
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
+
+  const currentUserReturn = api.users.getCurrentUser.useQuery();
+
+  useEffect(() => {
+    if (currentUserReturn.data) setCurrentUser(currentUserReturn.data);
+  }, [currentUserReturn]);
 
   useEffect(() => {
     if (pathname == "/app") {
@@ -180,7 +195,7 @@ const Navbar = (props: {
                   >
                     <div className="-ml-40 mt-8 rounded-b-3xl rounded-tr-sm rounded-tl-3xl border border-zinc-500 bg-zinc-200 shadow-xl dark:bg-zinc-900">
                       <div className="p-1">
-                        <InfoModalContent />
+                        <InfoModalContent isDarkTheme={isDarkTheme} />
                       </div>
                     </div>
                   </div>
@@ -242,12 +257,25 @@ const Navbar = (props: {
                 </div>
               )}
               <li className="mx-2 my-auto text-sm ">
-                {status === "authenticated" ? (
+                {status === "authenticated" &&
+                (session.user?.name || currentUser?.pseudonym) ? (
                   <Button shadow color="gradient" auto size={"sm"}>
                     <Link href={"/app"} className="text-[#E2E2E2]">
                       Web App
                     </Link>
                   </Button>
+                ) : status === "authenticated" ? (
+                  <Tooltip
+                    content={"Finish account setup!"}
+                    placement="bottomStart"
+                    color={"secondary"}
+                  >
+                    <Button shadow color="gradient" auto size={"sm"}>
+                      <Link href={"/account-set-up"} className="text-[#E2E2E2]">
+                        Web App
+                      </Link>
+                    </Button>
+                  </Tooltip>
                 ) : (
                   <Tooltip
                     content={"Login to use!"}

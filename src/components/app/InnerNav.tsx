@@ -51,7 +51,6 @@ type ServerIncludingChannel = {
 
 const InnerNav = (props: {
   serverModalToggle: MouseEventHandler<HTMLButtonElement>;
-
   botButtonRef: RefObject<HTMLButtonElement>;
   serverButtonRef: RefObject<HTMLButtonElement>;
   timestamp: number;
@@ -114,10 +113,6 @@ const InnerNav = (props: {
     setCreateChannelModalShowing(false);
   });
 
-  const thisServer = usersServers.find(
-    (server) => server.id === props.selectedInnerTabID
-  );
-
   const handleSubmit = (event: any) => {
     event.preventDefault();
     // Perform your search logic here
@@ -134,7 +129,7 @@ const InnerNav = (props: {
     );
     if (confirmed) {
       loadingOverlaySetter(true);
-      await deleteUser.mutateAsync(thisServer!.id);
+      await deleteUser.mutateAsync(selectedInnerTabID);
       serverRefetch();
       loadingOverlaySetter(false);
     }
@@ -479,42 +474,44 @@ const InnerNav = (props: {
             {/* end */}
             <div>
               <div>
-                {thisServer?.channels.map((channel) => (
-                  <div className="my-2" key={channel.id}>
-                    <button
-                      onClick={() => {
-                        props.setSelectedChannel(channel);
-                      }}
-                      className={`flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 ${
-                        selectedChannel?.id == channel.id
-                          ? "dark:border-purple-600"
-                          : "border-zinc-300 dark:border-zinc-600"
-                      } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
-                    >
-                      {channel.type == "voice" ? (
-                        <span className="my-auto">
-                          <HeadphonesIcon
-                            height={24}
-                            width={24}
-                            color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                          />
-                        </span>
-                      ) : (
-                        <span className="my-auto">
-                          <CommentsIcon
-                            height={24}
-                            width={24}
-                            strokeWidth={0.5}
-                            color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                          />
-                        </span>
-                      )}
-                      <div className="my-auto ml-4 text-left">
-                        {channel.name}
-                      </div>
-                    </button>
-                  </div>
-                ))}
+                {usersServers
+                  .find((server) => server.id === props.selectedInnerTabID)
+                  ?.channels.map((channel) => (
+                    <div className="my-2" key={channel.id}>
+                      <button
+                        onClick={() => {
+                          props.setSelectedChannel(channel);
+                        }}
+                        className={`flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 ${
+                          selectedChannel?.id == channel.id
+                            ? "dark:border-purple-600"
+                            : "border-zinc-300 dark:border-zinc-600"
+                        } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
+                      >
+                        {channel.type == "voice" ? (
+                          <span className="my-auto">
+                            <HeadphonesIcon
+                              height={24}
+                              width={24}
+                              color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                            />
+                          </span>
+                        ) : (
+                          <span className="my-auto">
+                            <CommentsIcon
+                              height={24}
+                              width={24}
+                              strokeWidth={0.5}
+                              color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                            />
+                          </span>
+                        )}
+                        <div className="my-auto ml-4 text-left">
+                          {channel.name}
+                        </div>
+                      </button>
+                    </div>
+                  ))}
 
                 <button
                   onClick={createChannelToggle}

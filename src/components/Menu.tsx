@@ -150,15 +150,17 @@ const Menu = (props: {
             className="absolute -mt-7 flex rounded-full py-1 px-2 hover:bg-purple-400 dark:hover:bg-zinc-700"
             onClick={infoDropdownToggle}
           >
-            <BackArrow
-              height={24}
-              width={24}
-              stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              strokeWidth={1}
-            />
             <div className="pl-2">Back</div>
+            <div className="my-auto rotate-180">
+              <BackArrow
+                height={24}
+                width={24}
+                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                strokeWidth={1}
+              />
+            </div>
           </button>
-          <InfoModalContent />
+          <InfoModalContent isDarkTheme={isDarkTheme} />
         </ul>
       );
     }

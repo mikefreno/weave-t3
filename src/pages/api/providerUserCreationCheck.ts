@@ -1,6 +1,6 @@
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -8,7 +8,7 @@ export default async function providerUserCreationCheck(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await unstable_getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions);
   const user = await prisma?.user.findFirst({
     where: {
       email: session?.user?.email,

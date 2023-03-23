@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import { authOptions } from "./auth/[...nextauth]";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
@@ -9,7 +9,7 @@ export default async function joinServer(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await unstable_getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions);
   if (session == null) {
     res.status(401).redirect("/login");
   } else {

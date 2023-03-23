@@ -1,8 +1,14 @@
 import { api } from "@/src/utils/api";
-import React, { useCallback, useContext, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Dropzone from "@/src/components/app/Dropzone";
 import Navbar from "@/src/components/Navbar";
-import { Button, Input, Loading } from "@nextui-org/react";
+import { Button, Input, Loading, Tooltip } from "@nextui-org/react";
 import BackArrow from "@/src/icons/BackArrow";
 import ThemeContext from "@/src/components/ThemeContextProvider";
 import axios from "axios";
@@ -12,6 +18,7 @@ import { useSession } from "next-auth/react";
 import router from "next/router";
 import Resizer from "react-image-file-resizer";
 import Head from "next/head";
+import crypto from "crypto";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -57,12 +64,25 @@ const UserSetup = () => {
   const pseudonymMutation = api.users.setUserPseudonym.useMutation();
   const imageMutation = api.users.setUserImage.useMutation();
   const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
-
+  const gravatarImageMutation = api.users.setGravatarAsImage.useMutation();
   const [nameField, setNameField] = useState("-");
   const [pseudonymField, setPseudonymField] = useState("-");
   const switchRef = useRef<HTMLDivElement | null>(null);
-
+  const [nameError, setNameError] = useState("");
+  const [gravatar, setGravatar] = useState<string | null>(null);
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
+
+  // create gravatar
+  useEffect(() => {
+    if (session?.user && session.user.email) {
+      const normalizedEmail = session.user.email.trim().toLowerCase();
+      const hash = crypto
+        .createHash("md5")
+        .update(normalizedEmail)
+        .digest("hex");
+      setGravatar(`https://www.gravatar.com/avatar/${hash}?s=80&d=identicon`);
+    }
+  }, [session?.user]);
 
   const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {
@@ -93,21 +113,34 @@ const UserSetup = () => {
     });
   }, []);
 
-  const setNames = () => {
+  const setNames = (e: any) => {
+    e.preventDefault();
     setButtonLoading(true);
-    if (nameField !== "-") {
-      nameMutation.mutate(realName.current!.value);
+    if (realName.current?.value || pseudonym.current?.value) {
+      if (nameField !== "-") {
+        nameMutation.mutate(realName.current!.value);
+      }
+      if (pseudonymField !== "-") {
+        pseudonymMutation.mutate(pseudonym.current!.value);
+      }
+      setButtonLoading(false);
+      setStep(1);
+    } else {
+      setNameError("One of the above is required!");
+      setButtonLoading(false);
     }
-    if (pseudonymField !== "-") {
-      pseudonymMutation.mutate(pseudonym.current!.value);
-    }
-    setButtonLoading(false);
-    setStep(1);
   };
   const setPictures = async () => {
     setButtonLoading(true);
-
-    if (realNamePicture !== null) {
+    if (
+      realNamePicture == null &&
+      pseudonymPicture == null &&
+      userQuery.data?.image == null &&
+      userQuery.data?.pseudonym_image == null &&
+      gravatar
+    ) {
+      gravatarImageMutation.mutate(gravatar);
+    } else if (realNamePicture !== null) {
       const type = "image";
       const ext = realNamePictureExt;
       const id = userQuery.data!.id;
@@ -124,8 +157,7 @@ const UserSetup = () => {
       });
 
       imageMutation.mutate(s3TokenReturn.key);
-    }
-    if (pseudonymPicture !== null) {
+    } else if (pseudonymPicture !== null) {
       const type = "pseudonym_image";
       const ext = pseudonymPictureExt;
       const id = userQuery.data!.id;
@@ -158,65 +190,72 @@ const UserSetup = () => {
     if (step == 0) {
       // Set Names
       return (
-        <div className="text-center text-3xl">
-          At least one of these is needed, but both are encouraged
-          <div className="flex flex-row">
-            <div className="flex w-1/2 flex-col items-center">
-              <div className="pt-8">
-                <Input
-                  id="realName"
-                  ref={realName}
-                  onChange={(e) => setNameField(e.target.value)}
-                  label="Your Full Name"
-                  required
-                  clearable
-                  underlined
-                  color="secondary"
-                  initialValue={userQuery.data?.name ? userQuery.data.name : ""}
-                />
+        <div className="text-center">
+          <div className="text-3xl">
+            At least one of these is needed, but both are encouraged
+          </div>
+          <form onSubmit={setNames}>
+            <div className="flex flex-row">
+              <div className="flex w-1/2 flex-col items-center">
+                <div className="pt-8">
+                  <Input
+                    id="realName"
+                    ref={realName}
+                    onChange={(e) => setNameField(e.target.value)}
+                    label="Your Full Name"
+                    clearable
+                    underlined
+                    color="secondary"
+                    initialValue={
+                      userQuery.data?.name ? userQuery.data.name : ""
+                    }
+                  />
+                </div>
+                <div className="mx-12  text-sm">
+                  This is generally only used for workspaces.
+                </div>
               </div>
-              <div className="mx-12  text-sm">
-                This is generally only used for workspaces.
+              <div className="flex w-1/2 flex-col items-center border-l border-zinc-500">
+                <div className="pt-8">
+                  <Input
+                    id="pseudonym"
+                    ref={pseudonym}
+                    onChange={(e) => setPseudonymField(e.target.value)}
+                    label="Pseudonym"
+                    clearable
+                    underlined
+                    color="secondary"
+                    initialValue={
+                      userQuery.data?.pseudonym ? userQuery.data.pseudonym : ""
+                    }
+                  />
+                </div>
+                <div className="mx-12 text-sm">
+                  Used in more casual communities.
+                </div>
               </div>
             </div>
-            <div className="flex w-1/2 flex-col items-center border-l border-zinc-500">
-              <div className="pt-8">
-                <Input
-                  id="pseudonym"
-                  ref={pseudonym}
-                  onChange={(e) => setPseudonymField(e.target.value)}
-                  label="Pseudonym"
-                  required
-                  clearable
-                  underlined
-                  color="secondary"
-                  initialValue={
-                    userQuery.data?.pseudonym ? userQuery.data.pseudonym : ""
-                  }
-                />
-              </div>
-              <div className="mx-12 text-sm">
-                Used in more casual communities.
-              </div>
+            <div className="flex justify-end pt-8">
+              {buttonLoading ? (
+                <Button
+                  disabled
+                  auto
+                  bordered
+                  color="gradient"
+                  css={{ px: "$13" }}
+                >
+                  <Loading type="points" size="sm" />
+                </Button>
+              ) : (
+                <Button auto shadow color={"secondary"} type="submit">
+                  Next
+                </Button>
+              )}
             </div>
-          </div>
-          <div className="flex justify-end pt-8">
-            {buttonLoading ? (
-              <Button
-                disabled
-                auto
-                bordered
-                color="gradient"
-                css={{ px: "$13" }}
-              >
-                <Loading type="points" size="sm" />
-              </Button>
-            ) : (
-              <Button auto shadow color={"secondary"} onClick={setNames}>
-                Next
-              </Button>
-            )}
-          </div>
+            <span className="text-center text-lg text-red-500">
+              {nameError}
+            </span>
+          </form>
         </div>
       );
     } else if (step == 1) {
@@ -263,6 +302,24 @@ const UserSetup = () => {
             </div>
             <div className="pt-4">
               If only one picture is chosen it will be used for both.
+            </div>
+            <div className="flex justify-center pt-1">
+              If none are chosen, a
+              <Tooltip
+                content={
+                  <div className="p-2">
+                    <div>Your gravatar</div>
+                    <div className="flex justify-center pt-2">
+                      <img src={gravatar ? gravatar : ""} alt="gravatar" />
+                    </div>
+                  </div>
+                }
+              >
+                <span className="px-1 text-blue-400 underline underline-offset-4">
+                  gravatar
+                </span>
+              </Tooltip>
+              will be used
             </div>
             <div className="w-full">
               <div className="float-right flex justify-end">

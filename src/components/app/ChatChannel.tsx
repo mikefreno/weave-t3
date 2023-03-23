@@ -166,7 +166,7 @@ const ChannelMain = (props: {
               />
             </button>
           </div>
-          <div className="overflow-y-scroll pt-8 pb-24">
+          <div className="scrollXDisabled overflow-y-scroll pt-8 pb-24">
             <ul className="w-full pt-6">
               {messages.map((message, index) => (
                 <div
