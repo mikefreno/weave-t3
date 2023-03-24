@@ -81,7 +81,7 @@ const LoginModal = (props: {
   return (
     <div ref={props.loginRef} className="flex justify-center">
       <div
-        className="fade-in dark:text- fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200 p-4 text-zinc-800
+        className="fade-in fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200 p-4 text-zinc-800
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/4 md:w-3/5 lg:w-2/5"
       >
         <div className="absolute z-50 -mb-6 max-w-[25vw] pl-2 text-2xl">

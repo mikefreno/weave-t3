@@ -18,21 +18,25 @@ const InfoModalContent = (props: { isDarkTheme: boolean }) => {
   if (showingDocs) {
     return (
       <>
-        <button
-          className="absolute ml-28 flex rounded-full py-1 px-2 hover:bg-purple-400 dark:hover:bg-zinc-700"
-          onClick={toggleDocsMenu}
-        >
-          <div className="pl-1">Back</div>
-          <div className="my-auto rotate-180">
-            <BackArrow
-              height={24}
-              width={24}
-              stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              strokeWidth={1}
-            />
+        {pathname !== "/app" ? (
+          <div className="hidden pb-8 md:flex">
+            <button
+              className="absolute ml-28 flex rounded-full py-1 px-2 hover:bg-purple-400 dark:hover:bg-zinc-700"
+              onClick={toggleDocsMenu}
+            >
+              <div className="pl-1">Back</div>
+              <div className="my-auto rotate-180">
+                <BackArrow
+                  height={24}
+                  width={24}
+                  stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                  strokeWidth={1}
+                />
+              </div>
+            </button>
           </div>
-        </button>
-        <div className="w-48 p-2 pt-8">
+        ) : null}
+        <div className="w-48 p-2">
           {pathname == "/docs/roadmap" ? (
             <>
               <div className="rounded-b rounded-tr rounded-tl-2xl bg-purple-400 p-2 dark:bg-zinc-700">
@@ -202,12 +206,37 @@ const InfoModalContent = (props: { isDarkTheme: boolean }) => {
           )}
         </div>
         <div className="w-48 p-2">
+          {pathname == "/contact" ? (
+            <>
+              <div className="rounded bg-purple-400 p-2 dark:bg-zinc-700">
+                <div className="text-lg text-zinc-800 dark:text-zinc-100">
+                  Contact
+                </div>
+                <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+                  Question or comment? Reach out!
+                </p>
+              </div>
+            </>
+          ) : (
+            <Link href="/contact">
+              <div className="rounded p-2 hover:bg-purple-400 dark:hover:bg-zinc-700">
+                <div className="text-lg text-zinc-800 dark:text-zinc-100">
+                  Contact
+                </div>
+                <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+                  Question or comment? Reach out!
+                </p>
+              </div>
+            </Link>
+          )}
+        </div>
+        <div className="w-48 p-2">
           {firstPathnameChunk === "docs" ? (
             <button
               onClick={toggleDocsMenu}
               className="rounded-t rounded-b-2xl bg-purple-400 p-2 dark:bg-zinc-700"
             >
-              <div className="text-lg text-zinc-800 dark:text-zinc-100">
+              <div className="text-left text-lg text-zinc-800 dark:text-zinc-100">
                 Docs
               </div>
               <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
@@ -219,7 +248,7 @@ const InfoModalContent = (props: { isDarkTheme: boolean }) => {
               onClick={toggleDocsMenu}
               className="rounded-t rounded-b-2xl p-2 hover:bg-purple-400 dark:hover:bg-zinc-700"
             >
-              <div className="text-lg text-zinc-800 dark:text-zinc-100">
+              <div className="text-left text-lg text-zinc-800 dark:text-zinc-100">
                 Docs
               </div>
               <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
