@@ -19,6 +19,7 @@ import router from "next/router";
 import Resizer from "react-image-file-resizer";
 import Head from "next/head";
 import crypto from "crypto";
+import { toSvg } from "jdenticon";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -41,20 +42,24 @@ const UserSetup = () => {
   const [realNamePicture, setRealNamePicture] = useState<File | Blob | null>(
     null
   );
-  const [realNamePictureExt, setRealNamePictureExt] = useState<string>("");
+  const [realNamePictureExt, setRealNamePictureExt] = useState<string | null>(
+    null
+  );
   const [realNamePicHolder, setRealNamePicHolder] = useState<
     string | ArrayBuffer | null
   >(null);
   const [pseudonymPicture, setPseudonymPicture] = useState<File | Blob | null>(
     null
   );
-  const [pseudonymPictureExt, setPseudonymPictureExt] = useState<string>("");
+  const [pseudonymPictureExt, setPseudonymPictureExt] = useState<string | null>(
+    null
+  );
   const [pseudonymPicHolder, setPseudonymPicHolder] = useState<
     string | ArrayBuffer | null
   >(null);
   const [step, setStep] = useState(0);
-  const realName = useRef<HTMLInputElement | null>(null);
-  const pseudonym = useRef<HTMLInputElement | null>(null);
+  const realName = useRef<HTMLInputElement>(null);
+  const pseudonym = useRef<HTMLInputElement>(null);
   const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [buttonPassState, setButtonPassState] = useState(false);
@@ -64,25 +69,18 @@ const UserSetup = () => {
   const pseudonymMutation = api.users.setUserPseudonym.useMutation();
   const imageMutation = api.users.setUserImage.useMutation();
   const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
-  const gravatarImageMutation = api.users.setGravatarAsImage.useMutation();
+  const identiconImageMutation = api.users.setIdenticonAsImage.useMutation();
   const [nameField, setNameField] = useState("-");
   const [pseudonymField, setPseudonymField] = useState("-");
   const switchRef = useRef<HTMLDivElement | null>(null);
   const [nameError, setNameError] = useState("");
-  const [gravatar, setGravatar] = useState<string | null>(null);
+  const [identicon, setIdenticon] = useState<string | null>(null);
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
+  const svgDivRef = useRef<HTMLDivElement>();
 
-  // create gravatar
   useEffect(() => {
-    if (session?.user && session.user.email) {
-      const normalizedEmail = session.user.email.trim().toLowerCase();
-      const hash = crypto
-        .createHash("md5")
-        .update(normalizedEmail)
-        .digest("hex");
-      setGravatar(`https://www.gravatar.com/avatar/${hash}?s=80&d=identicon`);
-    }
-  }, [session?.user]);
+    setIdenticon(toSvg(session?.user?.email, 100));
+  }, []);
 
   const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {
@@ -130,26 +128,25 @@ const UserSetup = () => {
       setButtonLoading(false);
     }
   };
+
   const setPictures = async () => {
     setButtonLoading(true);
-    if (
-      realNamePicture == null &&
-      pseudonymPicture == null &&
-      userQuery.data?.image == null &&
-      userQuery.data?.pseudonym_image == null &&
-      gravatar
-    ) {
-      gravatarImageMutation.mutate(gravatar);
-    } else if (realNamePicture !== null) {
-      const type = "image";
-      const ext = realNamePictureExt;
-      const id = userQuery.data!.id;
-      const s3TokenReturn = await s3TokenMutation.mutateAsync({
-        id: id,
+    let type = "image"; // type refers to being paired with real name or pseudonym
+    let ext = realNamePictureExt ? realNamePictureExt : "png";
+    let id = userQuery.data!.id;
+    let s3TokenReturn = await s3TokenMutation.mutateAsync({
+      id: id,
+      type: type,
+      ext: ext,
+      category: "users", // category is used to separate user and server images cleanly in s3
+    });
+    if (realNamePicture == null && userQuery.data?.image == null) {
+      await identiconImageMutation.mutateAsync({
         type: type,
-        ext: ext,
-        category: "users",
+        uploadURL: s3TokenReturn.uploadURL,
+        s3key: s3TokenReturn.key,
       });
+    } else if (realNamePicture !== null) {
       const resizedFile = await resizeFile(realNamePicture as File, ext);
 
       await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
@@ -157,17 +154,23 @@ const UserSetup = () => {
       });
 
       imageMutation.mutate(s3TokenReturn.key);
-    } else if (pseudonymPicture !== null) {
-      const type = "pseudonym_image";
-      const ext = pseudonymPictureExt;
-      const id = userQuery.data!.id;
-      const s3TokenReturn = await s3TokenMutation.mutateAsync({
-        id: id,
+    }
+    type = "pseudonym_image";
+    ext = pseudonymPictureExt ? pseudonymPictureExt : "png";
+    id = userQuery.data!.id;
+    s3TokenReturn = await s3TokenMutation.mutateAsync({
+      id: id,
+      type: type,
+      ext: ext,
+      category: "users",
+    });
+    if (pseudonymPicture == null && userQuery.data?.pseudonym_image == null) {
+      await identiconImageMutation.mutateAsync({
         type: type,
-        ext: ext,
-        category: "users",
+        uploadURL: s3TokenReturn.uploadURL,
+        s3key: s3TokenReturn.key,
       });
-
+    } else if (pseudonymPicture !== null) {
       const resizedFile = await resizeFile(pseudonymPicture as File, ext);
 
       await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
@@ -176,10 +179,10 @@ const UserSetup = () => {
 
       pseudonymImageMutation.mutate(s3TokenReturn.key);
     }
-
     setStep(2);
     setButtonLoading(false);
   };
+
   if (status === "loading") {
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }
@@ -300,26 +303,24 @@ const UserSetup = () => {
                 Paired with Pseudonym
               </div>
             </div>
-            <div className="pt-4">
-              If only one picture is chosen it will be used for both.
-            </div>
             <div className="flex justify-center pt-1">
-              If none are chosen, a
+              If one is not chosen, a
               <Tooltip
                 content={
                   <div className="p-2">
-                    <div>Your gravatar</div>
-                    <div className="flex justify-center pt-2">
-                      <img src={gravatar ? gravatar : ""} alt="gravatar" />
-                    </div>
+                    <div>Your identicon</div>
+                    <div
+                      className="flex justify-center rounded-full pt-2"
+                      dangerouslySetInnerHTML={{ __html: identicon as string }}
+                    ></div>
                   </div>
                 }
               >
                 <span className="px-1 text-blue-400 underline underline-offset-4">
-                  gravatar
+                  identicon
                 </span>
               </Tooltip>
-              will be used
+              will be used in its place.
             </div>
             <div className="w-full">
               <div className="float-right flex justify-end">

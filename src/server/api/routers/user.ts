@@ -1,5 +1,7 @@
+import axios from "axios";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { toPng } from "jdenticon";
 
 export const userRouter = createTRPCRouter({
   getCurrentUser: publicProcedure.query(({ ctx }) => {
@@ -17,6 +19,7 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
+
   getById: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.user.findFirst({
       where: {
@@ -24,6 +27,7 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+
   setUserName: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
@@ -33,6 +37,7 @@ export const userRouter = createTRPCRouter({
         data: { name: input },
       });
     }),
+
   setUserPseudonym: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
@@ -43,6 +48,7 @@ export const userRouter = createTRPCRouter({
         data: { pseudonym: input },
       });
     }),
+
   setUserImage: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
@@ -56,6 +62,7 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
+
   setUserPseudonymImage: protectedProcedure
     .input(z.string())
     .mutation(({ ctx, input }) => {
@@ -67,18 +74,37 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
-  setGravatarAsImage: protectedProcedure
-    .input(z.string())
-    .mutation(({ ctx, input }) => {
+
+  setIdenticonAsImage: protectedProcedure
+    .input(
+      z.object({ type: z.string(), uploadURL: z.string(), s3key: z.string() })
+    )
+    .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      return ctx.prisma.user.update({
-        where: { id: userId },
-        data: {
-          image: input,
-          pseudonym_image: input,
-        },
+      const userEmail = ctx.session.user.email;
+
+      const png = toPng(userEmail, 200);
+
+      await axios.put(input.uploadURL, png).catch((err) => {
+        console.log(err);
       });
+      if (input.type === "image") {
+        return ctx.prisma.user.update({
+          where: { id: userId },
+          data: {
+            image: `https://weaveimages.s3.amazonaws.com/${input.s3key}`,
+          },
+        });
+      } else {
+        return ctx.prisma.user.update({
+          where: { id: userId },
+          data: {
+            pseudonym_image: `https://weaveimages.s3.amazonaws.com/${input.s3key}`,
+          },
+        });
+      }
     }),
+
   userCheck: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.user.findFirst({
       where: {
@@ -86,6 +112,7 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+
   deleteUser: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.session.user.id;
     const res = await ctx.prisma.user.update({
