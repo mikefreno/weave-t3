@@ -69,6 +69,7 @@ export default function PrivacyPolicy() {
                     <div className="px-8">
                       <Input
                         ref={nameInputRef}
+                        css={{ zIndex: 0 }}
                         clearable
                         underlined
                         labelPlaceholder="Your Name"
@@ -81,6 +82,7 @@ export default function PrivacyPolicy() {
                     </div>
                     <Input
                       ref={emailInputRef}
+                      css={{ zIndex: 0 }}
                       clearable
                       underlined
                       labelPlaceholder="Your email"
@@ -97,6 +99,7 @@ export default function PrivacyPolicy() {
                       size="lg"
                       css={{
                         width: "100%",
+                        zIndex: 0,
                       }}
                       required
                       status="secondary"
