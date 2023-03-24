@@ -10,7 +10,7 @@ const StageBanner = (props: { isDarkTheme: boolean }) => {
   return (
     <div
       ref={banner}
-      className="bannerBGColor fixed z-[100] flex w-screen py-2 backdrop-blur"
+      className="bannerBGColor p fixed z-[100] flex w-screen py-[2px] backdrop-blur"
     >
       <button onClick={close} className="my-auto flex justify-end">
         <Xmark className={"w-8"} color="white" />

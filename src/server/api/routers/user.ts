@@ -2,18 +2,20 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
-  getCurrentUser: protectedProcedure.query(({ ctx }) => {
-    const userId = ctx.session.user.id;
-    return ctx.prisma.user.findFirst({
-      where: {
-        id: userId,
-      },
-      include: {
-        servers: true,
-        adminships: true,
-        memberships: true,
-      },
-    });
+  getCurrentUser: publicProcedure.query(({ ctx }) => {
+    if (ctx.session && ctx.session.user) {
+      const userId = ctx.session.user.id;
+      return ctx.prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+        include: {
+          servers: true,
+          adminships: true,
+          memberships: true,
+        },
+      });
+    }
   }),
   getById: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.user.findFirst({
