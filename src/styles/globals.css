@@ -356,7 +356,7 @@ select {
   transform: translateX(10px);
 }
 .bannerBGColor {
-  background: rgba(30, 30, 149, 0.5);
+  background: rgba(80, 30, 149, 0.5);
 }
 .highlightSpacings {
   margin: 0 -0.2em;
