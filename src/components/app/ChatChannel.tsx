@@ -129,7 +129,11 @@ const ChannelMain = (props: {
       <div className="">
         <div className="scrollXDisabled h-screen rounded bg-zinc-50 dark:bg-zinc-900">
           <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
-          <div className="scrollXDisabled overflow-y-scroll pt-8 pb-24">
+          <div
+            className={`scrollXDisabled overflow-y-scroll pt-8 ${
+              paddingAdded ? "pb-44" : "pb-24"
+            }`}
+          >
             <ul className={`${fullscreen ? "w-screen" : "w-full"} pt-6`}>
               {messages.map((message, index) => (
                 <div
