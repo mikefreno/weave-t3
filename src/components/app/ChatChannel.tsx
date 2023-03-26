@@ -55,6 +55,7 @@ const ChannelMain = (props: {
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
   const getMessages = api.server.getChannelComments.useMutation({});
   const [width, setWidth] = useState<number>(window.innerWidth);
+  const [paddingAdded, setPaddingAdded] = useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -121,6 +122,10 @@ const ChannelMain = (props: {
 
   const attachmentModalToggle = () => {
     setAttachmentModalShowing(!attachmentModalShowing);
+  };
+
+  const paddingToggle = () => {
+    setPaddingAdded(!paddingAdded);
   };
 
   const UsersCommentClass =
@@ -211,7 +216,35 @@ const ChannelMain = (props: {
           <div
             className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}
           >
-            <div className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
+            <button
+              className="absolute right-0 z-50 -mt-12 md:hidden"
+              onClick={paddingToggle}
+            >
+              {paddingAdded ? (
+                <div className="-rotate-90 transform transition-all duration-500 ease-in-out">
+                  <DoubleChevrons
+                    height={36}
+                    width={36}
+                    stroke={isDarkTheme ? "#fafafa" : "#18181b"}
+                    strokeWidth={1}
+                  />
+                </div>
+              ) : (
+                <div className="rotate-90 transform transition-all duration-300 ease-in-out">
+                  <DoubleChevrons
+                    height={36}
+                    width={36}
+                    stroke={isDarkTheme ? "#fafafa" : "#18181b"}
+                    strokeWidth={1}
+                  />
+                </div>
+              )}
+            </button>
+            <div
+              className={`${
+                paddingAdded ? "pb-24" : "pb-4"
+              } bg-zinc-100 dark:bg-zinc-700 md:pb-0`}
+            >
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>
                   <Input
