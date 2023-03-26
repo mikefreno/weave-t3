@@ -54,16 +54,7 @@ const ChannelMain = (props: {
   const messageInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
   const getMessages = api.server.getChannelComments.useMutation({});
-  const [width, setWidth] = useState<number>(window.innerWidth);
   const [paddingAdded, setPaddingAdded] = useState<boolean>(false);
-
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   const getComments = async () => {
     const comments = await getMessages.mutateAsync(selectedChannel.id);
@@ -133,7 +124,6 @@ const ChannelMain = (props: {
   const OtherCommentsClass =
     "bg-zinc-200 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
 
-  const chatBarSizing = width > 768 ? `${width - 320}px` : `${width - 200}px`;
   return (
     <>
       <div className="">
@@ -248,8 +238,7 @@ const ChannelMain = (props: {
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>
                   <Input
-                    css={{ width: chatBarSizing }}
-                    width={chatBarSizing}
+                    css={{ width: "100%" }}
                     ref={messageInputRef}
                     contentClickable
                     status="secondary"
