@@ -6,13 +6,17 @@ import ThemeContext from "../ThemeContextProvider";
 
 export default function TopBanner(props: {
   currentChannel: Server_Channel;
-  innerNavShowing: boolean;
+  fullscreen: boolean;
 }) {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { currentChannel } = props;
+  const { currentChannel, fullscreen } = props;
 
   return (
-    <div className="fixed top-0 z-10 my-auto h-14 w-full bg-purple-400 dark:bg-zinc-700">
+    <div
+      className={`fixed top-0 z-10 my-auto h-14 ${
+        fullscreen ? "w-screen" : "w-full"
+      } bg-purple-400 dark:bg-zinc-700`}
+    >
       <div className="flex items-center pl-6 pt-3 text-xl underline underline-offset-8">
         {currentChannel.type == "voice" ? (
           <HeadphonesIcon

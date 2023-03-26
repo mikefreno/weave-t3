@@ -145,7 +145,7 @@ model VerificationToken {
 model WSConnection {
   connectionID String @id
   user         User?   @relation(fields: [userId], references: [id])
-  userId       String?
+  userId       String? @unique
   channelID    Int?
   inCall       Boolean  @default(false)
   @@index([userId])

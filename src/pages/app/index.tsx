@@ -27,6 +27,7 @@ import {
 } from "@prisma/client";
 import LoadingOverlay from "@/src/components/app/LoadingOverlay";
 import VoiceChannel from "@/src/components/app/VoiceChannel";
+import DoubleChevrons from "@/src/icons/DoubleChevrons";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -55,13 +56,13 @@ const App = () => {
     null
   );
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
-  const [innerNavShowing, setInnerNavShowing] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [source, setSource] = useState<MediaStreamAudioSourceNode | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
+  const [fullscreen, setFullscreen] = useState<boolean>(false);
   const currentUserReturn = api.users.getCurrentUser.useQuery();
   const [currentUser, setCurrentUser] = useState<
     User & {
@@ -147,8 +148,6 @@ const App = () => {
   // }, []);
 
   const microphoneToggle = async () => {
-    // localStorage.setItem("microphoneState", (!microphoneState).toString());
-
     if (microphoneState) {
       turnOffMicrophone();
       setMicrophoneState(false);
@@ -174,6 +173,21 @@ const App = () => {
       return false;
     }
   };
+
+  useEffect(() => {
+    loadAudioWorklet();
+  }, []);
+
+  const loadAudioWorklet = async () => {
+    console.log("start worklet attempt");
+    if (window.AudioWorklet) {
+      const audioContext = new AudioContext();
+      await audioContext.audioWorklet.addModule("/audio-processor.js");
+      console.log("worklet started");
+      setAudioContext(audioContext);
+    }
+  };
+
   const turnOffMicrophone = () => {
     if (stream) {
       // Stop all tracks in the MediaStream
@@ -217,9 +231,10 @@ const App = () => {
     await usersServers.refetch();
   };
 
-  const hideInnerNavToggle = () => {
-    setInnerNavShowing(!innerNavShowing);
+  const fullscreenToggle = () => {
+    setFullscreen(!fullscreen);
   };
+
   return (
     <div className="bg-zinc-100 dark:bg-zinc-700">
       <Head>
@@ -232,24 +247,28 @@ const App = () => {
         setSelectedInnerTab={setSelectedInnerTab}
       />
       <div id="app-body" className="flex h-screen w-screen">
-        <div id="outer-nav" className="flex">
-          <SideNav
-            setSelectedChannel={setSelectedChannel}
-            serverModalToggle={serverModalToggle}
-            serverButtonRef={serverButtonRef}
-            botModalToggle={botModalToggle}
-            botButtonRef={botButtonRef}
-            currentTab={currentTab}
-            currentTabSetter={currentTabSetter}
-            setSelectedInnerTab={setSelectedInnerTab}
-            currentUser={currentUser}
-            setSelectedInnerTabID={setSelectedInnerTabID}
-            usersServers={usersServers.data}
-            selectedInnerTabID={selectedInnerTabID}
-            timestamp={timestamp}
-          />
-        </div>
-        {innerNavShowing ? (
+        <div
+          className={`${
+            fullscreen ? "-translate-x-72" : ""
+          } transform transition-all duration-500 ease-in-out`}
+        >
+          <div id="outer-nav" className="flex">
+            <SideNav
+              setSelectedChannel={setSelectedChannel}
+              serverModalToggle={serverModalToggle}
+              serverButtonRef={serverButtonRef}
+              botModalToggle={botModalToggle}
+              botButtonRef={botButtonRef}
+              currentTab={currentTab}
+              currentTabSetter={currentTabSetter}
+              setSelectedInnerTab={setSelectedInnerTab}
+              currentUser={currentUser}
+              setSelectedInnerTabID={setSelectedInnerTabID}
+              usersServers={usersServers.data}
+              selectedInnerTabID={selectedInnerTabID}
+              timestamp={timestamp}
+            />
+          </div>
           <div id="inner-nav" className="ml-20">
             <InnerNav
               botModalToggle={botModalToggle}
@@ -284,12 +303,41 @@ const App = () => {
               timestamp={timestamp}
             />
           </div>
-        ) : null}
+        </div>
+        <div
+          className={`absolute z-[100] mt-14 transform transition-all duration-500 ease-in-out ${
+            fullscreen ? "ml-0" : "ml-44 md:ml-72"
+          }`}
+        >
+          <button onClick={fullscreenToggle}>
+            {fullscreen ? (
+              <div className="rotate-180 transform transition-all duration-500 ease-in-out">
+                <DoubleChevrons
+                  height={36}
+                  width={36}
+                  stroke={isDarkTheme ? "#fafafa" : "#18181b"}
+                  strokeWidth={1}
+                />
+              </div>
+            ) : (
+              <div className="transform transition-all duration-300 ease-in-out">
+                <DoubleChevrons
+                  height={36}
+                  width={36}
+                  stroke={isDarkTheme ? "#fafafa" : "#18181b"}
+                  strokeWidth={1}
+                />
+              </div>
+            )}
+          </button>
+        </div>
         <div
           id="center-page"
           ref={scrollableRef}
           className={
-            innerNavShowing ? `flex-1 pl-24 md:pl-52` : "flex-1 md:pl-52"
+            !fullscreen
+              ? `ml-24 flex-1 transform transition-all duration-500 ease-in-out md:ml-52`
+              : "-ml-20 flex-1 transform transition-all duration-500 ease-in-out"
           }
         >
           {selectedInnerTab === "AccountOverview" ? (
@@ -329,9 +377,7 @@ const App = () => {
                   currentUser={currentUser}
                   socket={socket as WebSocket}
                   setSocket={setSocket}
-                  hideInnerNavToggle={hideInnerNavToggle}
-                  innerNavShowing={innerNavShowing}
-                  setInnerNavShowing={setInnerNavShowing}
+                  fullscreen={fullscreen}
                 />
               ) : (
                 <VoiceChannel
@@ -339,14 +385,13 @@ const App = () => {
                   currentUser={currentUser}
                   socket={socket as WebSocket}
                   setSocket={setSocket}
-                  hideInnerNavToggle={hideInnerNavToggle}
-                  innerNavShowing={innerNavShowing}
-                  setInnerNavShowing={setInnerNavShowing}
                   microphoneState={microphoneState}
                   audioState={audioState}
                   audioToggle={audioToggle}
                   microphoneToggle={microphoneToggle}
                   stream={stream}
+                  audioContext={audioContext}
+                  fullscreen={fullscreen}
                 />
               )
             ) : (

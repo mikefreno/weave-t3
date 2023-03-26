@@ -82,7 +82,7 @@ const UserSetup = () => {
     if (userQuery.data) {
       setIdenticon(toSvg(userQuery.data.email, 100));
     }
-  }, [userQuery]);
+  }, []);
 
   const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {

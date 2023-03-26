@@ -35,7 +35,6 @@ type CommentWithUser = {
 
 const ChannelMain = (props: {
   selectedChannel: Server_Channel;
-  hideInnerNavToggle: () => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -43,17 +42,9 @@ const ChannelMain = (props: {
   };
   socket: WebSocket;
   setSocket: any;
-  innerNavShowing: boolean;
-  setInnerNavShowing: Dispatch<React.SetStateAction<boolean>>;
+  fullscreen: boolean;
 }) => {
-  const {
-    selectedChannel,
-    currentUser,
-    socket,
-    setSocket,
-    hideInnerNavToggle,
-    setInnerNavShowing,
-  } = props;
+  const { selectedChannel, currentUser, socket, setSocket, fullscreen } = props;
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
@@ -131,11 +122,6 @@ const ChannelMain = (props: {
   const attachmentModalToggle = () => {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
-  useEffect(() => {
-    return () => {
-      setInnerNavShowing(true);
-    };
-  }, []);
 
   const UsersCommentClass =
     "shadow-lg text-zinc-100 shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6";
@@ -147,27 +133,9 @@ const ChannelMain = (props: {
     <>
       <div className="">
         <div className="scrollXDisabled h-screen rounded bg-zinc-50 dark:bg-zinc-900">
-          <TopBanner
-            currentChannel={selectedChannel}
-            innerNavShowing={props.innerNavShowing}
-          />
-          <div className={`${props.innerNavShowing ? "md:hidden" : ""}`}>
-            <button
-              className={`absolute mt-2 ${
-                props.innerNavShowing ? null : "rotate-180"
-              }`}
-              onClick={hideInnerNavToggle}
-            >
-              <DoubleChevrons
-                height={24}
-                width={24}
-                stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
-                strokeWidth={1}
-              />
-            </button>
-          </div>
+          <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
           <div className="scrollXDisabled overflow-y-scroll pt-8 pb-24">
-            <ul className="w-full pt-6">
+            <ul className={`${fullscreen ? "w-screen" : "w-full"} pt-6`}>
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -241,12 +209,10 @@ const ChannelMain = (props: {
           ) : null}
 
           <div
-            className={`fixed bottom-0 ${
-              props.innerNavShowing ? "w-full" : "w-screen"
-            }`}
+            className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}
           >
-            <div className="bg-zinc-100 pb-28 dark:bg-zinc-700 md:pb-0">
-              <div className="p-4">
+            <div className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
+              <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>
                   <Input
                     css={{ width: chatBarSizing }}

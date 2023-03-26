@@ -7,15 +7,16 @@ import {
   Server_Member,
   Server_Admin,
   User,
+  WSConnection,
 } from "@prisma/client";
 import { Dispatch, useContext, useEffect, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import TopBanner from "./TopBanner";
 import Image from "next/image";
+import { GetServerSideProps } from "next";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
-  hideInnerNavToggle: () => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -23,15 +24,18 @@ interface VoiceChannelProps {
   };
   socket: WebSocket;
   setSocket: any;
-  innerNavShowing: boolean;
-  setInnerNavShowing: Dispatch<React.SetStateAction<boolean>>;
   microphoneState: boolean;
   audioState: boolean;
   audioToggle: () => void;
   microphoneToggle: () => void;
   stream: MediaStream | null;
+  audioContext: AudioContext | null;
+  fullscreen: boolean;
 }
 
+type WSWithUser = WSConnection & {
+  user: User;
+};
 export default function VoiceChannel(props: VoiceChannelProps) {
   const {
     selectedChannel,
@@ -39,39 +43,54 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     socket,
     setSocket,
     stream,
-    hideInnerNavToggle,
-    setInnerNavShowing,
     microphoneState,
     audioState,
+    audioContext,
+    fullscreen,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [userJoined, setUserJoined] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
-  const [usersInChannel, setUsersInChannel] = useState<User[]>();
-  // const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-  //   null
-  // );
-  // const [stream, setStream] = useState<MediaStream | null>(null);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  // const [audioWorklet, setAudioWorklet] = useState<AudioWorklet | null>(null);
-  // const [source, setSource] = useState<MediaStreamAudioSourceNode | null>(null);
-  const getUsersInChannel = api.server.getUsersInChannel.useQuery(
-    selectedChannel.id
-  );
   const disconnectWS = api.websocket.disconnectWsFromChannel.useMutation();
   const updateWS = api.websocket.updateWs.useMutation();
   const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
   const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
-  const usersInCallQuery = api.websocket.usersInCall.useQuery(
+  const [websocketsInCall, setWebsocketsInCall] = useState<
+    | (WSConnection & {
+        user: User;
+      })[]
+    | null
+  >(null);
+  const [websocketsInChannel, setWebsocketsInChannel] = useState<
+    | (WSConnection & {
+        user: User;
+      })[]
+    | null
+  >(null);
+
+  const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(
     selectedChannel.id
   );
-  const [usersInCall, setUsersInCall] = useState<User[] | null>(null);
 
   useEffect(() => {
-    if (usersInCallQuery.data && usersInCallQuery.data !== "No users in call") {
-      setUsersInCall(usersInCallQuery.data);
+    if (connectedWSQuery.data) {
+      setWebsocketsInChannel(connectedWSQuery.data);
     }
-  }, [usersInCallQuery]);
+  }, [connectedWSQuery]);
+
+  useEffect(() => {
+    if (websocketsInChannel) {
+      const wsInCall = websocketsInChannel.filter(
+        (connection) => connection.inCall
+      );
+      const userInCallBoolean = wsInCall.some(
+        (connection) => connection.user.id === currentUser.id
+      );
+
+      setUserJoined(userInCallBoolean);
+      setWebsocketsInCall(wsInCall);
+    }
+  }, [websocketsInChannel]);
 
   useEffect(() => {
     if (socket.readyState === 0) {
@@ -89,12 +108,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   }, [selectedChannel]);
 
   useEffect(() => {
-    if (getUsersInChannel) {
-      setUsersInChannel(getUsersInChannel.data);
-    }
-  }, [getUsersInChannel]);
-
-  useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => {
@@ -102,49 +115,28 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     };
   }, []);
 
-  useEffect(() => {
-    if (socket) {
-      socket.addEventListener("message", (event) => {
-        // Handle the incoming audio data here
-        const audioContext = new AudioContext();
-        const receivedData = JSON.parse(event.data);
-        playReceivedAudio(audioContext, event.data);
-      });
+  socket.onmessage = async (event) => {
+    if (audioContext) {
+      console.log("received audio");
+      playReceivedAudio(audioContext, event.data);
     }
-  }, [socket]);
-
-  useEffect(() => {
-    async function loadAudioWorklet() {
-      if (window.AudioWorklet) {
-        const audioContext = new AudioContext();
-        await audioContext.audioWorklet.addModule("/audio-processor.js");
-        setAudioContext(audioContext);
-      }
-    }
-    loadAudioWorklet();
-  }, []);
-
-  // useEffect(() => {
-  //   return () => {
-
-  //   };
-  // }, []);
+  };
 
   const joinCall = async () => {
     await joinOrLeaveCallMutation.mutateAsync(true);
-    usersInCallQuery.refetch();
-    if (microphoneState == false) {
-      const res = confirm("Turn on Microphone?");
-      if (res) {
-        props.microphoneToggle();
-      }
-    }
-    await updateWS.mutateAsync(selectedChannel.id);
-    await getUsersInChannel.refetch();
+    connectedWSQuery.refetch();
+    handleAudioStream();
+    // if (microphoneState == false) {
+    //   const res = confirm("Turn on Microphone?");
+    //   if (res) {
+    //     props.microphoneToggle();
+    //   }
+    // }
+  };
 
+  const handleAudioStream = () => {
     if (audioContext && stream) {
       const audioSource = audioContext.createMediaStreamSource(stream);
-
       const audioProcessorNode = new AudioWorkletNode(
         audioContext,
         "audio-processor"
@@ -163,22 +155,19 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           audio: audioData,
           audioChannelTag: true,
         };
-        socket.send(JSON.stringify(payload));
+        console.log("send audio");
+        // socket.send(JSON.stringify(payload));
       };
+    } else {
+      //retrigger audio context and stream
     }
   };
 
   const leaveCall = async () => {
     await joinOrLeaveCallMutation.mutateAsync(false);
-    usersInCallQuery.refetch();
-    if (microphoneState) {
-      const res = confirm("Turn off Microphone?");
-      if (res) {
-        props.microphoneToggle();
-      }
-    }
+    connectedWSQuery.refetch();
+
     await disconnectWS.mutateAsync();
-    await getUsersInChannel.refetch();
   };
 
   useEffect(() => {
@@ -191,66 +180,52 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     audioContext: AudioContext,
     audioData: ArrayBuffer
   ) => {
-    const buffer = new Float32Array(audioData);
-    const audioBuffer = audioContext.createBuffer(
-      1,
-      buffer.length,
-      audioContext.sampleRate
-    );
-    audioBuffer.copyToChannel(buffer, 0);
-    const bufferSource = audioContext.createBufferSource();
-    bufferSource.buffer = audioBuffer;
-    bufferSource.connect(audioContext.destination);
-    bufferSource.start();
+    if (audioData.byteLength > 0) {
+      const buffer = new Float32Array(audioData);
+      const audioBuffer = audioContext.createBuffer(
+        1,
+        buffer.length,
+        audioContext.sampleRate
+      );
+      audioBuffer.copyToChannel(buffer, 0);
+      const bufferSource = audioContext.createBufferSource();
+      bufferSource.buffer = audioBuffer;
+      bufferSource.connect(audioContext.destination);
+      bufferSource.start();
+    }
   };
 
   return (
     <div className="">
-      <TopBanner
-        currentChannel={selectedChannel}
-        innerNavShowing={props.innerNavShowing}
-      />
-      <div className={`${props.innerNavShowing ? "md:hidden" : ""}`}>
-        <button
-          className={`absolute ${props.innerNavShowing ? null : "rotate-180"}`}
-          onClick={hideInnerNavToggle}
-        >
-          <DoubleChevrons
-            height={24}
-            width={24}
-            stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
-            strokeWidth={1}
-          />
-        </button>
-      </div>
+      <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
       <div
-        className="scrollXDisabled h-screen overflow-y-scroll rounded bg-zinc-50 pt-14 dark:bg-zinc-900"
-        style={{ width: bodySizing }}
+        className={`scrollXDisabled h-screen overflow-y-scroll rounded bg-zinc-50 pt-14 dark:bg-zinc-900`}
+        style={{ width: fullscreen ? "100vw" : bodySizing }}
       >
         <div className="pt-8 text-center text-lg">
-          {usersInCall && usersInCall?.length !== 0
+          {websocketsInCall && websocketsInCall?.length !== 0
             ? "Currently in Channel:"
             : "No one's here... yet"}
         </div>
-        {usersInCall ? (
+        {websocketsInCall ? (
           <div className={`grid grid-cols-5 justify-center`}>
-            {usersInCall.map((user) => (
-              <div className="px-4 py-6" key={user.id}>
+            {websocketsInCall.map((websocket) => (
+              <div className="px-4 py-6" key={websocket.user.id}>
                 <div className="flex h-24 w-24 rounded-full border md:h-36 md:w-36">
                   <div className="flex flex-col">
                     <button>
                       <img
                         src={
-                          user.image
-                            ? user.image
-                            : user.pseudonym_image
-                            ? user.pseudonym_image
+                          websocket.user.image
+                            ? websocket.user.image
+                            : websocket.user.pseudonym_image
+                            ? websocket.user.pseudonym_image
                             : "/Logo - light.png"
                         }
                         alt={"user-logo"}
                         className="rounded-full"
                       />
-                      <div className="pl-4">{user.name}</div>
+                      <div className="pl-4">{websocket.user.name}</div>
                     </button>
                   </div>
                 </div>
@@ -259,7 +234,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           </div>
         ) : null}
         {!userJoined ? (
-          <div className="absolute bottom-24 -ml-36 w-full">
+          <div className="flex h-screen flex-col justify-center">
             <div className="flex justify-center pb-4">
               <Button
                 auto
@@ -289,7 +264,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           </div>
         ) : (
           <>
-            <div className="flex">
+            <div className="flex content-center justify-center ">
               {microphoneState ? (
                 <Button auto onClick={props.microphoneToggle} className="mx-2">
                   Turn Mic Off

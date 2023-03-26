@@ -1,7 +1,7 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import S3 from "aws-sdk/clients/s3";
-import { User } from "@prisma/client";
+import { User, WSConnection } from "@prisma/client";
 
 export const websocketRouter = createTRPCRouter({
   disconnectWsFromChannel: protectedProcedure.mutation(async ({ ctx }) => {
@@ -14,6 +14,7 @@ export const websocketRouter = createTRPCRouter({
       },
     });
   }),
+
   updateWs: protectedProcedure
     .input(z.number())
     .mutation(async ({ input, ctx }) => {
@@ -24,6 +25,7 @@ export const websocketRouter = createTRPCRouter({
         },
       });
     }),
+
   joinOrLeaveCall: protectedProcedure
     .input(z.boolean())
     .mutation(async ({ input, ctx }) => {
@@ -34,20 +36,22 @@ export const websocketRouter = createTRPCRouter({
         },
       });
     }),
-  usersInCall: protectedProcedure
+  wssConnectedToChannel: protectedProcedure
     .input(z.number())
     .query(async ({ input, ctx }) => {
       const connections = await ctx.prisma.wSConnection.findMany({
-        where: { inCall: true, channelID: input },
+        where: {
+          channelID: input,
+          NOT: {
+            user: null,
+            userId: null,
+          },
+        },
         include: { user: true },
       });
-      if (connections && connections.length > 0) {
-        const users = connections
-          .map((connection) => connection.user)
-          .filter((user): user is User => user !== undefined);
-        return users;
-      } else {
-        return "No users in call";
-      }
+
+      return connections as (WSConnection & {
+        user: User;
+      })[];
     }),
 });

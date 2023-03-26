@@ -269,7 +269,9 @@ const AccountPage = (props: {
                       ? currentUser.pseudonym_image
                       : currentUser.image
                   }?t=${timestamp}`}
-                  className="h-32 w-32 rounded-full"
+                  className={`h-32 w-32 rounded-full ${
+                    isDarkTheme ? "bg-zinc-800" : "bg-zinc-50"
+                  }`}
                 />
                 <label
                   htmlFor="uploadPseudonym"
