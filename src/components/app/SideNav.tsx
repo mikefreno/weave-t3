@@ -130,13 +130,13 @@ const SideNav = (props: {
             >
               <button
                 ref={props.serverButtonRef}
-                className="borderRadiusTransform shaker w-min rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
+                className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                 onClick={props.serverModalToggle}
               >
                 <AddIcon
                   height={40}
                   width={40}
-                  stroke={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
+                  stroke={isDarkTheme ? "#9333ea" : "#8b5cf6"}
                   strokeWidth={1.5}
                 />
               </button>
@@ -150,7 +150,7 @@ const SideNav = (props: {
               placement="rightEnd"
             >
               <button
-                className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
+                className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                 onClick={() => {
                   props.currentTabSetter("PublicServers");
                   props.setSelectedInnerTab("");
@@ -160,7 +160,7 @@ const SideNav = (props: {
                   <BullhornIcon
                     height={30}
                     width={30}
-                    fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
+                    fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
                     strokeWidth={1.5}
                   />
                 </div>
@@ -179,13 +179,13 @@ const SideNav = (props: {
             >
               <button
                 ref={props.botButtonRef}
-                className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
+                className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                 onClick={props.botModalToggle}
               >
                 <RobotForApp
                   height={40}
                   width={40}
-                  fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
+                  fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
                 />
               </button>
             </Tooltip>

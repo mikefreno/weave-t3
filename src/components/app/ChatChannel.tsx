@@ -55,6 +55,8 @@ const ChannelMain = (props: {
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
   const getMessages = api.server.getChannelComments.useMutation({});
   const [paddingAdded, setPaddingAdded] = useState<boolean>(false);
+  const inputDivRef = useRef<HTMLDivElement>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
 
   const getComments = async () => {
     const comments = await getMessages.mutateAsync(selectedChannel.id);
@@ -69,18 +71,25 @@ const ChannelMain = (props: {
       );
       setSocket(newSocket);
     }
-    const payload = {
-      senderID: currentUser.id,
-      channelID: selectedChannel.id,
-      channelUpdate: true,
-    };
-    socket.send(JSON.stringify(payload));
+    socket.send(
+      JSON.stringify({
+        invocation: "update",
+        senderID: currentUser.id,
+        channelID: selectedChannel.id,
+      })
+    );
   }, [selectedChannel]);
 
   socket.onmessage = async (event) => {
+    console.log(event.data);
     const comments = await getMessages.mutateAsync(selectedChannel.id);
     setMessages(comments);
   };
+  socket.onerror = (event) => {
+    console.error("WebSocket error:", event);
+    // Display error message to user
+  };
+
   const manualReconnect = () => {
     if (socket.readyState === 0 || socket.readyState === 2) {
       const newSocket = new WebSocket(
@@ -94,13 +103,13 @@ const ChannelMain = (props: {
     const input = messageInputRef.current?.value;
     if (input!.length > 0) {
       setIconClass("move-fade");
-      const payload = {
+      const data = {
         message: input,
         senderID: currentUser.id,
         channelID: selectedChannel.id,
-        channelUpdate: false,
+        action: "message",
       };
-      socket.send(JSON.stringify(payload));
+      socket.send(JSON.stringify(data));
       messageInputRef.current!.value = "";
       setTimeout(() => {
         setIconClass("");
@@ -124,11 +133,18 @@ const ChannelMain = (props: {
   const OtherCommentsClass =
     "bg-zinc-200 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
 
+  const chatWindowHight = inputDivRef.current?.clientHeight;
+
   return (
     <>
       <div className="">
         <div className="scrollXDisabled h-screen rounded bg-zinc-50 dark:bg-zinc-900">
-          <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
+          <div ref={bannerRef}>
+            <TopBanner
+              currentChannel={selectedChannel}
+              fullscreen={fullscreen}
+            />
+          </div>
           <div
             className={`scrollXDisabled overflow-y-scroll pt-8 ${
               paddingAdded ? "pb-44" : "pb-24"
@@ -235,6 +251,7 @@ const ChannelMain = (props: {
               )}
             </button>
             <div
+              ref={inputDivRef}
               className={`${
                 paddingAdded ? "pb-24" : "pb-4"
               } bg-zinc-100 dark:bg-zinc-700 md:pb-0`}

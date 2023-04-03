@@ -5,7 +5,7 @@ import Head from "next/head";
 import router from "next/router";
 import React, { useRef } from "react";
 
-const LoginPage = () => {
+const LoginRedirect = () => {
   const { data: session, status } = useSession();
   const switchRef = useRef<HTMLDivElement>(null);
 
@@ -27,4 +27,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginRedirect;

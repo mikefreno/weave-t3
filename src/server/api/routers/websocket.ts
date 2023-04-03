@@ -1,6 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
-import S3 from "aws-sdk/clients/s3";
 import { User, WSConnection } from "@prisma/client";
 
 export const websocketRouter = createTRPCRouter({
@@ -14,25 +13,14 @@ export const websocketRouter = createTRPCRouter({
       },
     });
   }),
-
-  updateWs: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.wSConnection.updateMany({
-        where: { userId: ctx.session.user.id },
-        data: {
-          channelID: input,
-        },
-      });
-    }),
-
   joinOrLeaveCall: protectedProcedure
-    .input(z.boolean())
+    .input(z.object({ newState: z.boolean(), channelID: z.number() }))
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.wSConnection.updateMany({
         where: { userId: ctx.session.user.id },
         data: {
-          inCall: input,
+          inCall: input.newState,
+          channelID: input.channelID,
         },
       });
     }),

@@ -1,4 +1,3 @@
-import DoubleChevrons from "@/src/icons/DoubleChevrons";
 import { api } from "@/src/utils/api";
 import { Button } from "@nextui-org/react";
 import {
@@ -9,11 +8,9 @@ import {
   User,
   WSConnection,
 } from "@prisma/client";
-import { Dispatch, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import TopBanner from "./TopBanner";
-import Image from "next/image";
-import { GetServerSideProps } from "next";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
@@ -52,7 +49,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const [userJoined, setUserJoined] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
   const disconnectWS = api.websocket.disconnectWsFromChannel.useMutation();
-  const updateWS = api.websocket.updateWs.useMutation();
   const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
   const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
   const [websocketsInCall, setWebsocketsInCall] = useState<
@@ -72,6 +68,10 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     selectedChannel.id
   );
 
+  const [audioNodes, setAudioNodes] = useState<AudioNode[]>([]);
+
+  // const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   useEffect(() => {
     if (connectedWSQuery.data) {
       setWebsocketsInChannel(connectedWSQuery.data);
@@ -86,26 +86,19 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       const userInCallBoolean = wsInCall.some(
         (connection) => connection.user.id === currentUser.id
       );
-
       setUserJoined(userInCallBoolean);
       setWebsocketsInCall(wsInCall);
     }
   }, [websocketsInChannel]);
 
-  useEffect(() => {
-    if (socket.readyState === 0) {
-      const newSocket = new WebSocket(
-        process.env.NEXT_PUBLIC_WEBSOCKET as string
-      );
-      setSocket(newSocket);
-    }
-    const payload = {
-      senderID: currentUser.id,
-      channelID: selectedChannel.id,
-      channelUpdate: true,
-    };
-    socket.send(JSON.stringify(payload));
-  }, [selectedChannel]);
+  // useEffect(() => {
+  //   if (socket.readyState === 0 || socket.readyState === 2 || !socket) {
+  //     const newSocket = new WebSocket(
+  //       process.env.NEXT_PUBLIC_WEBSOCKET as string
+  //     );
+  //     setSocket(newSocket);
+  //   }
+  // }, [selectedChannel]);
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -115,24 +108,66 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     };
   }, []);
 
-  socket.onmessage = async (event) => {
-    if (audioContext) {
-      console.log("received audio");
-      playReceivedAudio(audioContext, event.data);
-    }
+  // useEffect(() => {
+  //   socket.binaryType = "arraybuffer";
+  // }, []);
+
+  socket.onmessage = (event: MessageEvent) => {
+    const data = JSON.parse(event.data);
+    console.log(data);
+    // if (data) {
+    //   if (audioContext && userJoined) {
+    //     playAudio(data);
+    //   }
   };
 
   const joinCall = async () => {
-    await joinOrLeaveCallMutation.mutateAsync(true);
-    connectedWSQuery.refetch();
-    handleAudioStream();
-    // if (microphoneState == false) {
-    //   const res = confirm("Turn on Microphone?");
-    //   if (res) {
-    //     props.microphoneToggle();
-    //   }
-    // }
+    if (socket) {
+      await joinOrLeaveCallMutation.mutateAsync({
+        newState: true,
+        channelID: selectedChannel.id,
+      });
+      await connectedWSQuery.refetch();
+    }
   };
+
+  useEffect(() => {
+    if (userJoined && microphoneState) {
+      handleAudioStream();
+    } else {
+      audioNodes.forEach((node) => node.disconnect());
+    }
+  }, [microphoneState, userJoined]);
+
+  // const initRecorder = async () => {
+  //   try {
+  //     if (stream) {
+  //       mediaRecorderRef.current = new MediaRecorder(stream);
+  //       mediaRecorderRef.current.start(500);
+  //       mediaRecorderRef.current.ondataavailable = (e: BlobEvent) => {
+  //         if (e.data.size > 0) {
+  //           sendData(e.data);
+  //         }
+  //       };
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to initialize the MediaRecorder:", error);
+  //   }
+  // };
+
+  // const sendData = async (data: Blob) => {
+  //   if (socket.readyState === 1) {
+  //     const arrayBuffer = await data.arrayBuffer();
+  //     const audioData = new Uint8Array(arrayBuffer);
+  //     const payload = {
+  //       audio: audioData,
+  //       senderID: currentUser.id,
+  //       channelID: selectedChannel.id,
+  //       invocation: "audio",
+  //     };
+  //     socket.send(JSON.stringify(payload));
+  //   }
+  // };
 
   const handleAudioStream = () => {
     if (audioContext && stream) {
@@ -149,51 +184,77 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         const audioData = event.data as Float32Array;
         // Send audio data to WebSocket
         const payload = {
+          audio: audioData,
           senderID: currentUser.id,
           channelID: selectedChannel.id,
-          channelUpdate: false,
-          audio: audioData,
-          audioChannelTag: true,
+          action: "audio",
         };
+        socket.send(JSON.stringify(payload));
         console.log("send audio");
-        // socket.send(JSON.stringify(payload));
       };
+      setAudioNodes([
+        audioSource,
+        audioProcessorNode,
+        audioContext.destination,
+      ]);
     } else {
+      console.log("stream needs restart");
       //retrigger audio context and stream
     }
   };
 
   const leaveCall = async () => {
-    await joinOrLeaveCallMutation.mutateAsync(false);
-    connectedWSQuery.refetch();
-
+    await joinOrLeaveCallMutation.mutateAsync({
+      newState: false,
+      channelID: selectedChannel.id,
+    });
+    await connectedWSQuery.refetch();
     await disconnectWS.mutateAsync();
   };
 
-  useEffect(() => {
-    return joinOrLeaveCallMutation.mutate(false);
-  }, []);
+  // async function playAudio(audioData: any) {
+  //   if (audioContext) {
+  //     console.log(audioData);
+  //     const float32Array = new Float32Array(audioData.buffer);
 
-  ///audio streaming
+  //     const buffer = audioContext.createBuffer(
+  //       1,
+  //       float32Array.length,
+  //       audioContext.sampleRate
+  //     );
+  //     buffer.copyToChannel(float32Array, 0);
 
-  const playReceivedAudio = (
-    audioContext: AudioContext,
-    audioData: ArrayBuffer
-  ) => {
-    if (audioData.byteLength > 0) {
-      const buffer = new Float32Array(audioData);
-      const audioBuffer = audioContext.createBuffer(
-        1,
-        buffer.length,
-        audioContext.sampleRate
-      );
-      audioBuffer.copyToChannel(buffer, 0);
-      const bufferSource = audioContext.createBufferSource();
-      bufferSource.buffer = audioBuffer;
-      bufferSource.connect(audioContext.destination);
-      bufferSource.start();
+  //     const source = audioContext.createBufferSource();
+  //     source.buffer = buffer;
+  //     source.connect(audioContext.destination);
+  //     source.start();
+
+  //     // If you want to handle the end of the playback, you can use the following event listener:
+  //     source.onended = () => {
+  //       console.log("Audio playback ended.");
+  //     };
+  //   }
+  // }
+
+  async function playAudio(audioData: Uint8Array) {
+    // Create an AudioBuffer
+    if (audioContext) {
+      const arrayBuffer = audioData.buffer;
+
+      // decode the ArrayBuffer into an AudioBuffer
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+      // create a new AudioBufferSourceNode and connect it to the AudioContext destination
+      const sourceNode = audioContext.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+      sourceNode.connect(audioContext.destination);
+
+      // start playing the audio
+      sourceNode.start();
+    } else {
+      console.log("audio context start error");
     }
-  };
+  }
 
   return (
     <div className="">

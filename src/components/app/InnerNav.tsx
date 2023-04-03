@@ -74,6 +74,7 @@ const InnerNav = (props: {
   };
   loadingOverlaySetter: (boolean: boolean) => void;
   serverRefetch: () => void;
+  socket: WebSocket | null;
 }) => {
   const {
     currentTabSetter,
@@ -89,6 +90,7 @@ const InnerNav = (props: {
     timestamp,
     setSelectedInnerTabID,
     setSelectedChannel,
+    socket,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
@@ -132,6 +134,19 @@ const InnerNav = (props: {
       await deleteUser.mutateAsync(selectedInnerTabID);
       serverRefetch();
       loadingOverlaySetter(false);
+    }
+  };
+
+  const channelSetter = (channel: Server_Channel) => {
+    props.setSelectedChannel(channel);
+    if (socket) {
+      socket.send(
+        JSON.stringify({
+          invocation: "update",
+          senderID: currentUser.id,
+          channelID: channel.id,
+        })
+      );
     }
   };
 
@@ -479,9 +494,7 @@ const InnerNav = (props: {
                   ?.channels.map((channel) => (
                     <div className="my-2" key={channel.id}>
                       <button
-                        onClick={() => {
-                          props.setSelectedChannel(channel);
-                        }}
+                        onClick={() => channelSetter(channel)}
                         className={`flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 ${
                           selectedChannel?.id == channel.id
                             ? "dark:border-purple-600"

@@ -85,9 +85,10 @@ const LoginModal = (props: {
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/4 md:w-3/5 lg:w-2/5"
       >
         <div className="absolute z-50 -mb-6 max-w-[25vw] pl-2 text-2xl">
-          {router == "/login" ? "Login" : "Login / Register"}
+          {router === "/login/redirect" ? "Login" : "Login / Register"}
         </div>
-        {router == "/login" ? null : (
+        {router === "/login/redirect" ||
+        router === "/login/_standalone" ? null : (
           <button
             className="absolute right-4 -mt-2 w-10"
             onClick={props.onClose}

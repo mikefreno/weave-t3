@@ -17,7 +17,7 @@ import { api } from "@/src/utils/api";
 import LoadingElement from "@/src/components/loading";
 import router from "next/router";
 import ServerMainScreen from "@/src/components/app/ServerMainScreen";
-import ChannelMain from "@/src/components/app/ChatChannel";
+import ChatChannel from "@/src/components/app/ChatChannel";
 import {
   Server,
   Server_Admin,
@@ -77,16 +77,33 @@ const App = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const socket = new WebSocket(
-      "wss://ho6sto5l50.execute-api.us-east-1.amazonaws.com/prod"
-    );
-    socket.onopen = () => {
-      console.log("Socket opened");
-    };
-    setSocket(socket);
+    if (!socket) {
+      const new_socket = new WebSocket(
+        process.env.NEXT_PUBLIC_WEBSOCKET as string
+      );
+
+      setSocket(new_socket);
+    }
+
+    if (socket) {
+      socket.onopen = () => {
+        console.log("Socket opened");
+      };
+      socket.onclose = () => {
+        setInterval(() => {
+          const new_socket = new WebSocket(
+            process.env.NEXT_PUBLIC_WEBSOCKET as string
+          );
+
+          setSocket(new_socket);
+        }, 2000);
+      };
+    }
 
     return () => {
-      socket?.close();
+      if (socket) {
+        socket.close();
+      }
     };
   }, []);
 
@@ -140,12 +157,11 @@ const App = () => {
     }
   }, [serverModalShowing, botModalShowing, directMessageModalShowing]);
 
-  // useEffect(() => {
-  //   const storedValue = localStorage.getItem("microphoneState");
-  //   if (storedValue === "true") {
-  //     setMicrophoneState(true);
-  //   }
-  // }, []);
+  useEffect(() => {
+    const audioContext = new AudioContext();
+    audioContext.audioWorklet.addModule("/audio-processor.js");
+    setAudioContext(audioContext);
+  }, []);
 
   const microphoneToggle = async () => {
     if (microphoneState) {
@@ -165,26 +181,10 @@ const App = () => {
         audio: true,
       });
       setStream(stream);
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
       return true;
     } catch (err) {
       console.error("Error accessing microphone:", err);
       return false;
-    }
-  };
-
-  useEffect(() => {
-    loadAudioWorklet();
-  }, []);
-
-  const loadAudioWorklet = async () => {
-    console.log("start worklet attempt");
-    if (window.AudioWorklet) {
-      const audioContext = new AudioContext();
-      await audioContext.audioWorklet.addModule("/audio-processor.js");
-      console.log("worklet started");
-      setAudioContext(audioContext);
     }
   };
 
@@ -222,7 +222,7 @@ const App = () => {
   if (currentUser === undefined || currentUser === null) {
     setTimeout(() => {
       if (status == "unauthenticated") {
-        router.push("/login");
+        router.push("/login/redirect");
       }
     }, 1000);
     return <LoadingElement isDarkTheme={isDarkTheme} />;
@@ -291,6 +291,7 @@ const App = () => {
               serverRefetch={serverRefetch}
               timestamp={timestamp}
               usersServers={usersServers.data as any}
+              socket={socket}
             />
             <InnerNavOverlay
               setSelectedInnerTab={setSelectedInnerTab}
@@ -305,7 +306,7 @@ const App = () => {
           </div>
         </div>
         <div
-          className={`absolute z-[100] mt-14 transform transition-all duration-500 ease-in-out ${
+          className={`absolute z-[100] mt-16 transform transition-all duration-700 ease-in-out ${
             fullscreen ? "ml-0" : "ml-44 md:ml-72"
           }`}
         >
@@ -372,7 +373,7 @@ const App = () => {
           {currentTab === "server" && usersServers ? (
             selectedChannel !== null ? (
               selectedChannel.type == "text" ? (
-                <ChannelMain
+                <ChatChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
                   socket={socket as WebSocket}
