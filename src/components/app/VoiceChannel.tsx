@@ -20,7 +20,6 @@ interface VoiceChannelProps {
     adminships: Server_Admin[];
   };
   socket: WebSocket;
-  setSocket: any;
   microphoneState: boolean;
   audioState: boolean;
   audioToggle: () => void;
@@ -38,7 +37,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     selectedChannel,
     currentUser,
     socket,
-    setSocket,
     stream,
     microphoneState,
     audioState,
@@ -260,7 +258,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     <div className="">
       <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
       <div
-        className={`scrollXDisabled h-screen overflow-y-scroll rounded bg-zinc-50 pt-14 dark:bg-zinc-900`}
+        className={`scrollXDisabled h-screen overflow-y-hidden rounded bg-zinc-50 pt-14 dark:bg-zinc-900`}
         style={{ width: fullscreen ? "100vw" : bodySizing }}
       >
         <div className="pt-8 text-center text-lg">

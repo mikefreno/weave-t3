@@ -171,6 +171,7 @@ const InnerNav = (props: {
         />
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
+            aria-label="search input"
             type="search"
             className="w-24 text-xs"
             placeholder="Search..."
@@ -315,6 +316,7 @@ const InnerNav = (props: {
         </span>
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
+            aria-label="search input"
             type="search"
             className="w-24 text-xs"
             placeholder="Search..."

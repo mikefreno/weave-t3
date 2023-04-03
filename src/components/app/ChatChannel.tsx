@@ -2,23 +2,15 @@ import DoubleChevrons from "@/src/icons/DoubleChevrons";
 import PaperClip from "@/src/icons/PaperClip";
 import SendIcon from "@/src/icons/SendIcon";
 import { api } from "@/src/utils/api";
-import { Button, Input, Loading, Tooltip } from "@nextui-org/react";
+import { Input, Loading, Tooltip } from "@nextui-org/react";
 import {
-  Comment,
   Server,
   Server_Admin,
   Server_Channel,
   Server_Member,
   User,
 } from "@prisma/client";
-import Image from "next/image";
-import React, {
-  Dispatch,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import useOnClickOutside from "../ClickOutsideHook";
 import ThemeContext from "../ThemeContextProvider";
 import AttachmentModal from "./AttachmentModal";
@@ -41,10 +33,9 @@ const ChannelMain = (props: {
     adminships: Server_Admin[];
   };
   socket: WebSocket;
-  setSocket: any;
   fullscreen: boolean;
 }) => {
-  const { selectedChannel, currentUser, socket, setSocket, fullscreen } = props;
+  const { selectedChannel, currentUser, socket, fullscreen } = props;
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
@@ -65,19 +56,6 @@ const ChannelMain = (props: {
 
   useEffect(() => {
     getComments();
-    if (socket.readyState === 0) {
-      const newSocket = new WebSocket(
-        process.env.NEXT_PUBLIC_WEBSOCKET as string
-      );
-      setSocket(newSocket);
-    }
-    socket.send(
-      JSON.stringify({
-        invocation: "update",
-        senderID: currentUser.id,
-        channelID: selectedChannel.id,
-      })
-    );
   }, [selectedChannel]);
 
   socket.onmessage = async (event) => {
@@ -90,14 +68,6 @@ const ChannelMain = (props: {
     // Display error message to user
   };
 
-  const manualReconnect = () => {
-    if (socket.readyState === 0 || socket.readyState === 2) {
-      const newSocket = new WebSocket(
-        process.env.NEXT_PUBLIC_WEBSOCKET as string
-      );
-      setSocket(newSocket);
-    }
-  };
   const sendMessage = async (e: any) => {
     e.preventDefault();
     const input = messageInputRef.current?.value;
@@ -207,22 +177,6 @@ const ChannelMain = (props: {
               ))}
             </ul>
           </div>
-          {socket.readyState == 0 ? (
-            <div className="flex flex-col items-center justify-center pt-[30vh]">
-              <button onClick={manualReconnect}>Connect</button>
-            </div>
-          ) : socket.readyState == 2 ? (
-            <div className="flex flex-col items-center justify-center pt-[30vh]">
-              Disconnected, click channel button to reconnect
-              <button
-                className="mt-2 w-min rounded-sm border px-4 py-2"
-                onClick={manualReconnect}
-              >
-                Reconnect
-              </button>
-            </div>
-          ) : null}
-
           <div
             className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}
           >
@@ -260,6 +214,7 @@ const ChannelMain = (props: {
                 <form onSubmit={sendMessage}>
                   <Input
                     css={{ width: "100%" }}
+                    aria-label="message input"
                     ref={messageInputRef}
                     contentClickable
                     status="secondary"

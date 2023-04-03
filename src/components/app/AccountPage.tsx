@@ -310,6 +310,7 @@ const AccountPage = (props: {
                           labelPlaceholder="Real Name"
                           ref={realName}
                           status={isDarkTheme ? "default" : "secondary"}
+                          aria-label="name input"
                         />
                       </div>
                       <div className="flex flex-row">
@@ -342,6 +343,7 @@ const AccountPage = (props: {
                           labelPlaceholder="Pseudonym"
                           ref={pseudonym}
                           status={isDarkTheme ? "default" : "secondary"}
+                          aria-label="pseudonym input"
                         />
                       </div>
                       <div className="flex flex-row">

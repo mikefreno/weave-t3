@@ -74,38 +74,35 @@ const App = () => {
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const socket = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!socket) {
+    if (socket.current) {
+      return socket.current.close();
+    }
+    if (!socket.current) {
       const new_socket = new WebSocket(
         process.env.NEXT_PUBLIC_WEBSOCKET as string
       );
-
-      setSocket(new_socket);
+      socket.current = new_socket;
     }
-
-    if (socket) {
-      socket.onopen = () => {
+    if (socket.current) {
+      socket.current.onopen = () => {
         console.log("Socket opened");
       };
-      socket.onclose = () => {
-        setInterval(() => {
-          const new_socket = new WebSocket(
-            process.env.NEXT_PUBLIC_WEBSOCKET as string
-          );
-
-          setSocket(new_socket);
-        }, 2000);
+      socket.current.onclose = () => {
+        if (socket.current?.readyState !== WebSocket.OPEN) {
+          socket.current = null;
+        }
       };
     }
-
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
   }, []);
+
+  // useEffect(() => {
+  //   return () => {
+  //     socket.current?.close();
+  //   };
+  // });
 
   useEffect(() => {
     setCurrentUser(currentUserReturn.data!);
@@ -144,9 +141,9 @@ const App = () => {
   };
   useEffect(() => {
     document.getElementById("html")?.classList.add("scrollDisabled");
-    document
-      .getElementById("body")
-      ?.setAttribute("class", "bg-zinc-300 dark:bg-zinc-700");
+    // document
+    //   .getElementById("body")
+    //   ?.setAttribute("class", "bg-zinc-300 dark:bg-zinc-700");
   }, []);
 
   useEffect(() => {
@@ -291,7 +288,7 @@ const App = () => {
               serverRefetch={serverRefetch}
               timestamp={timestamp}
               usersServers={usersServers.data as any}
-              socket={socket}
+              socket={socket.current}
             />
             <InnerNavOverlay
               setSelectedInnerTab={setSelectedInnerTab}
@@ -367,6 +364,7 @@ const App = () => {
               <PublicServersPages
                 selectedInnerTab={selectedInnerTab}
                 refreshUserServers={refreshUserServers}
+                fullscreen={fullscreen}
               />
             </div>
           ) : null}
@@ -376,16 +374,14 @@ const App = () => {
                 <ChatChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
-                  socket={socket as WebSocket}
-                  setSocket={setSocket}
+                  socket={socket.current as WebSocket}
                   fullscreen={fullscreen}
                 />
               ) : (
                 <VoiceChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
-                  socket={socket as WebSocket}
-                  setSocket={setSocket}
+                  socket={socket.current as WebSocket}
                   microphoneState={microphoneState}
                   audioState={audioState}
                   audioToggle={audioToggle}
