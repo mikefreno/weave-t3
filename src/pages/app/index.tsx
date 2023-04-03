@@ -74,35 +74,35 @@ const App = () => {
 
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
 
-  const socket = useRef<WebSocket | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (socket.current) {
-      return socket.current.close();
-    }
-    if (!socket.current) {
-      const new_socket = new WebSocket(
+    if (!socketRef.current) {
+      const newSocket = new WebSocket(
         process.env.NEXT_PUBLIC_WEBSOCKET as string
       );
-      socket.current = new_socket;
+      socketRef.current = newSocket;
+      setSocket(newSocket);
     }
-    if (socket.current) {
-      socket.current.onopen = () => {
+
+    if (socket) {
+      socket.onopen = () => {
         console.log("Socket opened");
       };
-      socket.current.onclose = () => {
-        if (socket.current?.readyState !== WebSocket.OPEN) {
-          socket.current = null;
+
+      socket.onclose = () => {
+        if (socket?.readyState !== WebSocket.OPEN) {
+          socketRef.current = null;
         }
       };
-    }
-  }, []);
 
-  // useEffect(() => {
-  //   return () => {
-  //     socket.current?.close();
-  //   };
-  // });
+      return () => {
+        socket?.close();
+      };
+    }
+  }, [socket]);
 
   useEffect(() => {
     setCurrentUser(currentUserReturn.data!);
@@ -194,11 +194,11 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      document.getElementById("html")?.classList.remove("scrollDisabled");
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     document.getElementById("html")?.classList.remove("scrollDisabled");
+  //   };
+  // }, []);
 
   const audioToggle = () => {
     // localStorage.setItem("audioState", (!audioState).toString());
@@ -288,7 +288,7 @@ const App = () => {
               serverRefetch={serverRefetch}
               timestamp={timestamp}
               usersServers={usersServers.data as any}
-              socket={socket.current}
+              socket={socket}
             />
             <InnerNavOverlay
               setSelectedInnerTab={setSelectedInnerTab}
@@ -374,14 +374,16 @@ const App = () => {
                 <ChatChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
-                  socket={socket.current as WebSocket}
+                  socket={socket as WebSocket}
+                  setSocket={setSocket}
                   fullscreen={fullscreen}
                 />
               ) : (
                 <VoiceChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
-                  socket={socket.current as WebSocket}
+                  socket={socket as WebSocket}
+                  setSocket={setSocket}
                   microphoneState={microphoneState}
                   audioState={audioState}
                   audioToggle={audioToggle}
