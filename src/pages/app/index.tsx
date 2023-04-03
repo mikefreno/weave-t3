@@ -375,7 +375,6 @@ const App = () => {
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
                   socket={socket as WebSocket}
-                  setSocket={setSocket}
                   fullscreen={fullscreen}
                 />
               ) : (
@@ -383,7 +382,6 @@ const App = () => {
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
                   socket={socket as WebSocket}
-                  setSocket={setSocket}
                   microphoneState={microphoneState}
                   audioState={audioState}
                   audioToggle={audioToggle}
