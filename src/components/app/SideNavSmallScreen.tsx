@@ -174,7 +174,7 @@ const SideNavSmallScreen = (props: {
                 </div>
               </div>
               <div id="server-utilities">
-                <div className="my-4 flex justify-center">
+                <div className="flex justify-center py-4">
                   <Tooltip
                     content={"Add a Server!"}
                     trigger="hover"
@@ -183,14 +183,14 @@ const SideNavSmallScreen = (props: {
                   >
                     <button
                       ref={props.serverButtonRef}
-                      className="borderRadiusTransform shaker w-min rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
+                      className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={serverModalTrigger}
                     >
                       <AddIcon
                         height={48}
                         width={48}
-                        stroke={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
-                        strokeWidth={1.5}
+                        stroke={isDarkTheme ? "#9333ea" : "#8b5cf6"}
+                        strokeWidth={1}
                       />
                     </button>
                   </Tooltip>
@@ -206,7 +206,7 @@ const SideNavSmallScreen = (props: {
                     placement="rightEnd"
                   >
                     <button
-                      className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-3 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
+                      className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-4 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={() => {
                         props.currentTabSetter("PublicServers");
                         props.setSelectedInnerTab("");
@@ -214,10 +214,10 @@ const SideNavSmallScreen = (props: {
                       }}
                     >
                       <BullhornIcon
-                        height={40}
-                        width={40}
-                        fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
-                        strokeWidth={1}
+                        height={32}
+                        width={32}
+                        fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
+                        strokeWidth={1.5}
                       />
                     </button>
                   </Tooltip>
@@ -231,13 +231,13 @@ const SideNavSmallScreen = (props: {
                   >
                     <button
                       ref={props.botButtonRef}
-                      className="borderRadiusTransform shaker flex justify-center rounded-2xl bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-800"
+                      className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={botModalTrigger}
                     >
                       <RobotForApp
                         height={48}
                         width={48}
-                        fill={isDarkTheme ? "#4c1d95" : "#8b5cf6"}
+                        fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
                       />
                     </button>
                   </Tooltip>
