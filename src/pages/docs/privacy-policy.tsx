@@ -22,8 +22,10 @@ export default function PrivacyPolicy() {
             collected and recorded by Weave, and how we use it.
           </div>
           <ol>
-            <li className="list-decimal">
-              <div className="pb-2 text-lg">Information We Collect</div>
+            <div className="py-2">
+              <div className="pb-2 text-lg">
+                <span className="-ml-4 pr-2">1.</span> Information We Collect
+              </div>
               <div className="pl-4">
                 <div className="pb-2">
                   <div className="-ml-6">(a) Personal Information:</div> We may
@@ -56,9 +58,12 @@ export default function PrivacyPolicy() {
                   information that the visitor sends via their browser.
                 </div>
               </div>
-            </li>
-            <li className="list-decimal">
-              <div className="pb-2 text-lg">How We Use Your Information</div>
+            </div>
+            <div className="py-2">
+              <div className="pb-2 text-lg">
+                <span className="-ml-4 pr-2">2.</span>How We Use Your
+                Information
+              </div>
               <div className="text-lg">
                 We use the information we collect in various ways, including:
               </div>
@@ -81,31 +86,40 @@ export default function PrivacyPolicy() {
                   <li className="list-disc">To find and prevent fraud</li>
                 </ul>
               </div>
-            </li>
-            <li className="list-decimal">
-              <div className="pb-2 text-lg">Sharing Your Information</div>We
-              will not share any user information with any outside party, except
-              to comply with legal requirements, ie. A warrant from law
+            </div>
+            <div className="py-2">
+              <div className="pb-2 text-lg">
+                <span className="-ml-4 pr-2">3.</span>Sharing Your Information
+              </div>
+              We will not share any user information with any outside party,
+              except to comply with legal requirements, ie. A warrant from law
               enforcement.
-            </li>
-            <li className="list-decimal">
-              <div className="pb-2 text-lg">Children&apos;s Information</div>
+            </div>
+            <div className="py-2">
+              <div className="pb-2 text-lg">
+                <span className="-ml-4 pr-2">4.</span>Children&apos;s
+                Information
+              </div>
               Weave does not knowingly collect any personally identifiable
               information from children under the age of 13. If you think that
               your child provided this kind of information on our website or
               used this service in any way, we strongly encourage you to contact
               us immediately, and we will do our best to promptly remove such
               information from our records.
-            </li>
-            <li className="list-decimal">
-              <div className="pb-2 text-lg">Changes to This Privacy Policy</div>
+            </div>
+            <div className="py-2">
+              <div className="pb-2 text-lg">
+                <span className="-ml-4 pr-2">5.</span>Changes to This Privacy
+                Policy
+              </div>
               We may update our Privacy Policy from time to time. We will notify
               you of any changes by posting the new Privacy Policy on this page.
               Changes to this Privacy Policy are effective when they are posted
               on this page.
-            </li>
-            <li className="list-decimal">
+            </div>
+            <div className="py-2">
               <div className="pb-2 text-lg">
+                <span className="-ml-4 pr-2">6.</span>
                 If you have any questions about what is contained here please
                 contact by:
               </div>
@@ -114,14 +128,14 @@ export default function PrivacyPolicy() {
                 <li className="list-disc">
                   Or by going{" "}
                   <Link
-                    href="contact"
+                    href="/contact"
                     className="underline-offset-4 hover:underline"
                   >
                     here
                   </Link>
                 </li>
               </div>
-            </li>
+            </div>
           </ol>
         </div>
       </div>
