@@ -19,7 +19,9 @@ const LoginStandalone = () => {
   const emailLoginInputRef = useRef<HTMLInputElement | null>(null);
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
 
-  const emailLogin = () => {};
+  const emailLogin = () => {
+    console.log("temp");
+  };
 
   function loginButtonLoadingToggle() {
     setLoginButtonLoading(!loginButtonLoading);
@@ -40,9 +42,13 @@ const LoginStandalone = () => {
     }
   }
 
-  const googleLogin = () => {};
+  const googleLogin = () => {
+    console.log("temp");
+  };
 
-  const githubLogin = () => {};
+  const githubLogin = () => {
+    console.log("temp");
+  };
 
   return (
     <div className="bg-white dark:bg-zinc-800">
