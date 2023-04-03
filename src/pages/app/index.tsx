@@ -95,6 +95,7 @@ const App = () => {
       socket.onclose = () => {
         if (socket?.readyState !== WebSocket.OPEN) {
           socketRef.current = null;
+          setSocket(null);
         }
       };
 
@@ -194,11 +195,11 @@ const App = () => {
     }
   };
 
-  // useEffect(() => {
-  //   return () => {
-  //     document.getElementById("html")?.classList.remove("scrollDisabled");
-  //   };
-  // }, []);
+  useEffect(() => {
+    return () => {
+      document.getElementById("html")?.classList.remove("scrollDisabled");
+    };
+  }, []);
 
   const audioToggle = () => {
     // localStorage.setItem("audioState", (!audioState).toString());
