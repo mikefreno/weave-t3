@@ -24,6 +24,7 @@ export const websocketRouter = createTRPCRouter({
         },
       });
     }),
+  // getSocketState: protectedProcedure.input().query(),
   wssConnectedToChannel: protectedProcedure
     .input(z.number())
     .query(async ({ input, ctx }) => {

@@ -25,16 +25,18 @@ type CommentWithUser = {
   user: User;
 };
 
-const ChannelMain = (props: {
+interface ChannelMainProps {
   selectedChannel: Server_Channel;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
-  socket: WebSocket;
+  socket: WebSocket | null;
   fullscreen: boolean;
-}) => {
+}
+
+const ChannelMain = (props: ChannelMainProps) => {
   const { selectedChannel, currentUser, socket, fullscreen } = props;
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
@@ -44,29 +46,30 @@ const ChannelMain = (props: {
   const attachmentModalRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<CommentWithUser[]>([]);
-  const getMessages = api.server.getChannelComments.useMutation({});
+  const getMessages = api.server.getChannelComments.useQuery(
+    selectedChannel.id
+  );
   const [paddingAdded, setPaddingAdded] = useState<boolean>(false);
   const inputDivRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
-
-  const getComments = async () => {
-    const comments = await getMessages.mutateAsync(selectedChannel.id);
-    setMessages(comments);
-  };
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getComments();
-  }, [selectedChannel]);
+    if (getMessages.data) {
+      setMessages(getMessages.data);
+    }
+  }, [selectedChannel, getMessages]);
 
-  socket.onmessage = async (event) => {
-    console.log(event.data);
-    const comments = await getMessages.mutateAsync(selectedChannel.id);
-    setMessages(comments);
-  };
-  socket.onerror = (event) => {
-    console.error("WebSocket error:", event);
-    // Display error message to user
-  };
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = async (event) => {
+        console.log(event.data);
+        if (event.data.message !== "Internal server error") {
+          getMessages.refetch();
+        }
+      };
+    }
+  }, [socket]);
 
   const sendMessage = async (e: any) => {
     e.preventDefault();
@@ -79,13 +82,14 @@ const ChannelMain = (props: {
         channelID: selectedChannel.id,
         action: "message",
       };
-      socket.send(JSON.stringify(data));
+      socket?.send(JSON.stringify(data));
       messageInputRef.current!.value = "";
       setTimeout(() => {
         setIconClass("");
       }, 500);
     }
   };
+
   useOnClickOutside([attachmentModalRef, attachmentButtonRef], () => {
     setAttachmentModalShowing(false);
   });
@@ -97,6 +101,10 @@ const ChannelMain = (props: {
   const paddingToggle = () => {
     setPaddingAdded(!paddingAdded);
   };
+
+  useEffect(() => {
+    bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const UsersCommentClass =
     "shadow-lg text-zinc-100 shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6";
@@ -149,7 +157,7 @@ const ChannelMain = (props: {
                     </div>
                     {message.userId == currentUser.id ? null : (
                       <div>
-                        <div className="-ml-8 mt-1 -mb-12">
+                        <div className="-mb-12 -ml-8 mt-1">
                           {message.user.name !== "User Deleted" ? (
                             <Tooltip
                               content={<UserTooltip user={message.user} />}
@@ -176,6 +184,7 @@ const ChannelMain = (props: {
                 </div>
               ))}
             </ul>
+            <div ref={bottomRef}></div>
           </div>
           <div
             className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}

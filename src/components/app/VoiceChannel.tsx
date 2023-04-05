@@ -19,7 +19,7 @@ interface VoiceChannelProps {
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
-  socket: WebSocket;
+  socket: WebSocket | null;
   microphoneState: boolean;
   audioState: boolean;
   audioToggle: () => void;
@@ -29,9 +29,6 @@ interface VoiceChannelProps {
   fullscreen: boolean;
 }
 
-type WSWithUser = WSConnection & {
-  user: User;
-};
 export default function VoiceChannel(props: VoiceChannelProps) {
   const {
     selectedChannel,
@@ -66,10 +63,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     selectedChannel.id
   );
 
-  const [audioNodes, setAudioNodes] = useState<AudioNode[]>([]);
-
-  // const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
   useEffect(() => {
     if (connectedWSQuery.data) {
       setWebsocketsInChannel(connectedWSQuery.data);
@@ -89,15 +82,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   }, [websocketsInChannel]);
 
-  // useEffect(() => {
-  //   if (socket.readyState === 0 || socket.readyState === 2 || !socket) {
-  //     const newSocket = new WebSocket(
-  //       process.env.NEXT_PUBLIC_WEBSOCKET as string
-  //     );
-  //     setSocket(newSocket);
-  //   }
-  // }, [selectedChannel]);
-
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -106,18 +90,14 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     };
   }, []);
 
-  // useEffect(() => {
-  //   socket.binaryType = "arraybuffer";
-  // }, []);
-
-  socket.onmessage = (event: MessageEvent) => {
-    const data = JSON.parse(event.data);
-    console.log(data);
-    // if (data) {
-    //   if (audioContext && userJoined) {
-    //     playAudio(data);
-    //   }
-  };
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = (event: MessageEvent) => {
+        const data = JSON.parse(event.data);
+        console.log(data);
+      };
+    }
+  }, []);
 
   const joinCall = async () => {
     if (socket) {
@@ -129,76 +109,8 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
-  useEffect(() => {
-    if (userJoined && microphoneState) {
-      handleAudioStream();
-    } else {
-      audioNodes.forEach((node) => node.disconnect());
-    }
-  }, [microphoneState, userJoined]);
-
-  // const initRecorder = async () => {
-  //   try {
-  //     if (stream) {
-  //       mediaRecorderRef.current = new MediaRecorder(stream);
-  //       mediaRecorderRef.current.start(500);
-  //       mediaRecorderRef.current.ondataavailable = (e: BlobEvent) => {
-  //         if (e.data.size > 0) {
-  //           sendData(e.data);
-  //         }
-  //       };
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to initialize the MediaRecorder:", error);
-  //   }
-  // };
-
-  // const sendData = async (data: Blob) => {
-  //   if (socket.readyState === 1) {
-  //     const arrayBuffer = await data.arrayBuffer();
-  //     const audioData = new Uint8Array(arrayBuffer);
-  //     const payload = {
-  //       audio: audioData,
-  //       senderID: currentUser.id,
-  //       channelID: selectedChannel.id,
-  //       invocation: "audio",
-  //     };
-  //     socket.send(JSON.stringify(payload));
-  //   }
-  // };
-
-  const handleAudioStream = () => {
-    if (audioContext && stream) {
-      const audioSource = audioContext.createMediaStreamSource(stream);
-      const audioProcessorNode = new AudioWorkletNode(
-        audioContext,
-        "audio-processor"
-      );
-      audioSource.connect(audioProcessorNode);
-      audioProcessorNode.connect(audioContext.destination);
-
-      // Listen for messages from the audio processor to receive audio data
-      audioProcessorNode.port.onmessage = (event: MessageEvent) => {
-        const audioData = event.data as Float32Array;
-        // Send audio data to WebSocket
-        const payload = {
-          audio: audioData,
-          senderID: currentUser.id,
-          channelID: selectedChannel.id,
-          action: "audio",
-        };
-        socket.send(JSON.stringify(payload));
-        console.log("send audio");
-      };
-      setAudioNodes([
-        audioSource,
-        audioProcessorNode,
-        audioContext.destination,
-      ]);
-    } else {
-      console.log("stream needs restart");
-      //retrigger audio context and stream
-    }
+  const createOffer = () => {
+    const peerConnection = new RTCPeerConnection();
   };
 
   const leaveCall = async () => {
@@ -209,50 +121,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     await connectedWSQuery.refetch();
     await disconnectWS.mutateAsync();
   };
-
-  // async function playAudio(audioData: any) {
-  //   if (audioContext) {
-  //     console.log(audioData);
-  //     const float32Array = new Float32Array(audioData.buffer);
-
-  //     const buffer = audioContext.createBuffer(
-  //       1,
-  //       float32Array.length,
-  //       audioContext.sampleRate
-  //     );
-  //     buffer.copyToChannel(float32Array, 0);
-
-  //     const source = audioContext.createBufferSource();
-  //     source.buffer = buffer;
-  //     source.connect(audioContext.destination);
-  //     source.start();
-
-  //     // If you want to handle the end of the playback, you can use the following event listener:
-  //     source.onended = () => {
-  //       console.log("Audio playback ended.");
-  //     };
-  //   }
-  // }
-
-  async function playAudio(audioData: Uint8Array) {
-    // Create an AudioBuffer
-    if (audioContext) {
-      const arrayBuffer = audioData.buffer;
-
-      // decode the ArrayBuffer into an AudioBuffer
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-      // create a new AudioBufferSourceNode and connect it to the AudioContext destination
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = audioBuffer;
-      sourceNode.connect(audioContext.destination);
-
-      // start playing the audio
-      sourceNode.start();
-    } else {
-      console.log("audio context start error");
-    }
-  }
 
   return (
     <div className="">

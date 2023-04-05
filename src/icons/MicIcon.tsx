@@ -1,6 +1,3 @@
-import React from "react";
-import PropTypes from "prop-types";
-
 const MicIcon = (props: { color: string; height: number; width: number }) => {
   return (
     <svg

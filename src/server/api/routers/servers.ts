@@ -207,13 +207,17 @@ export const serverRouter = createTRPCRouter({
     }),
   getChannelComments: protectedProcedure
     .input(z.number())
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.comment.findMany({
-        where: { channelID: input },
-        include: {
-          user: true,
-        },
-      });
+    .query(async ({ input, ctx }) => {
+      if (input === 0) {
+        return "";
+      } else {
+        return ctx.prisma.comment.findMany({
+          where: { channelID: input },
+          include: {
+            user: true,
+          },
+        });
+      }
     }),
   deleteUserFromServer: protectedProcedure
     .input(z.number())

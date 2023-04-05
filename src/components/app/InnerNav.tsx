@@ -49,7 +49,7 @@ type ServerIncludingChannel = {
   channels: Server_Channel[];
 };
 
-const InnerNav = (props: {
+interface InnerNavProps {
   serverModalToggle: MouseEventHandler<HTMLButtonElement>;
   botButtonRef: RefObject<HTMLButtonElement>;
   serverButtonRef: RefObject<HTMLButtonElement>;
@@ -75,7 +75,9 @@ const InnerNav = (props: {
   loadingOverlaySetter: (boolean: boolean) => void;
   serverRefetch: () => void;
   socket: WebSocket | null;
-}) => {
+}
+
+const InnerNav = (props: InnerNavProps) => {
   const {
     currentTabSetter,
     currentTab,
@@ -139,15 +141,6 @@ const InnerNav = (props: {
 
   const channelSetter = (channel: Server_Channel) => {
     props.setSelectedChannel(channel);
-    if (socket) {
-      socket.send(
-        JSON.stringify({
-          invocation: "update",
-          senderID: currentUser.id,
-          channelID: channel.id,
-        })
-      );
-    }
   };
 
   if (currentTab == "DMS") {

@@ -106,8 +106,43 @@ const App = () => {
   }, [socket]);
 
   useEffect(() => {
-    setCurrentUser(currentUserReturn.data!);
+    if (currentUserReturn.data) {
+      setCurrentUser(currentUserReturn.data);
+    }
   }, [currentUserReturn]);
+
+  useEffect(() => {
+    if (socket && socket.readyState === WebSocket.OPEN && currentUser) {
+      if (selectedChannel) {
+        socketChannelUpdate();
+      } else {
+        socketUserUpdate();
+      }
+    }
+  }, [socket, currentUser]);
+
+  const socketUserUpdate = () => {
+    socket?.send(
+      JSON.stringify({
+        senderID: currentUser?.id,
+        updateType: "user",
+      })
+    );
+  };
+
+  const socketChannelUpdate = () => {
+    socket?.send(
+      JSON.stringify({
+        senderID: currentUser?.id,
+        channelID: selectedChannel?.id,
+        updateType: "channel",
+      })
+    );
+  };
+
+  useEffect(() => {
+    socketChannelUpdate();
+  }, [selectedChannel]);
 
   const triggerUserRefresh = async () => {
     await currentUserReturn.refetch();
@@ -375,14 +410,14 @@ const App = () => {
                 <ChatChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
-                  socket={socket as WebSocket}
+                  socket={socket}
                   fullscreen={fullscreen}
                 />
               ) : (
                 <VoiceChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
-                  socket={socket as WebSocket}
+                  socket={socket}
                   microphoneState={microphoneState}
                   audioState={audioState}
                   audioToggle={audioToggle}
