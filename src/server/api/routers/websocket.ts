@@ -23,6 +23,42 @@ export const websocketRouter = createTRPCRouter({
           channelID: input.channelID,
         },
       });
+      const connection = await ctx.prisma.wSConnection.findFirst({
+        where: { userId: ctx.session.user.id },
+      });
+      if (connection && connection.channelID) {
+        const thisChannel = await ctx.prisma.server_Channel.findFirst({
+          where: { id: connection.channelID },
+        });
+        if (thisChannel && input.newState === true) {
+          const newConnectionString = thisChannel.connections
+            ? thisChannel.connections + connection.connectionID + ","
+            : connection.connectionID + ",";
+          await ctx.prisma.server_Channel.update({
+            where: { id: connection.channelID },
+            data: {
+              connections: newConnectionString,
+            },
+          });
+        }
+        if (thisChannel && input.newState === false) {
+          let newConnectionString;
+          if (thisChannel.connections === connection.connectionID) {
+            newConnectionString = null;
+          } else {
+            newConnectionString = thisChannel.connections?.replace(
+              connection.connectionID + ",",
+              ""
+            );
+          }
+          await ctx.prisma.server_Channel.update({
+            where: { id: connection.channelID },
+            data: {
+              connections: newConnectionString,
+            },
+          });
+        }
+      }
     }),
   // getSocketState: protectedProcedure.input().query(),
   wssConnectedToChannel: protectedProcedure

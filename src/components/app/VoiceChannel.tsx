@@ -40,47 +40,52 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     audioContext,
     fullscreen,
   } = props;
+
   const { isDarkTheme } = useContext(ThemeContext);
   const [userJoined, setUserJoined] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
   const disconnectWS = api.websocket.disconnectWsFromChannel.useMutation();
   const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
   const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
-  const [websocketsInCall, setWebsocketsInCall] = useState<
+
+  const [webSocketsInCall, setWebSocketsInCall] = useState<
     | (WSConnection & {
         user: User;
       })[]
-    | null
-  >(null);
-  const [websocketsInChannel, setWebsocketsInChannel] = useState<
+  >([]);
+
+  const [webSocketsInChannel, setWebSocketsInChannel] = useState<
     | (WSConnection & {
         user: User;
       })[]
-    | null
-  >(null);
+  >([]);
 
   const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(
     selectedChannel.id
   );
 
+  const [peerConnections, setPeerConnections] = useState<
+    Map<string, RTCPeerConnection>
+  >(new Map());
+
   useEffect(() => {
     if (connectedWSQuery.data) {
-      setWebsocketsInChannel(connectedWSQuery.data);
+      setWebSocketsInChannel(connectedWSQuery.data);
     }
   }, [connectedWSQuery]);
 
   useEffect(() => {
-    if (websocketsInChannel) {
-      const wsInCall = websocketsInChannel.filter(
+    if (webSocketsInChannel) {
+      const wsInCall = webSocketsInChannel.filter(
         (connection) => connection.inCall
       );
       const userInCallBoolean = wsInCall.some(
         (connection) => connection.user.id === currentUser.id
       );
       setUserJoined(userInCallBoolean);
-      setWebsocketsInCall(wsInCall);
+      setWebSocketsInCall(wsInCall);
     }
-  }, [websocketsInChannel]);
+  }, [webSocketsInChannel]);
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -95,9 +100,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       socket.onmessage = (event: MessageEvent) => {
         const data = JSON.parse(event.data);
         console.log(data);
+
+        if (data.type === "signal") {
+          handleSignalMessage(data);
+        }
       };
     }
-  }, []);
+  }, [socket, peerConnections]);
 
   const joinCall = async () => {
     if (socket) {
@@ -106,14 +115,148 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         channelID: selectedChannel.id,
       });
       await connectedWSQuery.refetch();
+
+      webSocketsInCall.forEach(async (websocket) => {
+        const targetSocket = websocket.connectionID;
+        const peerConnection = new RTCPeerConnection();
+        handlePeerConnection(targetSocket, peerConnection);
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        socket.send(
+          JSON.stringify({
+            action: "audio",
+            requestType: "signal",
+            targetConnectionID: targetSocket,
+            data: JSON.stringify({ type: "offer", offer: offer }),
+          })
+        );
+
+        setPeerConnections(
+          (prevConnections) =>
+            new Map(prevConnections.set(targetSocket, peerConnection))
+        );
+      });
     }
   };
 
-  const createOffer = () => {
-    const peerConnection = new RTCPeerConnection();
+  const handlePeerConnection = async (
+    targetSocket: string,
+    peerConnection: RTCPeerConnection
+  ) => {
+    const dataChannel = peerConnection.createDataChannel("chat");
+
+    dataChannel.onmessage = (event) => {
+      console.log("DataChannel message:", event.data);
+    };
+
+    dataChannel.onopen = () => {
+      console.log("DataChannel opened.");
+    };
+
+    dataChannel.onclose = () => {
+      console.log("DataChannel closed.");
+    };
+
+    let iceCandidates: RTCIceCandidate[] = [];
+    peerConnection.onicecandidate = async (event) => {
+      if (event.candidate && socket) {
+        iceCandidates.push(event.candidate);
+      } else {
+        // The event.candidate is null, which means the ICE gathering process has completed
+        if (iceCandidates.length > 0) {
+          // Send all the candidates in a single message
+          socket?.send(
+            JSON.stringify({
+              action: "audio",
+              requestType: "signal",
+              targetConnectionID: targetSocket,
+              data: JSON.stringify({
+                type: "candidates",
+                candidates: iceCandidates,
+              }),
+            })
+          );
+          iceCandidates = [];
+        }
+      }
+    };
+
+    peerConnection.ontrack = async (event) => {
+      console.log("ontrack triggered");
+      const remoteAudioStream = new MediaStream();
+      if (event.streams[0]) {
+        console.log("if check passed");
+        event.streams[0].getTracks().forEach((track) => {
+          remoteAudioStream.addTrack(track);
+        });
+      } else {
+        console.error("No media stream found.");
+      }
+    };
+
+    if (stream) {
+      stream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, stream);
+      });
+    }
+  };
+
+  const handleSignalMessage = async (data: any) => {
+    const targetSocket = data.from;
+
+    let peerConnection = peerConnections.get(targetSocket);
+
+    console.log("Current peer connections :" + peerConnections);
+
+    if (!peerConnection) {
+      peerConnection = new RTCPeerConnection();
+      handlePeerConnection(targetSocket, peerConnection);
+      setPeerConnections(
+        (prevConnections) =>
+          new Map(
+            prevConnections.set(
+              targetSocket,
+              peerConnection as RTCPeerConnection
+            )
+          )
+      );
+    }
+
+    if (data.signal.type === "offer") {
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.signal.offer)
+      );
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+
+      socket?.send(
+        JSON.stringify({
+          action: "audio",
+          requestType: "signal",
+          targetConnectionID: targetSocket,
+          data: JSON.stringify({ type: "answer", answer: answer }),
+        })
+      );
+      console.log("answer sent");
+    } else if (data.signal.type === "answer") {
+      console.log("answer found");
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.signal.answer)
+      );
+    } else if (data.signal.type === "candidate") {
+      const candidate = new RTCIceCandidate(data.signal.candidate);
+      await peerConnection.addIceCandidate(candidate);
+    }
   };
 
   const leaveCall = async () => {
+    peerConnections.forEach((peerConnection) => {
+      peerConnection.close();
+    });
+    setPeerConnections(new Map());
+
     await joinOrLeaveCallMutation.mutateAsync({
       newState: false,
       channelID: selectedChannel.id,
@@ -121,7 +264,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     await connectedWSQuery.refetch();
     await disconnectWS.mutateAsync();
   };
-
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
@@ -130,13 +272,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         style={{ width: fullscreen ? "100vw" : bodySizing }}
       >
         <div className="pt-8 text-center text-lg">
-          {websocketsInCall && websocketsInCall?.length !== 0
+          {webSocketsInCall && webSocketsInCall?.length !== 0
             ? "Currently in Channel:"
             : "No one's here... yet"}
         </div>
-        {websocketsInCall ? (
+        {webSocketsInCall ? (
           <div className={`grid grid-cols-5 justify-center`}>
-            {websocketsInCall.map((websocket) => (
+            {webSocketsInCall.map((websocket) => (
               <div className="px-4 py-6" key={websocket.user.id}>
                 <div className="flex h-24 w-24 rounded-full border md:h-36 md:w-36">
                   <div className="flex flex-col">
@@ -178,14 +320,34 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             </div>
             <div className="flex flex-col">
               {microphoneState ? (
-                <button onClick={props.microphoneToggle}>Turn Mic Off</button>
+                <button
+                  onClick={props.microphoneToggle}
+                  className="underline-offset-4 hover:text-purple-400 hover:underline"
+                >
+                  Turn Mic Off
+                </button>
               ) : (
-                <button onClick={props.microphoneToggle}>Turn Mic On</button>
+                <button
+                  onClick={props.microphoneToggle}
+                  className="underline-offset-4 hover:text-purple-400 hover:underline"
+                >
+                  Turn Mic On
+                </button>
               )}
               {audioState ? (
-                <button onClick={props.audioToggle}>Turn Sound Off</button>
+                <button
+                  onClick={props.audioToggle}
+                  className="underline-offset-4 hover:text-purple-400 hover:underline"
+                >
+                  Turn Sound Off
+                </button>
               ) : (
-                <button onClick={props.audioToggle}>Turn Sound On</button>
+                <button
+                  onClick={props.audioToggle}
+                  className="underline-offset-4 hover:text-purple-400 hover:underline"
+                >
+                  Turn Sound On
+                </button>
               )}
             </div>
           </div>
