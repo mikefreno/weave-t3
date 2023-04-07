@@ -339,7 +339,7 @@ const App = () => {
           </div>
         </div>
         <div
-          className={`absolute z-[100] mt-16 transform transition-all duration-700 ease-in-out ${
+          className={`fixed z-[100] mt-16 transform transition-all duration-700 ease-in-out ${
             fullscreen ? "ml-0" : "ml-44 md:ml-72"
           }`}
         >
