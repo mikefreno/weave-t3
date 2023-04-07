@@ -108,6 +108,7 @@ model Server_Channel {
   description String?
   comments    Comment[]
   type        String
+  connections String?
 
   @@index([ServerId])
 }
