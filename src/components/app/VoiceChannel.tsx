@@ -1,5 +1,5 @@
 import { api } from "@/src/utils/api";
-import { Button } from "@nextui-org/react";
+import { Button, Loading } from "@nextui-org/react";
 import {
   Server_Channel,
   Server,
@@ -25,7 +25,6 @@ interface VoiceChannelProps {
   audioToggle: () => void;
   microphoneToggle: () => void;
   stream: MediaStream | null;
-  audioContext: AudioContext | null;
   fullscreen: boolean;
 }
 
@@ -37,7 +36,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     stream,
     microphoneState,
     audioState,
-    audioContext,
     fullscreen,
   } = props;
 
@@ -47,6 +45,8 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const disconnectWS = api.websocket.disconnectWsFromChannel.useMutation();
   const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
   const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
+  const [joinButtonState, setJoinButtonState] = useState(false);
+  const [leaveButtonState, setLeaveButtonState] = useState(false);
 
   const [webSocketsInCall, setWebSocketsInCall] = useState<
     | (WSConnection & {
@@ -64,9 +64,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     selectedChannel.id
   );
 
-  const [peerConnections, setPeerConnections] = useState<
-    Map<string, RTCPeerConnection>
-  >(new Map());
+  const localPeerConnection = useRef<RTCPeerConnection | null>(null);
 
   useEffect(() => {
     if (connectedWSQuery.data) {
@@ -97,173 +95,202 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   useEffect(() => {
     if (socket) {
-      socket.onmessage = (event: MessageEvent) => {
+      socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
         console.log(data);
+        if (localPeerConnection.current) {
+          if (data.type === "offer") {
+            console.log("receive offer");
+            await localPeerConnection.current.setRemoteDescription(
+              new RTCSessionDescription(data.offer)
+            );
 
-        if (data.type === "signal") {
-          handleSignalMessage(data);
+            const answer = await localPeerConnection.current.createAnswer();
+            await localPeerConnection.current.setLocalDescription(answer);
+
+            console.log("Sending answer");
+            socket.send(
+              JSON.stringify({
+                action: "audio",
+                type: "answer",
+                answer: localPeerConnection.current.localDescription,
+              })
+            );
+          } else if (data.type === "answer") {
+            console.log("receive answer");
+            await localPeerConnection.current.setRemoteDescription(
+              new RTCSessionDescription(data.answer)
+            );
+          } else if (data.type === "ice-candidate") {
+            console.log("receive ice candidate");
+            await localPeerConnection.current.addIceCandidate(
+              new RTCIceCandidate(data.candidate)
+            );
+          } else if (data.type === "leave") {
+            await connectedWSQuery.refetch();
+          }
         }
       };
     }
-  }, [socket, peerConnections]);
+  }, [socket, localPeerConnection]);
+
+  useEffect(() => {
+    if (stream && userJoined && localPeerConnection.current) {
+      localPeerConnection.current.ontrack = (event) => {
+        // Play the received track (audio) in a new HTMLAudioElement
+        if (event.streams[0]) {
+          const audioElement = new Audio();
+          audioElement.srcObject = event.streams[0];
+          audioElement.play();
+        }
+      };
+    }
+  }, [userJoined, stream, localPeerConnection.current]);
+
+  useEffect(() => {
+    if (userJoined && !localPeerConnection.current) {
+      localPeerConnection.current = new RTCPeerConnection();
+
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          localPeerConnection.current?.addTrack(track, stream);
+        });
+      }
+
+      localPeerConnection.current.oniceconnectionstatechange = () => {
+        console.log(
+          `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+        );
+
+        // if (localPeerConnection.current?.iceConnectionState === "failed") {
+        //   // Handle connection failure
+        // }
+      };
+
+      localPeerConnection.current.onicecandidate = (event) => {
+        console.log("triggered onicecandidate");
+        if (event.candidate) {
+          console.log("sending ice candidate");
+          socket?.send(
+            JSON.stringify({
+              action: "audio",
+              type: "ice-candidate",
+              candidate: event.candidate,
+            })
+          );
+        }
+      };
+
+      if (stream && userJoined && localPeerConnection.current) {
+        localPeerConnection.current.ontrack = (event) => {
+          // Play the received track (audio) in a new HTMLAudioElement
+          if (event.streams[0]) {
+            const audioElement = new Audio();
+            audioElement.srcObject = event.streams[0];
+            audioElement.play();
+          }
+        };
+      }
+    }
+  }, [userJoined, stream, localPeerConnection.current, socket]);
 
   const joinCall = async () => {
-    if (socket) {
+    setJoinButtonState(true);
+    if (socket && webSocketsInCall.length < 5) {
+      //add user to inCall field in database
       await joinOrLeaveCallMutation.mutateAsync({
         newState: true,
         channelID: selectedChannel.id,
       });
+      // refresh list of connections in the call, accessed with 'webSocketsInCall'
       await connectedWSQuery.refetch();
+      setJoinButtonState(false);
 
-      webSocketsInCall.forEach(async (websocket) => {
-        const targetSocket = websocket.connectionID;
-        const peerConnection = new RTCPeerConnection();
-        handlePeerConnection(targetSocket, peerConnection);
+      // Add event listener for iceconnectionstatechange
 
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
+      localPeerConnection.current = new RTCPeerConnection();
 
-        socket.send(
-          JSON.stringify({
-            action: "audio",
-            requestType: "signal",
-            targetConnectionID: targetSocket,
-            data: JSON.stringify({ type: "offer", offer: offer }),
-          })
-        );
+      const offer = await localPeerConnection.current?.createOffer();
+      await localPeerConnection.current?.setLocalDescription(offer);
 
-        setPeerConnections(
-          (prevConnections) =>
-            new Map(prevConnections.set(targetSocket, peerConnection))
-        );
-      });
-    }
-  };
-
-  const handlePeerConnection = async (
-    targetSocket: string,
-    peerConnection: RTCPeerConnection
-  ) => {
-    const dataChannel = peerConnection.createDataChannel("chat");
-
-    dataChannel.onmessage = (event) => {
-      console.log("DataChannel message:", event.data);
-    };
-
-    dataChannel.onopen = () => {
-      console.log("DataChannel opened.");
-    };
-
-    dataChannel.onclose = () => {
-      console.log("DataChannel closed.");
-    };
-
-    let iceCandidates: RTCIceCandidate[] = [];
-    peerConnection.onicecandidate = async (event) => {
-      if (event.candidate && socket) {
-        iceCandidates.push(event.candidate);
-      } else {
-        // The event.candidate is null, which means the ICE gathering process has completed
-        if (iceCandidates.length > 0) {
-          // Send all the candidates in a single message
-          socket?.send(
-            JSON.stringify({
-              action: "audio",
-              requestType: "signal",
-              targetConnectionID: targetSocket,
-              data: JSON.stringify({
-                type: "candidates",
-                candidates: iceCandidates,
-              }),
-            })
-          );
-          iceCandidates = [];
-        }
-      }
-    };
-
-    peerConnection.ontrack = async (event) => {
-      console.log("ontrack triggered");
-      const remoteAudioStream = new MediaStream();
-      if (event.streams[0]) {
-        console.log("if check passed");
-        event.streams[0].getTracks().forEach((track) => {
-          remoteAudioStream.addTrack(track);
-        });
-      } else {
-        console.error("No media stream found.");
-      }
-    };
-
-    if (stream) {
-      stream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, stream);
-      });
-    }
-  };
-
-  const handleSignalMessage = async (data: any) => {
-    const targetSocket = data.from;
-
-    let peerConnection = peerConnections.get(targetSocket);
-
-    console.log("Current peer connections :" + peerConnections);
-
-    if (!peerConnection) {
-      peerConnection = new RTCPeerConnection();
-      handlePeerConnection(targetSocket, peerConnection);
-      setPeerConnections(
-        (prevConnections) =>
-          new Map(
-            prevConnections.set(
-              targetSocket,
-              peerConnection as RTCPeerConnection
-            )
-          )
-      );
-    }
-
-    if (data.signal.type === "offer") {
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.signal.offer)
-      );
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
-
-      socket?.send(
+      socket.send(
         JSON.stringify({
           action: "audio",
-          requestType: "signal",
-          targetConnectionID: targetSocket,
-          data: JSON.stringify({ type: "answer", answer: answer }),
+          type: "offer",
+          offer: localPeerConnection.current?.localDescription,
         })
       );
-      console.log("answer sent");
-    } else if (data.signal.type === "answer") {
-      console.log("answer found");
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.signal.answer)
-      );
-    } else if (data.signal.type === "candidate") {
-      const candidate = new RTCIceCandidate(data.signal.candidate);
-      await peerConnection.addIceCandidate(candidate);
     }
   };
 
   const leaveCall = async () => {
-    peerConnections.forEach((peerConnection) => {
-      peerConnection.close();
-    });
-    setPeerConnections(new Map());
-
+    setLeaveButtonState(true);
     await joinOrLeaveCallMutation.mutateAsync({
       newState: false,
       channelID: selectedChannel.id,
     });
+    socket?.send(
+      JSON.stringify({
+        action: "audio",
+        type: "leave",
+      })
+    );
     await connectedWSQuery.refetch();
-    await disconnectWS.mutateAsync();
+    setLeaveButtonState(false);
+
+    // await disconnectWS.mutateAsync();
   };
+
+  const joinCallButton = () => {
+    if (joinButtonState) {
+      return (
+        <Button auto shadow size={"lg"} color="secondary" animated disabled>
+          <Loading type="points" />
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          auto
+          shadow
+          size={"lg"}
+          color="secondary"
+          onClick={() => {
+            joinCall();
+          }}
+          animated
+        >
+          <div className="px-12">Join</div>
+        </Button>
+      );
+    }
+  };
+
+  const leaveCallButton = () => {
+    if (leaveButtonState) {
+      return (
+        <Button auto shadow size={"lg"} color="secondary" animated disabled>
+          <Loading type="points" />
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          auto
+          shadow
+          size={"lg"}
+          color="secondary"
+          onClick={() => {
+            leaveCall();
+          }}
+          animated
+        >
+          <div className="">Leave</div>
+        </Button>
+      );
+    }
+  };
+
   return (
     <div className="">
       <TopBanner currentChannel={selectedChannel} fullscreen={fullscreen} />
@@ -276,6 +303,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             ? "Currently in Channel:"
             : "No one's here... yet"}
         </div>
+        {webSocketsInCall.length === 5 ? (
+          <div className="py-4 text-center text-sm italic">
+            Currently voice calls only support up to 5 people.
+          </div>
+        ) : null}
         {webSocketsInCall ? (
           <div className={`grid grid-cols-5 justify-center`}>
             {webSocketsInCall.map((websocket) => (
@@ -304,20 +336,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         ) : null}
         {!userJoined ? (
           <div className="flex h-screen flex-col justify-center">
-            <div className="flex justify-center pb-4">
-              <Button
-                auto
-                shadow
-                size={"lg"}
-                color="secondary"
-                onClick={() => {
-                  joinCall();
-                }}
-                animated
-              >
-                <div className="px-12">Join</div>
-              </Button>
-            </div>
+            <div className="flex justify-center pb-4">{joinCallButton()}</div>
             <div className="flex flex-col">
               {microphoneState ? (
                 <button
@@ -373,20 +392,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                 </Button>
               )}
             </div>
-            <div className="absolute bottom-4 pl-4">
-              <Button
-                auto
-                shadow
-                size={"lg"}
-                color="secondary"
-                onClick={() => {
-                  leaveCall();
-                }}
-                animated
-              >
-                <div className="">Leave</div>
-              </Button>
-            </div>
+            <div className="absolute bottom-4 pl-4">{leaveCallButton()}</div>
           </>
         )}
       </div>

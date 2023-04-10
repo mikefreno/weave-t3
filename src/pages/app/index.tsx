@@ -57,8 +57,6 @@ const App = () => {
   );
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [source, setSource] = useState<MediaStreamAudioSourceNode | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
@@ -190,12 +188,6 @@ const App = () => {
     }
   }, [serverModalShowing, botModalShowing, directMessageModalShowing]);
 
-  useEffect(() => {
-    const audioContext = new AudioContext();
-    audioContext.audioWorklet.addModule("/audio-processor.js");
-    setAudioContext(audioContext);
-  }, []);
-
   const microphoneToggle = async () => {
     if (microphoneState) {
       turnOffMicrophone();
@@ -210,10 +202,13 @@ const App = () => {
 
   const requestMicrophoneAccess = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const newStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
-      setStream(stream);
+      newStream.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+      setStream(newStream);
       return true;
     } catch (err) {
       console.error("Error accessing microphone:", err);
@@ -223,9 +218,9 @@ const App = () => {
 
   const turnOffMicrophone = () => {
     if (stream) {
-      // Stop all tracks in the MediaStream
-      stream.getTracks().forEach((track) => {
-        track.stop();
+      // Disable all audio tracks in the MediaStream
+      stream.getAudioTracks().forEach((track) => {
+        track.enabled = false;
       });
     }
   };
@@ -423,7 +418,6 @@ const App = () => {
                   audioToggle={audioToggle}
                   microphoneToggle={microphoneToggle}
                   stream={stream}
-                  audioContext={audioContext}
                   fullscreen={fullscreen}
                 />
               )
