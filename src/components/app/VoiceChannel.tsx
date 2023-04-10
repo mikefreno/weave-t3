@@ -135,19 +135,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   }, [socket, localPeerConnection]);
 
   useEffect(() => {
-    if (stream && userJoined && localPeerConnection.current) {
-      localPeerConnection.current.ontrack = (event) => {
-        // Play the received track (audio) in a new HTMLAudioElement
-        if (event.streams[0]) {
-          const audioElement = new Audio();
-          audioElement.srcObject = event.streams[0];
-          audioElement.play();
-        }
-      };
-    }
-  }, [userJoined, stream, localPeerConnection.current]);
-
-  useEffect(() => {
     if (userJoined && !localPeerConnection.current) {
       localPeerConnection.current = new RTCPeerConnection();
 
@@ -167,20 +154,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         // }
       };
 
-      localPeerConnection.current.onicecandidate = (event) => {
-        console.log("triggered onicecandidate");
-        if (event.candidate) {
-          console.log("sending ice candidate");
-          socket?.send(
-            JSON.stringify({
-              action: "audio",
-              type: "ice-candidate",
-              candidate: event.candidate,
-            })
-          );
-        }
-      };
-
       if (stream && userJoined && localPeerConnection.current) {
         localPeerConnection.current.ontrack = (event) => {
           // Play the received track (audio) in a new HTMLAudioElement
@@ -196,6 +169,12 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   const joinCall = async () => {
     setJoinButtonState(true);
+    socket?.send(
+      JSON.stringify({
+        action: "audio",
+        type: "leave",
+      })
+    );
     if (socket && webSocketsInCall.length < 5) {
       //add user to inCall field in database
       await joinOrLeaveCallMutation.mutateAsync({
@@ -205,21 +184,44 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       // refresh list of connections in the call, accessed with 'webSocketsInCall'
       await connectedWSQuery.refetch();
       setJoinButtonState(false);
+      if (localPeerConnection.current) {
+        // Set the onicecandidate event listener before creating the offer
+        localPeerConnection.current.onicecandidate = (event) => {
+          console.log("triggered onicecandidate");
+          if (event.candidate) {
+            console.log("sending ice candidate");
+            socket.send(
+              JSON.stringify({
+                action: "audio",
+                type: "ice-candidate",
+                candidate: event.candidate,
+              })
+            );
+          }
+        };
 
-      // Add event listener for iceconnectionstatechange
+        const offer = await localPeerConnection.current.createOffer();
+        await localPeerConnection.current.setLocalDescription(offer);
 
-      localPeerConnection.current = new RTCPeerConnection();
+        socket.send(
+          JSON.stringify({
+            action: "audio",
+            type: "offer",
+            offer: localPeerConnection.current.localDescription,
+          })
+        );
 
-      const offer = await localPeerConnection.current?.createOffer();
-      await localPeerConnection.current?.setLocalDescription(offer);
+        // Add event listener for iceconnectionstatechange
+        localPeerConnection.current.oniceconnectionstatechange = () => {
+          console.log(
+            `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+          );
 
-      socket.send(
-        JSON.stringify({
-          action: "audio",
-          type: "offer",
-          offer: localPeerConnection.current?.localDescription,
-        })
-      );
+          // if (localPeerConnection.current?.iceConnectionState === "failed") {
+          //   // Handle connection failure
+          // }
+        };
+      }
     }
   };
 
