@@ -28,6 +28,8 @@ import {
 import LoadingOverlay from "@/src/components/app/LoadingOverlay";
 import VoiceChannel from "@/src/components/app/VoiceChannel";
 import DoubleChevrons from "@/src/icons/DoubleChevrons";
+import CreateChannelModal from "@/src/components/app/CreateChannelModal";
+import InviteModal from "@/src/components/app/InviteModal";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -57,9 +59,23 @@ const App = () => {
   );
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+
+  const [inviteModalShowing, setInviteModalShowing] = useState(false);
+  const [createChannelModalShowing, setCreateChannelModalShowing] =
+    useState(false);
+
+  const inviteModalButtonRef = useRef<HTMLButtonElement>(null);
+  const inviteModalRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside([inviteModalRef, inviteModalButtonRef], () => {
+    setInviteModalShowing(false);
+  });
+  const createChannelButtonRef = useRef<HTMLButtonElement>(null);
+  const createChannelRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
+    setCreateChannelModalShowing(false);
+  });
   const [fullscreen, setFullscreen] = useState<boolean>(false);
   const currentUserReturn = api.users.getCurrentUser.useQuery();
   const [currentUser, setCurrentUser] = useState<
@@ -263,6 +279,13 @@ const App = () => {
     setFullscreen(!fullscreen);
   };
 
+  const inviteModalToggle = () => {
+    setInviteModalShowing(!inviteModalShowing);
+  };
+  const createChannelToggle = () => {
+    setCreateChannelModalShowing(!createChannelModalShowing);
+  };
+
   return (
     <div className="bg-zinc-100 dark:bg-zinc-700">
       <Head>
@@ -320,6 +343,10 @@ const App = () => {
               timestamp={timestamp}
               usersServers={usersServers.data as any}
               socket={socket}
+              createChannelToggle={createChannelToggle}
+              createChannelButtonRef={createChannelButtonRef}
+              inviteModalToggle={inviteModalToggle}
+              inviteModalButtonRef={inviteModalButtonRef}
             />
             <InnerNavOverlay
               setSelectedInnerTab={setSelectedInnerTab}
@@ -449,6 +476,24 @@ const App = () => {
         ) : null}
         {directMessageModalShowing ? (
           <DirectMessageModal directMessageModalRef={directMessageModalRef} />
+        ) : null}
+        {inviteModalShowing ? (
+          <InviteModal
+            isDarkTheme={isDarkTheme}
+            inviteModalToggle={inviteModalToggle}
+            selectedInnerTabID={selectedInnerTabID}
+            selectedInnerTab={selectedInnerTab}
+            inviteModalRef={inviteModalRef}
+          />
+        ) : null}
+        {createChannelModalShowing ? (
+          <CreateChannelModal
+            refreshUserServers={refreshUserServers}
+            isDarkTheme={isDarkTheme}
+            createChannelToggle={createChannelToggle}
+            selectedInnerTabID={selectedInnerTabID}
+            createChannelRef={createChannelRef}
+          />
         ) : null}
       </div>
     </div>

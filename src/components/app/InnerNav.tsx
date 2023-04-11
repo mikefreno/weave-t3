@@ -32,8 +32,6 @@ import React, {
   useState,
 } from "react";
 import ThemeContext from "../ThemeContextProvider";
-import CreateChannelModal from "./CreateChannelModal";
-import InviteModal from "./InviteModal";
 import { api } from "@/src/utils/api";
 import LoadingOverlay from "./LoadingOverlay";
 import SideNavSmallScreen from "./SideNavSmallScreen";
@@ -75,6 +73,10 @@ interface InnerNavProps {
   loadingOverlaySetter: (boolean: boolean) => void;
   serverRefetch: () => void;
   socket: WebSocket | null;
+  createChannelToggle: () => void;
+  createChannelButtonRef: RefObject<HTMLButtonElement>;
+  inviteModalToggle: () => void;
+  inviteModalButtonRef: RefObject<HTMLButtonElement>;
 }
 
 const InnerNav = (props: InnerNavProps) => {
@@ -93,40 +95,22 @@ const InnerNav = (props: InnerNavProps) => {
     setSelectedInnerTabID,
     setSelectedChannel,
     socket,
+    createChannelToggle,
+    createChannelButtonRef,
+    inviteModalToggle,
+    inviteModalButtonRef,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
 
-  const [inviteModalShowing, setInviteModalShowing] = useState(false);
-  const [createChannelModalShowing, setCreateChannelModalShowing] =
-    useState(false);
-
-  const inviteModalButtonRef = useRef<HTMLButtonElement>(null);
-  const inviteModalRef = useRef<HTMLDivElement>(null);
-
-  useOnClickOutside([inviteModalRef, inviteModalButtonRef], () => {
-    setInviteModalShowing(false);
-  });
-  const createChannelButtonRef = useRef<HTMLButtonElement>(null);
-  const createChannelRef = useRef<HTMLDivElement>(null);
   const deleteUser = api.server.deleteUserFromServer.useMutation({});
-  const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
-
-  useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
-    setCreateChannelModalShowing(false);
-  });
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
     // Perform your search logic here
   };
-  const inviteModalToggle = () => {
-    setInviteModalShowing(!inviteModalShowing);
-  };
-  const createChannelToggle = () => {
-    setCreateChannelModalShowing(!createChannelModalShowing);
-  };
+
   const leaveServerAlert = async () => {
     const confirmed = window.confirm(
       "Are you sure you want to leave the server?"
@@ -564,24 +548,6 @@ const InnerNav = (props: InnerNavProps) => {
             </button>
           </div>
         </div>
-        {inviteModalShowing ? (
-          <InviteModal
-            isDarkTheme={isDarkTheme}
-            inviteModalToggle={inviteModalToggle}
-            selectedInnerTabID={selectedInnerTabID}
-            selectedInnerTab={selectedInnerTab}
-            inviteModalRef={inviteModalRef}
-          />
-        ) : null}
-        {createChannelModalShowing ? (
-          <CreateChannelModal
-            refreshUserServers={props.refreshUserServers}
-            isDarkTheme={isDarkTheme}
-            createChannelToggle={createChannelToggle}
-            selectedInnerTabID={selectedInnerTabID}
-            createChannelRef={createChannelRef}
-          />
-        ) : null}
       </div>
     );
   } else {

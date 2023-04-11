@@ -93,10 +93,10 @@ const InviteModal = (props: {
 
   return (
     <div className="fixed">
-      <div className="absolute mt-24 flex w-screen items-center justify-center">
+      <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={props.inviteModalRef}
-          className="fade-in w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+          className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
         >
           <div className="">
             <button
@@ -111,7 +111,7 @@ const InviteModal = (props: {
               Send an Invite
             </div>
             <div className="mt-6 flex justify-center">
-              <div className="my-auto mx-4">Send by email</div>
+              <div className="mx-4 my-auto">Send by email</div>
               <Input
                 id="invitee-input"
                 ref={invitee}
