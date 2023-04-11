@@ -192,7 +192,7 @@ const RoadMap = () => {
                 <div className="pl-2">Chat Channels</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>
                 <div className="pl-2">Voice Channels</div>
               </li>
             </ul>

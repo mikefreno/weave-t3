@@ -220,7 +220,7 @@ const App = () => {
     if (stream) {
       // Disable all audio tracks in the MediaStream
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = false;
+        track.stop();
       });
     }
   };

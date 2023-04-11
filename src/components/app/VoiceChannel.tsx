@@ -134,39 +134,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   }, [socket, localPeerConnection]);
 
-  useEffect(() => {
-    if (userJoined && !localPeerConnection.current) {
-      localPeerConnection.current = new RTCPeerConnection();
-
-      if (stream) {
-        stream.getTracks().forEach((track) => {
-          localPeerConnection.current?.addTrack(track, stream);
-        });
-      }
-
-      localPeerConnection.current.oniceconnectionstatechange = () => {
-        console.log(
-          `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
-        );
-
-        // if (localPeerConnection.current?.iceConnectionState === "failed") {
-        //   // Handle connection failure
-        // }
-      };
-
-      if (stream && userJoined && localPeerConnection.current) {
-        localPeerConnection.current.ontrack = (event) => {
-          // Play the received track (audio) in a new HTMLAudioElement
-          if (event.streams[0]) {
-            const audioElement = new Audio();
-            audioElement.srcObject = event.streams[0];
-            audioElement.play();
-          }
-        };
-      }
-    }
-  }, [userJoined, stream, localPeerConnection.current, socket]);
-
   const joinCall = async () => {
     setJoinButtonState(true);
     if (socket && webSocketsInCall.length < 5) {
@@ -184,44 +151,61 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       );
       await connectedWSQuery.refetch();
       setJoinButtonState(false);
-      if (localPeerConnection.current) {
-        // Set the onicecandidate event listener before creating the offer
-        localPeerConnection.current.onicecandidate = (event) => {
-          console.log("triggered onicecandidate");
-          if (event.candidate) {
-            console.log("sending ice candidate");
-            socket.send(
-              JSON.stringify({
-                action: "audio",
-                type: "ice-candidate",
-                candidate: event.candidate,
-              })
-            );
-          }
-        };
 
-        const offer = await localPeerConnection.current.createOffer();
-        await localPeerConnection.current.setLocalDescription(offer);
+      // Set the onicecandidate event listener before creating the offer
+      localPeerConnection.current = new RTCPeerConnection();
 
-        socket.send(
-          JSON.stringify({
-            action: "audio",
-            type: "offer",
-            offer: localPeerConnection.current.localDescription,
-          })
-        );
-
-        // Add event listener for iceconnectionstatechange
-        localPeerConnection.current.oniceconnectionstatechange = () => {
-          console.log(
-            `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
-          );
-
-          // if (localPeerConnection.current?.iceConnectionState === "failed") {
-          //   // Handle connection failure
-          // }
-        };
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          console.log("adding track");
+          localPeerConnection.current?.addTrack(track, stream);
+        });
       }
+
+      localPeerConnection.current.oniceconnectionstatechange = () => {
+        console.log(
+          `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+        );
+      };
+      localPeerConnection.current.onicecandidate = (event) => {
+        if (event.candidate) {
+          console.log("sending ice candidate");
+          socket.send(
+            JSON.stringify({
+              action: "audio",
+              type: "ice-candidate",
+              candidate: event.candidate,
+            })
+          );
+        }
+      };
+      localPeerConnection.current.ontrack = (event) => {
+        console.log("track added");
+        // Play the received track (audio) in a new HTMLAudioElement
+        if (event.streams[0]) {
+          const audioElement = new Audio();
+          audioElement.srcObject = event.streams[0];
+          audioElement.play();
+        }
+      };
+
+      const offer = await localPeerConnection.current.createOffer();
+      await localPeerConnection.current.setLocalDescription(offer);
+
+      socket.send(
+        JSON.stringify({
+          action: "audio",
+          type: "offer",
+          offer: localPeerConnection.current.localDescription,
+        })
+      );
+
+      // Add event listener for iceconnectionstatechange
+      localPeerConnection.current.oniceconnectionstatechange = () => {
+        console.log(
+          `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+        );
+      };
     }
   };
 
@@ -376,22 +360,34 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           <>
             <div className="flex content-center justify-center pt-12">
               {microphoneState ? (
-                <Button auto onClick={props.microphoneToggle} className="mx-2">
-                  Turn Mic Off
-                </Button>
+                <div className="px-2">
+                  <Button auto onClick={props.microphoneToggle}>
+                    Turn Mic Off
+                  </Button>
+                </div>
               ) : (
-                <Button auto onClick={props.microphoneToggle}>
-                  Turn Mic On
-                </Button>
+                <div className="px-2">
+                  <Button
+                    auto
+                    onClick={props.microphoneToggle}
+                    className="px-2"
+                  >
+                    Turn Mic On
+                  </Button>
+                </div>
               )}
               {audioState ? (
-                <Button auto onClick={props.audioToggle}>
-                  Turn Sound Off
-                </Button>
+                <div className="px-2">
+                  <Button auto onClick={props.audioToggle} className="px-2">
+                    Turn Sound Off
+                  </Button>
+                </div>
               ) : (
-                <Button auto onClick={props.audioToggle}>
-                  Turn Sound On
-                </Button>
+                <div className="px-2">
+                  <Button auto onClick={props.audioToggle} className="px-2">
+                    Turn Sound On
+                  </Button>
+                </div>
               )}
             </div>
             <div className="absolute bottom-4 pl-4">{leaveCallButton()}</div>
