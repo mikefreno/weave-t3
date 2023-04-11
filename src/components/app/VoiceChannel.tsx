@@ -169,12 +169,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   const joinCall = async () => {
     setJoinButtonState(true);
-    socket?.send(
-      JSON.stringify({
-        action: "audio",
-        type: "leave",
-      })
-    );
     if (socket && webSocketsInCall.length < 5) {
       //add user to inCall field in database
       await joinOrLeaveCallMutation.mutateAsync({
@@ -182,6 +176,12 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         channelID: selectedChannel.id,
       });
       // refresh list of connections in the call, accessed with 'webSocketsInCall'
+      socket?.send(
+        JSON.stringify({
+          action: "audio",
+          type: "leave",
+        })
+      );
       await connectedWSQuery.refetch();
       setJoinButtonState(false);
       if (localPeerConnection.current) {
@@ -314,7 +314,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           <div className={`grid grid-cols-5 justify-center`}>
             {webSocketsInCall.map((websocket) => (
               <div className="px-4 py-6" key={websocket.user.id}>
-                <div className="flex h-24 w-24 rounded-full border md:h-36 md:w-36">
+                <div className="flex h-24 w-24 rounded-full md:h-36 md:w-36">
                   <div className="flex flex-col">
                     <button>
                       <img
@@ -326,9 +326,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                             : "/Logo - light.png"
                         }
                         alt={"user-logo"}
-                        className="rounded-full"
+                        className="h-24 w-24 rounded-full md:h-36 md:w-36"
                       />
-                      <div className="pl-4">{websocket.user.name}</div>
+                      <div className="py-4">{websocket.user.name}</div>
                     </button>
                   </div>
                 </div>
@@ -374,7 +374,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           </div>
         ) : (
           <>
-            <div className="flex content-center justify-center ">
+            <div className="flex content-center justify-center pt-12">
               {microphoneState ? (
                 <Button auto onClick={props.microphoneToggle} className="mx-2">
                   Turn Mic Off
