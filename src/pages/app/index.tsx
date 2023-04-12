@@ -374,8 +374,8 @@ const App = () => {
             {fullscreen ? (
               <div className="rotate-180 transform transition-all duration-500 ease-in-out">
                 <DoubleChevrons
-                  height={30}
-                  width={30}
+                  height={36}
+                  width={36}
                   stroke={isDarkTheme ? "#fafafa" : "#18181b"}
                   strokeWidth={1}
                 />
@@ -383,8 +383,8 @@ const App = () => {
             ) : (
               <div className="transform transition-all duration-300 ease-in-out">
                 <DoubleChevrons
-                  height={30}
-                  width={30}
+                  height={36}
+                  width={36}
                   stroke={isDarkTheme ? "#fafafa" : "#18181b"}
                   strokeWidth={1}
                 />
