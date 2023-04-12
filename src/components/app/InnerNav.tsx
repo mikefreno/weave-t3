@@ -77,6 +77,7 @@ interface InnerNavProps {
   createChannelButtonRef: RefObject<HTMLButtonElement>;
   inviteModalToggle: () => void;
   inviteModalButtonRef: RefObject<HTMLButtonElement>;
+  serverSetter: (server: Server) => void;
 }
 
 const InnerNav = (props: InnerNavProps) => {
@@ -99,6 +100,7 @@ const InnerNav = (props: InnerNavProps) => {
     createChannelButtonRef,
     inviteModalToggle,
     inviteModalButtonRef,
+    serverSetter,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
@@ -145,6 +147,7 @@ const InnerNav = (props: InnerNavProps) => {
           botModalToggle={props.botModalToggle}
           selectedInnerTabID={props.selectedInnerTabID}
           currentTab={props.currentTab}
+          serverSetter={serverSetter}
         />
         <form onSubmit={handleSubmit} className="mx-2 py-4">
           <Input
@@ -286,6 +289,7 @@ const InnerNav = (props: InnerNavProps) => {
           botModalToggle={props.botModalToggle}
           selectedInnerTabID={props.selectedInnerTabID}
           currentTab={props.currentTab}
+          serverSetter={serverSetter}
         />
 
         <span className="justify-left flex pl-4 pt-4 text-xl font-bold">
@@ -446,6 +450,7 @@ const InnerNav = (props: InnerNavProps) => {
             botModalToggle={props.botModalToggle}
             selectedInnerTabID={props.selectedInnerTabID}
             currentTab={props.currentTab}
+            serverSetter={serverSetter}
           />
           <button
             className="justify-left flex pl-4 pt-4 text-xl font-bold"

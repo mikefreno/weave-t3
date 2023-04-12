@@ -85,7 +85,7 @@ const App = () => {
       adminships: Server_Admin[];
     }
   >();
-
+  const [selectedServer, setSelectedServer] = useState<Server | null>(null);
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
 
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -285,6 +285,9 @@ const App = () => {
   const createChannelToggle = () => {
     setCreateChannelModalShowing(!createChannelModalShowing);
   };
+  const serverSetter = async (server: Server) => {
+    setSelectedServer(server);
+  };
 
   return (
     <div className="bg-zinc-100 dark:bg-zinc-700">
@@ -318,10 +321,12 @@ const App = () => {
               usersServers={usersServers.data}
               selectedInnerTabID={selectedInnerTabID}
               timestamp={timestamp}
+              serverSetter={serverSetter}
             />
           </div>
           <div id="inner-nav" className="ml-20">
             <InnerNav
+              serverSetter={serverSetter}
               botModalToggle={botModalToggle}
               botButtonRef={botButtonRef}
               serverModalToggle={serverModalToggle}
@@ -361,7 +366,7 @@ const App = () => {
           </div>
         </div>
         <div
-          className={`fixed z-[100] mt-16 transform transition-all duration-700 ease-in-out ${
+          className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out ${
             fullscreen ? "ml-0" : "ml-44 md:ml-72"
           }`}
         >
@@ -369,8 +374,8 @@ const App = () => {
             {fullscreen ? (
               <div className="rotate-180 transform transition-all duration-500 ease-in-out">
                 <DoubleChevrons
-                  height={36}
-                  width={36}
+                  height={30}
+                  width={30}
                   stroke={isDarkTheme ? "#fafafa" : "#18181b"}
                   strokeWidth={1}
                 />
@@ -378,8 +383,8 @@ const App = () => {
             ) : (
               <div className="transform transition-all duration-300 ease-in-out">
                 <DoubleChevrons
-                  height={36}
-                  width={36}
+                  height={30}
+                  width={30}
                   stroke={isDarkTheme ? "#fafafa" : "#18181b"}
                   strokeWidth={1}
                 />
@@ -452,6 +457,7 @@ const App = () => {
               <ServerMainScreen
                 usersServers={usersServers.data}
                 selectedInnerTabID={selectedInnerTabID}
+                selectedServer={selectedServer}
               />
             )
           ) : null}

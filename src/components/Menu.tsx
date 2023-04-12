@@ -73,7 +73,7 @@ const Menu = (props: {
                         setSelectedInnerTab("AccountOverview");
                         props.setMenuOpen(false);
                       }}
-                      className="text-zinc-800hover:bg-purple-400 w-28 rounded-lg py-2 px-4 text-center text-lg hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      className="text-zinc-800hover:bg-purple-400 w-28 rounded-lg px-4 py-2 text-center text-lg hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
                     >
                       User Settings
                     </button>
@@ -83,7 +83,7 @@ const Menu = (props: {
                       placement="bottomStart"
                       color={"secondary"}
                     >
-                      <div className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                      <div className="w-28 rounded-lg px-4 py-2 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700">
                         User Settings
                       </div>
                     </Tooltip>
@@ -92,7 +92,7 @@ const Menu = (props: {
                 <li className="flex justify-center text-lg">
                   <button
                     onClick={() => signOut()}
-                    className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    className="w-28 rounded-lg px-4 py-2 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     Sign out
                   </button>
@@ -102,7 +102,7 @@ const Menu = (props: {
               <li className="my-auto text-lg">
                 <button
                   onClick={props.openLogin}
-                  className="w-28 rounded-lg py-2 px-4 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                  className="w-28 rounded-lg px-4 py-2 text-center text-lg text-zinc-800 hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"
                 >
                   Login / Register
                 </button>
@@ -147,7 +147,7 @@ const Menu = (props: {
       return (
         <ul className="pt-8">
           <button
-            className="absolute -mt-7 flex rounded-full py-1 px-2 hover:bg-purple-400 dark:hover:bg-zinc-700"
+            className="absolute -mt-7 flex rounded-full px-2 py-1 hover:bg-purple-400 dark:hover:bg-zinc-700"
             onClick={infoDropdownToggle}
           >
             <div className="pl-2">Back</div>

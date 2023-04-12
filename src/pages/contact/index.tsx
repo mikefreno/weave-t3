@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
             <meta name="description" content="Weave's Privacy Policy" />
           </Head>
           <Navbar switchRef={switchRef} />
-          <div className="flex min-h-screen justify-center">
+          <div className="flex min-h-screen justify-center px-12">
             <div className="pt-[20vh]">
               <div className="text-center text-3xl tracking-widest">
                 Contact
@@ -93,7 +93,7 @@ export default function PrivacyPolicy() {
                       }
                     />
                   </div>
-                  <div className="pt-12 pl-7">
+                  <div className="pl-7 pt-12">
                     <Textarea
                       ref={messageInputRef}
                       size="lg"

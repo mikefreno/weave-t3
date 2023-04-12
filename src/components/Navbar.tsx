@@ -144,7 +144,7 @@ const Navbar = (props: {
                 height={40}
                 className="logoSpinner"
               />
-              <span className="mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">
+              <span className="z-10 mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">
                 Weave
               </span>
             </Link>
@@ -193,7 +193,7 @@ const Navbar = (props: {
                     className="fade-in absolute -ml-1 p-2"
                     ref={infoModalRef}
                   >
-                    <div className="-ml-40 mt-8 rounded-b-3xl rounded-tr-sm rounded-tl-3xl border border-zinc-500 bg-zinc-200 shadow-xl dark:bg-zinc-900">
+                    <div className="-ml-40 mt-8 rounded-b-3xl rounded-tl-3xl rounded-tr-sm border border-zinc-500 bg-zinc-200 shadow-xl dark:bg-zinc-900">
                       <div className="p-1">
                         <InfoModalContent isDarkTheme={isDarkTheme} />
                       </div>
@@ -247,7 +247,7 @@ const Navbar = (props: {
               ) : (
                 <div className="my-auto flex pr-2">
                   <Loading size="md" color={"secondary"} />
-                  <div className="absolute mt-1 ml-1">
+                  <div className="absolute ml-1 mt-1">
                     {isDarkTheme ? (
                       <Image src={DarkLogo} alt={"logo"} width="24" />
                     ) : (
@@ -305,31 +305,41 @@ const Navbar = (props: {
               iconOn={<MoonIcon />}
               iconOff={<SunIcon />}
               onChange={switchDarkTheme}
-              className="my-auto mr-2"
+              className="z-[1000] my-auto mr-2"
             />
             {isDarkTheme ? (
-              <button onClick={menuToggle} className="my-auto" ref={closeRef}>
+              <button
+                onClick={menuToggle}
+                className="z-[1000] my-auto"
+                ref={closeRef}
+              >
                 <MenuBars stroke="white" />
               </button>
             ) : (
-              <button onClick={menuToggle} className="my-auto" ref={closeRef}>
+              <button
+                onClick={menuToggle}
+                className="z-[1000] my-auto"
+                ref={closeRef}
+              >
                 <MenuBars stroke="black" />
               </button>
             )}
           </div>
         </div>
-        {menuOpen ? (
-          <Menu
-            openLogin={openLoginRegisterModal}
-            menuRef={menuRef}
-            session={session}
-            status={status}
-            isDarkTheme={isDarkTheme}
-            currentTabSetter={currentTabSetter}
-            setSelectedInnerTab={setSelectedInnerTab}
-            setMenuOpen={setMenuOpen}
-          />
-        ) : null}
+        <div className="z-[100]">
+          {menuOpen ? (
+            <Menu
+              openLogin={openLoginRegisterModal}
+              menuRef={menuRef}
+              session={session}
+              status={status}
+              isDarkTheme={isDarkTheme}
+              currentTabSetter={currentTabSetter}
+              setSelectedInnerTab={setSelectedInnerTab}
+              setMenuOpen={setMenuOpen}
+            />
+          ) : null}
+        </div>
       </nav>
       {showingLoginModal ? (
         <LoginModal onClose={loginToggle} loginRef={loginRef} />

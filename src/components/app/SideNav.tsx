@@ -38,9 +38,10 @@ const SideNav = (props: {
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
+  serverSetter: (server: Server) => void;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { currentUser, usersServers, timestamp } = props;
+  const { currentUser, usersServers, timestamp, serverSetter } = props;
 
   return (
     <>
@@ -94,6 +95,7 @@ const SideNav = (props: {
                       onClick={() => {
                         props.setSelectedInnerTab(server.name);
                         props.setSelectedInnerTabID(server.id);
+                        props.serverSetter(server);
                         props.currentTabSetter("server");
                         props.setSelectedChannel(null);
                       }}

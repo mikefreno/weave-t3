@@ -36,7 +36,6 @@ export default function WhatIsWeave() {
   }, []);
 
   useEffect(() => {
-    console.log(scrollPosition);
     setTimeout(() => {
       firstHighlight.current?.classList.add("highlightLong");
     }, 2500);

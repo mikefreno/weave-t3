@@ -41,6 +41,7 @@ const SideNavSmallScreen = (props: {
   setSelectedInnerTabID: (id: number) => void;
   setSelectedChannel: Dispatch<React.SetStateAction<Server_Channel | null>>;
   serverModalToggle: any;
+  serverSetter: (server: Server) => void;
 }) => {
   const {
     isDarkTheme,
@@ -55,6 +56,7 @@ const SideNavSmallScreen = (props: {
     setSelectedChannel,
     serverModalToggle,
     botModalToggle,
+    serverSetter,
   } = props;
   const [navDropDownShowing, setNavDropDownShowing] = useState(false);
   const navDropdownRef = useRef<HTMLDivElement>(null);
@@ -95,7 +97,7 @@ const SideNavSmallScreen = (props: {
           <div className="stopIT fade-in absolute z-50 h-screen overflow-y-scroll px-8 backdrop-blur">
             <div
               ref={navDropdownRef}
-              className="z-[100] mt-16 mb-4 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
+              className="z-[100] mb-4 mt-16 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
             >
               <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
                 <Tooltip
@@ -146,6 +148,7 @@ const SideNavSmallScreen = (props: {
                             onClick={() => {
                               setSelectedInnerTab(server.name);
                               setSelectedInnerTabID(server.id);
+                              serverSetter(server);
                               currentTabSetter("server");
                               setSelectedChannel(null);
                               setNavDropDownShowing(false);
@@ -197,7 +200,7 @@ const SideNavSmallScreen = (props: {
                 </div>
                 <div className="flex justify-center">
                   {props.currentTab === "PublicServers" ? (
-                    <span className="absolute mr-20 -mt-1 ml-1 h-4 w-4 rounded-full bg-zinc-200" />
+                    <span className="absolute -mt-1 ml-1 mr-20 h-4 w-4 rounded-full bg-zinc-200" />
                   ) : null}
                   <Tooltip
                     content={"Join Public Server!"}

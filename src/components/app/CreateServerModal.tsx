@@ -185,11 +185,11 @@ const CreateServerModal = (props: {
   if (specifiedTemplate === "selector") {
     return (
       <div id="modal" className="fixed">
-        <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
+        <div className="modal-offset absolute flex h-screen w-screen items-center justify-center overflow-y-scroll">
           <div
             ref={props.serverModalRef}
             id="serverModalContent"
-            className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+            className="fade-in mt-36 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:-mt-24 md:w-1/2 xl:w-1/3"
           >
             <div className="flex w-full justify-between">
               <button onClick={props.serverModalToggle}>
@@ -296,7 +296,7 @@ const CreateServerModal = (props: {
           <div
             ref={props.serverModalRef}
             id="serverModalContent"
-            className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-12 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+            className="fade-in mt-36 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:-mt-24 md:w-1/2 xl:w-1/3"
           >
             <div className="flex w-full justify-between">
               <button id="selector" onClick={templateSetter}>
@@ -310,7 +310,7 @@ const CreateServerModal = (props: {
             </div>
             <div className="text-center text-2xl">Join a server</div>
             <form onSubmit={joinServerRequest}>
-              <div className="mt-12 mb-4">
+              <div className="mb-4 mt-12">
                 <div className="flex justify-center">
                   <Input
                     clearable
@@ -344,7 +344,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:-mt-24 md:w-1/2 xl:w-1/3"
             >
               <div className="flex w-full justify-between">
                 <button id="selector" onClick={templateSetter}>
@@ -463,7 +463,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:-mt-24 md:w-1/2 xl:w-1/3"
             >
               <div>
                 <button onClick={props.serverModalToggle}>
@@ -530,7 +530,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:-mt-24 md:w-1/2 xl:w-1/3"
             >
               <div>
                 <button onClick={props.serverModalToggle}>
@@ -572,7 +572,7 @@ const CreateServerModal = (props: {
             <div
               ref={props.serverModalRef}
               id="serverModalContent"
-              className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+              className="fade-in w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:-mt-24 md:w-1/2 xl:w-1/3"
             >
               <div>
                 <button onClick={props.serverModalToggle}>

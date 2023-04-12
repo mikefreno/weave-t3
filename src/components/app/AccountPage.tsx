@@ -1,11 +1,19 @@
 import PencilIcon from "@/src/icons/PencilIcon";
-import React, { useState, useRef, useContext, Dispatch } from "react";
+import React, {
+  useState,
+  useRef,
+  useContext,
+  Dispatch,
+  useEffect,
+} from "react";
 import { Button, Input, Loading, Radio, Tooltip } from "@nextui-org/react";
 import { api } from "../../utils/api";
 import axios from "axios";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import Resizer from "react-image-file-resizer";
 import ThemeContext from "../ThemeContextProvider";
+import DoubleChevrons from "@/src/icons/DoubleChevrons";
+import { nullable } from "zod";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -55,6 +63,8 @@ const AccountPage = (props: {
   const [realNameSetLoading, setRealNameSetLoading] = useState(false);
   const [pseudonymSetLoading, setPseudonymSetLoading] = useState(false);
   const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
+  const [showingSettingsMenu, setShowingSettingsMenu] = useState(false);
+  const menuItemListRef = useRef<HTMLUListElement>(null);
 
   const imageMutation = api.users.setUserImage.useMutation();
   const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
@@ -174,6 +184,18 @@ const AccountPage = (props: {
       deleteUser.mutate();
     }
   };
+  const toggleSettingsMenu = async () => {
+    setShowingSettingsMenu(!showingSettingsMenu);
+  };
+  useEffect(() => {
+    if (showingSettingsMenu) {
+      menuItemListRef.current?.classList.remove("hidden");
+    } else {
+      setTimeout(() => {
+        menuItemListRef.current?.classList.add("hidden");
+      }, 400);
+    }
+  }, [showingSettingsMenu]);
 
   // const changeRealNameUsage = () => {};
   // const changeNamePreference = () => {};
@@ -303,7 +325,7 @@ const AccountPage = (props: {
                   real name. Others allow you to use a pseudonym.
                 </div>
                 <div className="mt-4 flex justify-center">
-                  <div className="my-4 mx-4 flex flex-col">
+                  <div className="mx-4 my-4 flex flex-col">
                     <form onSubmit={setRealName}>
                       <div className="mb-4 w-48">
                         <Input
@@ -336,7 +358,7 @@ const AccountPage = (props: {
                       </div>
                     </form>
                   </div>
-                  <div className="my-4 mx-4 flex flex-col">
+                  <div className="mx-4 my-4 flex flex-col">
                     <form onSubmit={setPseudonym}>
                       <div className="mb-4 w-48">
                         <Input
@@ -445,13 +467,37 @@ const AccountPage = (props: {
   };
 
   return (
-    <div className="h-screen w-full md:flex">
-      <div id="settings-tabs" className="">
-        <div className="rounded-br-md bg-purple-200 px-6 py-4 dark:bg-zinc-800">
-          <div className="text-xl tracking-wide underline underline-offset-4">
-            Settings Menu
+    <div className="min-h-screen w-full md:flex">
+      <div id="settings-tabs flex">
+        <div className="fixed z-50 flex w-full flex-row px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit">
+          <div className="flex">Settings Menu</div>
+          <div className="flex">
+            <button
+              className={`my-auto ml-2 transform transition-all duration-700 ease-in-out md:hidden ${
+                showingSettingsMenu ? "rotate-90" : "-rotate-90"
+              }`}
+              onClick={toggleSettingsMenu}
+            >
+              <DoubleChevrons
+                height={30}
+                width={30}
+                stroke={isDarkTheme ? "#fafafa" : "#18181b"}
+                strokeWidth={1}
+              />
+            </button>
           </div>
-          <ul className="text-sm">
+        </div>
+        <div
+          className={`rounded-br-md bg-purple-200 px-6 py-4 pr-10 transition-all duration-500 ease-in-out dark:bg-zinc-800 ${
+            showingSettingsMenu ? "" : "-translate-y-full"
+          }`}
+        >
+          <ul
+            ref={menuItemListRef}
+            className={`${
+              showingSettingsMenu ? "" : "-translate-y-[200%]"
+            } transform pt-6 transition-all duration-500 ease-in-out`}
+          >
             <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("User")}>User</button>
             </li>
@@ -486,7 +532,7 @@ const AccountPage = (props: {
           </ul>
         </div>
       </div>
-      <div id="settingsMain" className="mt-24  ml-12">
+      <div id="settingsMain" className="flex px-6 pt-20 md:pt-24">
         <div className="">
           <div className="pb-4 text-3xl underline underline-offset-2">
             {settingsSelection} Settings

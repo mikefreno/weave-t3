@@ -399,9 +399,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                 </div>
               )}
             </div>
-            <div className="absolute bottom-16 pl-4 md:bottom-4">
-              {leaveCallButton()}
-            </div>
+            <div className="absolute bottom-4 pl-4">{leaveCallButton()}</div>
           </>
         )}
       </div>
