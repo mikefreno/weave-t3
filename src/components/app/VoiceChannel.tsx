@@ -134,6 +134,15 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   }, [socket, localPeerConnection]);
 
+  useEffect(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => {
+        console.log("adding track");
+        localPeerConnection.current?.addTrack(track, stream);
+      });
+    }
+  }, [microphoneState, stream, localPeerConnection]);
+
   const joinCall = async () => {
     setJoinButtonState(true);
     if (socket && webSocketsInCall.length < 5) {
