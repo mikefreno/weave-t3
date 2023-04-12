@@ -111,7 +111,7 @@ const ChannelMain = (props: ChannelMainProps) => {
   const OtherCommentsClass =
     "bg-zinc-200 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 px-6";
 
-  const chatWindowHight = inputDivRef.current?.clientHeight;
+  const chatWindowHeight = inputDivRef.current?.clientHeight;
 
   return (
     <>
@@ -189,7 +189,7 @@ const ChannelMain = (props: ChannelMainProps) => {
           <div
             className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}
           >
-            <button
+            {/* <button
               className="absolute right-0 z-50 -mt-12 md:hidden"
               onClick={paddingToggle}
             >
@@ -212,7 +212,7 @@ const ChannelMain = (props: ChannelMainProps) => {
                   />
                 </div>
               )}
-            </button>
+            </button> */}
             <div
               ref={inputDivRef}
               className={`${
