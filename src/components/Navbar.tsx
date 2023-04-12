@@ -204,7 +204,7 @@ const Navbar = (props: {
               {status !== "loading" ? (
                 session ? (
                   <>
-                    <Tooltip
+                    {/* <Tooltip
                       content={"Coming Soon!"}
                       trigger="click"
                       color={"secondary"}
@@ -224,7 +224,7 @@ const Navbar = (props: {
                           </div>
                         )}
                       </li>
-                    </Tooltip>
+                    </Tooltip> */}
                     <li className="z-50 my-auto pr-2">
                       <button
                         className="underline-offset-[6px] hover:underline"

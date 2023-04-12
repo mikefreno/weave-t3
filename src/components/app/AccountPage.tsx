@@ -63,7 +63,7 @@ const AccountPage = (props: {
   const [realNameSetLoading, setRealNameSetLoading] = useState(false);
   const [pseudonymSetLoading, setPseudonymSetLoading] = useState(false);
   const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
-  const [showingSettingsMenu, setShowingSettingsMenu] = useState(false);
+  const [showingSettingsMenu, setShowingSettingsMenu] = useState(true);
   const menuItemListRef = useRef<HTMLUListElement>(null);
 
   const imageMutation = api.users.setUserImage.useMutation();
