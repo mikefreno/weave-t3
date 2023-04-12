@@ -68,7 +68,7 @@ export const serverRouter = createTRPCRouter({
   }),
   getServerByID: publicProcedure
     .input(z.number())
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       const server = await ctx.prisma.server.findFirst({
         where: {
           id: input,
@@ -189,6 +189,7 @@ export const serverRouter = createTRPCRouter({
       });
     }),
   postComment: protectedProcedure
+    .meta({ openapi: { method: "POST", path: "/api/send-message" } })
     .input(
       z.object({
         channelID: z.number(),
