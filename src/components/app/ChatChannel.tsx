@@ -49,7 +49,6 @@ const ChannelMain = (props: ChannelMainProps) => {
   const getMessages = api.server.getChannelComments.useQuery(
     selectedChannel.id
   );
-  const [paddingAdded, setPaddingAdded] = useState<boolean>(false);
   const inputDivRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -98,10 +97,6 @@ const ChannelMain = (props: ChannelMainProps) => {
     setAttachmentModalShowing(!attachmentModalShowing);
   };
 
-  const paddingToggle = () => {
-    setPaddingAdded(!paddingAdded);
-  };
-
   useEffect(() => {
     bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -121,11 +116,7 @@ const ChannelMain = (props: ChannelMainProps) => {
               fullscreen={fullscreen}
             />
           </div>
-          <div
-            className={`scrollXDisabled overflow-y-scroll pt-8 ${
-              paddingAdded ? "pb-44" : "pb-24"
-            }`}
-          >
+          <div className="scrollXDisabled overflow-y-scroll pb-24 pt-8">
             <ul className={`${fullscreen ? "w-screen" : "w-full"} pt-6`}>
               {messages.map((message, index) => (
                 <div
@@ -187,35 +178,9 @@ const ChannelMain = (props: ChannelMainProps) => {
           <div
             className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}
           >
-            <button
-              className="absolute right-0 z-50 -mt-12 md:hidden"
-              onClick={paddingToggle}
-            >
-              {paddingAdded ? (
-                <div className="-rotate-90 transform transition-all duration-500 ease-in-out">
-                  <DoubleChevrons
-                    height={36}
-                    width={36}
-                    stroke={isDarkTheme ? "#fafafa" : "#18181b"}
-                    strokeWidth={1}
-                  />
-                </div>
-              ) : (
-                <div className="rotate-90 transform transition-all duration-300 ease-in-out">
-                  <DoubleChevrons
-                    height={36}
-                    width={36}
-                    stroke={isDarkTheme ? "#fafafa" : "#18181b"}
-                    strokeWidth={1}
-                  />
-                </div>
-              )}
-            </button>
             <div
               ref={inputDivRef}
-              className={`${
-                paddingAdded ? "pb-24" : "pb-4"
-              } bg-zinc-100 dark:bg-zinc-700 md:pb-0`}
+              className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0"
             >
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>
