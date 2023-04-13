@@ -2,7 +2,6 @@ import axios from "axios";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { toPng } from "jdenticon";
-import { config } from "process";
 
 export const userRouter = createTRPCRouter({
   getCurrentUser: publicProcedure.query(({ ctx }) => {
