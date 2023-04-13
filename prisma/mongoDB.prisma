@@ -1,0 +1,25 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client/mongo"
+}
+
+model Server {
+  id   Int    @id @map("_id")
+  name String
+}
+
+model User {
+  id        String @id @map("_id")
+  name      String
+  psuedonym String
+}
+
+model Bot {
+  id   Int    @id @map("_id")
+  name String
+}

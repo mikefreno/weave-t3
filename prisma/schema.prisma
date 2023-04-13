@@ -31,29 +31,35 @@ model Account {
 }
 
 model User {
-  id                String          @id @default(cuid())
-  name              String?
-  pseudonym         String?
-  email             String?         @unique
-  emailVerified     DateTime?
-  registered_at     DateTime?       @default(now())
-  image             String?
-  pseudonym_image   String?
-  servers           Server[]
-  sessions          Session[]
-  memberships       Server_Member[]
-  adminships        Server_Admin[]
-  provider          String?
-  refresh_token     String?
-  access_token      String?
-  token_expiration  DateTime?
-  type              Json?
-  real_name_use     String          @default("ask")
-  name_display_pref String          @default("real")
-  bio               String? 
-  comments          Comment[]
-  account           Account[]
-  WSConnection      WSConnection[]
+  id                     String                  @id @default(cuid())
+  name                   String?
+  pseudonym              String?
+  email                  String?                 @unique
+  emailVerified          DateTime?
+  registered_at          DateTime?               @default(now())
+  image                  String?
+  pseudonym_image        String?
+  servers                Server[]
+  sessions               Session[]
+  memberships            Server_Member[]
+  adminships             Server_Admin[]
+  provider               String?
+  refresh_token          String?
+  access_token           String?
+  token_expiration       DateTime?
+  type                   Json?
+  real_name_use          String                  @default("ask")
+  name_display_pref      String                  @default("real")
+  bio                    String?
+  comments               Comment[]
+  account                Account[]
+  WSConnection           WSConnection[]
+  friends                String?
+  friend_requests_inc    String?
+  friend_requests_out    String?
+  initiatedConversations Conversation_junction[] @relation("InitiatedConversations")
+  receivedConversations  Conversation_junction[] @relation("ReceivedConversations")
+  DirectMessage          DirectMessage[]
 }
 
 model Server {
@@ -124,6 +130,39 @@ model Comment {
   @@index([channelID])
 }
 
+model Conversation {
+  id                Int                     @id @default(autoincrement())
+  userConversations Conversation_junction[]
+  DirectMessage     DirectMessage[]
+}
+
+model Conversation_junction {
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  initiator      User         @relation("InitiatedConversations", fields: [initiatorId], references: [id])
+  initiatorId    String
+  receiver       User         @relation("ReceivedConversations", fields: [receiverId], references: [id])
+  receiverId     String
+
+  @@id([conversationId, initiatorId, receiverId])
+  @@index([initiatorId])
+  @@index([receiverId])
+  @@index([conversationId])
+}
+
+model DirectMessage {
+  id             Int          @id @default(autoincrement())
+  message        String
+  sender         User         @relation(fields: [senderID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  senderID       String
+  read           Boolean
+  conversation   Conversation @relation(fields: [conversationID], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  conversationID Int
+
+  @@index([conversationID])
+  @@index([senderID])
+}
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -147,6 +186,7 @@ model WSConnection {
   user         User?   @relation(fields: [userId], references: [id])
   userId       String? @unique
   channelID    Int?
-  inCall       Boolean  @default(false)
+  inCall       Boolean @default(false)
+
   @@index([userId])
 }
