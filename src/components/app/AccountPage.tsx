@@ -479,20 +479,24 @@ const AccountPage = (props: {
     <div className="h-screen w-full overflow-y-scroll bg-zinc-200 dark:bg-zinc-700 md:flex">
       <div id="settings-tabs flex" ref={settingMenuRef}>
         <div className="fixed z-[10000] flex w-full flex-row px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit">
-          <div className="flex">Settings Menu</div>
           <div className="flex">
             <button
-              className={`z-50 my-auto ml-1 transform transition-all duration-700 ease-in-out md:hidden ${
-                showingSettingsMenu ? "rotate-180" : ""
-              }`}
+              className="z-50 flex md:cursor-default"
               onClick={toggleSettingsMenu}
             >
-              <ChevronDown
-                height={30}
-                width={30}
-                stroke={isDarkTheme ? "#fafafa" : "#18181b"}
-                strokeWidth={1}
-              />
+              <div className="flex">Settings Menu</div>
+              <div
+                className={`${
+                  showingSettingsMenu ? "rotate-180" : ""
+                } my-auto flex transform transition-all duration-700 ease-in-out md:hidden`}
+              >
+                <ChevronDown
+                  height={30}
+                  width={30}
+                  stroke={isDarkTheme ? "#fafafa" : "#18181b"}
+                  strokeWidth={1}
+                />
+              </div>
             </button>
           </div>
         </div>
