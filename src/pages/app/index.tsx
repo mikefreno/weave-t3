@@ -30,6 +30,7 @@ import VoiceChannel from "@/src/components/app/VoiceChannel";
 import DoubleChevrons from "@/src/icons/DoubleChevrons";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
+import ChevronDown from "@/src/icons/ChevronDown";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -300,7 +301,7 @@ const App = () => {
         currentTabSetter={currentTabSetter}
         setSelectedInnerTab={setSelectedInnerTab}
       />
-      <div id="app-body" className="flex h-screen w-screen">
+      <div id="app-body" className={`flex h-screen w-screen`}>
         <div
           className={`${
             fullscreen ? "-translate-x-72" : ""
@@ -366,25 +367,25 @@ const App = () => {
           </div>
         </div>
         <div
-          className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out ${
-            fullscreen ? "ml-0" : "ml-44 md:ml-72"
+          className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out md:hidden ${
+            fullscreen ? "-ml-2" : "ml-40 pl-2 md:ml-72"
           }`}
         >
           <button onClick={fullscreenToggle}>
             {fullscreen ? (
-              <div className="rotate-180 transform transition-all duration-500 ease-in-out">
-                <DoubleChevrons
-                  height={36}
-                  width={36}
+              <div className="-rotate-90 transform transition-all duration-500 ease-in-out">
+                <ChevronDown
+                  height={44}
+                  width={44}
                   stroke={isDarkTheme ? "#fafafa" : "#18181b"}
                   strokeWidth={1}
                 />
               </div>
             ) : (
-              <div className="transform transition-all duration-300 ease-in-out">
-                <DoubleChevrons
-                  height={36}
-                  width={36}
+              <div className="rotate-90 transform transition-all duration-300 ease-in-out">
+                <ChevronDown
+                  height={44}
+                  width={44}
                   stroke={isDarkTheme ? "#fafafa" : "#18181b"}
                   strokeWidth={1}
                 />

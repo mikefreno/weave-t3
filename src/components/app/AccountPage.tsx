@@ -12,7 +12,8 @@ import axios from "axios";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import Resizer from "react-image-file-resizer";
 import ThemeContext from "../ThemeContextProvider";
-import DoubleChevrons from "@/src/icons/DoubleChevrons";
+import useOnClickOutside from "@/src/components/ClickOutsideHook";
+import ChevronDown from "@/src/icons/ChevronDown";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -64,11 +65,16 @@ const AccountPage = (props: {
   const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
   const [showingSettingsMenu, setShowingSettingsMenu] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
+  const settingMenuRef = useRef<HTMLDivElement>(null);
+
   const imageMutation = api.users.setUserImage.useMutation();
   const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
-
   const deleteUser = api.users.deleteUser.useMutation();
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
+
+  useOnClickOutside([settingMenuRef], () => {
+    setShowingSettingsMenu(false);
+  });
 
   const handleFileInput = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -256,10 +262,14 @@ const AccountPage = (props: {
                   />
                   <label
                     htmlFor="uploadRealName"
-                    className="z-50 -mt-4 flex h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
+                    className="z-50 -mt-4 flex h-6 w-6 cursor-pointer rounded-lg bg-zinc-700 hover:bg-zinc-800 active:bg-zinc-900 dark:bg-zinc-200 dark:hover:bg-zinc-300 dark:active:bg-zinc-400"
                   >
                     <span className="mx-auto mt-1 flex">
-                      <PencilIcon height={14} width={14} color={"#27272a"} />
+                      <PencilIcon
+                        height={14}
+                        width={14}
+                        color={isDarkTheme ? "#27272a" : "#f4f4f5"}
+                      />
                     </span>
                   </label>
                   <input
@@ -322,10 +332,14 @@ const AccountPage = (props: {
                   />
                   <label
                     htmlFor="uploadPseudonym"
-                    className="z-50 -mt-4 flex h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
+                    className="z-50 -mt-4 flex h-6 w-6 cursor-pointer rounded-lg bg-zinc-700 hover:bg-zinc-800 active:bg-zinc-900 dark:bg-zinc-200 dark:hover:bg-zinc-300 dark:active:bg-zinc-400"
                   >
                     <span className="mx-auto mt-1 flex">
-                      <PencilIcon height={14} width={14} color={"#27272a"} />
+                      <PencilIcon
+                        height={14}
+                        width={14}
+                        color={isDarkTheme ? "#27272a" : "#f4f4f5"}
+                      />
                     </span>
                   </label>
 
@@ -463,17 +477,17 @@ const AccountPage = (props: {
 
   return (
     <div className="h-screen w-full overflow-y-scroll bg-zinc-200 dark:bg-zinc-700 md:flex">
-      <div id="settings-tabs flex">
+      <div id="settings-tabs flex" ref={settingMenuRef}>
         <div className="fixed z-[10000] flex w-full flex-row px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit">
           <div className="flex">Settings Menu</div>
           <div className="flex">
             <button
-              className={`z-50 my-auto ml-2 transform transition-all duration-700 ease-in-out md:hidden ${
-                showingSettingsMenu ? "rotate-90" : "-rotate-90"
+              className={`z-50 my-auto ml-1 transform transition-all duration-700 ease-in-out md:hidden ${
+                showingSettingsMenu ? "rotate-180" : ""
               }`}
               onClick={toggleSettingsMenu}
             >
-              <DoubleChevrons
+              <ChevronDown
                 height={30}
                 width={30}
                 stroke={isDarkTheme ? "#fafafa" : "#18181b"}
@@ -493,33 +507,72 @@ const AccountPage = (props: {
             } transform pt-6 transition-all duration-700 ease-in-out`}
           >
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("User")}>User</button>
+              <button
+                onClick={() => {
+                  setSettingsSelection("User");
+                  toggleSettingsMenu();
+                }}
+              >
+                User
+              </button>
             </li>
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("App")}>App</button>
+              <button
+                onClick={() => {
+                  setSettingsSelection("App");
+                  toggleSettingsMenu();
+                }}
+              >
+                App
+              </button>
             </li>
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("Privacy")}>
+              <button
+                onClick={() => {
+                  setSettingsSelection("Privacy");
+                  toggleSettingsMenu();
+                }}
+              >
                 Privacy
               </button>
             </li>
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("Notification")}>
+              <button
+                onClick={() => {
+                  setSettingsSelection("Notification");
+                  toggleSettingsMenu();
+                }}
+              >
                 Notification
               </button>
             </li>
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("Accessibility")}>
+              <button
+                onClick={() => {
+                  setSettingsSelection("Accessibility");
+                  toggleSettingsMenu();
+                }}
+              >
                 Accessibility
               </button>
             </li>
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("Community")}>
+              <button
+                onClick={() => {
+                  setSettingsSelection("Community");
+                  toggleSettingsMenu();
+                }}
+              >
                 Community
               </button>
             </li>
             <li className="hvr-move-right">
-              <button onClick={() => setSettingsSelection("Other")}>
+              <button
+                onClick={() => {
+                  setSettingsSelection("Other");
+                  toggleSettingsMenu();
+                }}
+              >
                 Other
               </button>
             </li>

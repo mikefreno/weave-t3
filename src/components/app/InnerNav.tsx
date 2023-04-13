@@ -131,7 +131,7 @@ const InnerNav = (props: InnerNavProps) => {
 
   if (currentTab == "DMS") {
     return (
-      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
         <SideNavSmallScreen
           isDarkTheme={isDarkTheme}
           currentTabSetter={currentTabSetter}
@@ -273,7 +273,7 @@ const InnerNav = (props: InnerNavProps) => {
     );
   } else if (currentTab == "PublicServers") {
     return (
-      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
         <SideNavSmallScreen
           isDarkTheme={isDarkTheme}
           currentTabSetter={currentTabSetter}
@@ -434,7 +434,7 @@ const InnerNav = (props: InnerNavProps) => {
   } else if (currentTab == "server") {
     return (
       <div>
-        <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+        <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
           <SideNavSmallScreen
             isDarkTheme={isDarkTheme}
             currentTabSetter={currentTabSetter}

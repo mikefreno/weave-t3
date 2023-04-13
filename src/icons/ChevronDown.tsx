@@ -1,5 +1,3 @@
-import React from "react";
-
 const ChevronDown = (props: {
   height: number;
   width: number;

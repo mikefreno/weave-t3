@@ -96,7 +96,7 @@ const InviteModal = (props: {
       <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={props.inviteModalRef}
-          className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+          className="fade-in -mt-24 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
         >
           <div className="">
             <button

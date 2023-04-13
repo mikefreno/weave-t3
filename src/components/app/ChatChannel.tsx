@@ -104,7 +104,7 @@ const ChannelMain = (props: ChannelMainProps) => {
   const UsersCommentClass =
     "shadow-lg text-zinc-100 shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6 max-w-[75%]";
   const OtherCommentsClass =
-    "bg-zinc-200 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 pr-6 pl-8 max-w-[75%]";
+    "bg-zinc-100 shadow-lg dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 pr-6 pl-8 max-w-[75%]";
 
   return (
     <>
@@ -112,7 +112,7 @@ const ChannelMain = (props: ChannelMainProps) => {
         <div
           className={`${
             fullscreen ? "w-screen" : "w-full"
-          } scrollXDisabled h-screen  rounded bg-zinc-50 dark:bg-zinc-900`}
+          } scrollXDisabled h-screen  rounded bg-zinc-50 transition-colors duration-300 ease-in-out dark:bg-zinc-900`}
         >
           <div ref={bannerRef}>
             <TopBanner

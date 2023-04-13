@@ -45,7 +45,7 @@ const SideNav = (props: {
 
   return (
     <>
-      <aside className="stopIT fixed hidden h-screen w-20 border-r border-zinc-200 bg-purple-700 dark:border-zinc-400 dark:bg-zinc-900 md:block">
+      <aside className="stopIT fixed hidden h-screen w-20 border-r border-zinc-200 bg-purple-700 transition-colors duration-500 ease-in-out dark:border-zinc-400 dark:bg-zinc-900 md:block">
         <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
           <Tooltip
             content={"Direct Messaging"}

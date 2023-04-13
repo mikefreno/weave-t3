@@ -45,33 +45,37 @@ const CreateChannelModal = (props: {
           <div className="text-center text-xl">Create A Channel</div>
           <div className="flex">
             <button
-              className="m-4 mx-auto flex rounded-xl bg-emerald-500 p-4  hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:active:bg-emerald-800"
+              className="m-4 mx-auto flex max-w-[45%] justify-between rounded-xl bg-emerald-500 p-4 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:active:bg-emerald-800"
               onClick={() => {
                 setChannelType("text");
                 setStep(1);
               }}
             >
-              <CommentsIcon
-                height={40}
-                width={40}
-                strokeWidth={1.5}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              />
-              <div className="my-auto ml-8 text-xl">Text Channel</div>
+              <div className="my-auto">
+                <CommentsIcon
+                  height={40}
+                  width={40}
+                  strokeWidth={1.5}
+                  color="#e4e4e7"
+                />
+              </div>
+              <div className="my-auto text-xl text-zinc-200 md:pl-2">
+                Text Channel
+              </div>
             </button>
             <button
-              className="m-4 mx-auto flex rounded-xl bg-blue-500 p-4 hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-800"
+              className="m-4 mx-auto flex max-w-[45%] justify-between rounded-xl bg-blue-500 p-4 hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-800"
               onClick={() => {
                 setChannelType("voice");
                 setStep(1);
               }}
             >
-              <MicIcon
-                height={36}
-                width={36}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              />
-              <div className="my-auto ml-8 text-xl">Voice Channel</div>
+              <div className="my-auto">
+                <MicIcon height={36} width={36} color="#e4e4e7" />
+              </div>
+              <div className="my-auto text-xl text-zinc-200 md:pl-2">
+                Voice Channel
+              </div>
             </button>
           </div>
         </>
@@ -92,6 +96,7 @@ const CreateChannelModal = (props: {
                 labelPlaceholder="Channel Name..."
                 size="lg"
                 required
+                status="secondary"
                 ref={channelNameRef}
               />
             </div>
@@ -103,7 +108,7 @@ const CreateChannelModal = (props: {
                     <BackArrow
                       height={16}
                       width={16}
-                      stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                      stroke="#e4e4e7"
                       strokeWidth={1.5}
                     />
                   </span>
@@ -123,7 +128,7 @@ const CreateChannelModal = (props: {
               <BackArrow
                 height={12}
                 width={12}
-                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                stroke="#e4e4e7"
                 strokeWidth={1.5}
               />
             </Button>
@@ -155,7 +160,7 @@ const CreateChannelModal = (props: {
                 )}
               </div>
             </form>
-            <div className="-mt-12 flex items-end">
+            <div className="-mt-10 flex items-end">
               <Button
                 auto
                 color={"secondary"}
@@ -183,7 +188,7 @@ const CreateChannelModal = (props: {
       <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={createChannelRef}
-          className="fade-in -mt-24 w-3/4 rounded-xl bg-zinc-400 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+          className="fade-in -mt-24 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
         >
           <div className="">
             <button
