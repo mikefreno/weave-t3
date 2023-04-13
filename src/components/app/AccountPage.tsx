@@ -13,7 +13,6 @@ import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import Resizer from "react-image-file-resizer";
 import ThemeContext from "../ThemeContextProvider";
 import DoubleChevrons from "@/src/icons/DoubleChevrons";
-import { nullable } from "zod";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -63,9 +62,8 @@ const AccountPage = (props: {
   const [realNameSetLoading, setRealNameSetLoading] = useState(false);
   const [pseudonymSetLoading, setPseudonymSetLoading] = useState(false);
   const [imageConfirmLoading, setImageConfirmLoading] = useState(false);
-  const [showingSettingsMenu, setShowingSettingsMenu] = useState(true);
-  const menuItemListRef = useRef<HTMLUListElement>(null);
-
+  const [showingSettingsMenu, setShowingSettingsMenu] = useState(false);
+  const topRef = useRef<HTMLDivElement>(null);
   const imageMutation = api.users.setUserImage.useMutation();
   const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
 
@@ -186,17 +184,8 @@ const AccountPage = (props: {
   };
   const toggleSettingsMenu = async () => {
     setShowingSettingsMenu(!showingSettingsMenu);
+    topRef?.current?.scrollIntoView({ behavior: "smooth" });
   };
-  useEffect(() => {
-    if (showingSettingsMenu) {
-      menuItemListRef.current?.classList.remove("hidden");
-    } else {
-      setTimeout(() => {
-        menuItemListRef.current?.classList.add("hidden");
-      }, 400);
-    }
-  }, [showingSettingsMenu]);
-
   // const changeRealNameUsage = () => {};
   // const changeNamePreference = () => {};
 
@@ -254,65 +243,140 @@ const AccountPage = (props: {
                 </div>
               </div>
             ) : null}
-            <div className="flex justify-evenly">
-              <div>
-                <img
-                  src={`${
-                    currentUser.image
-                      ? currentUser.image
-                      : currentUser.pseudonym_image
-                  }?t=${timestamp}`}
-                  className="h-32 w-32 rounded-full"
-                />
-                <label
-                  htmlFor="uploadRealName"
-                  className="absolute  -mt-6 h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
-                >
-                  <span className="mt-1 flex justify-center">
-                    <PencilIcon height={14} width={14} color={"#27272a"} />
-                  </span>
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type={"file"}
-                  hidden
-                  id="uploadRealName"
-                  onChange={(e) => handleFileInput(e, "realName")}
-                  accept="image/png, image/jpeg"
-                />
-                <div className="flex justify-center pt-2 text-sm italic">
-                  Real Name image
+            <div className="flex flex-col justify-evenly md:flex-row">
+              <div className="mx-auto flex flex-col">
+                <div className="mx-auto">
+                  <img
+                    src={`${
+                      currentUser.image
+                        ? currentUser.image
+                        : currentUser.pseudonym_image
+                    }?t=${timestamp}`}
+                    className="h-32 w-32 rounded-full"
+                  />
+                  <label
+                    htmlFor="uploadRealName"
+                    className="z-50 -mt-4 flex h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
+                  >
+                    <span className="mx-auto mt-1 flex">
+                      <PencilIcon height={14} width={14} color={"#27272a"} />
+                    </span>
+                  </label>
+                  <input
+                    ref={fileInputRef}
+                    type={"file"}
+                    hidden
+                    id="uploadRealName"
+                    onChange={(e) => handleFileInput(e, "realName")}
+                    accept="image/png, image/jpeg"
+                  />
+                  <div className="flex justify-center pt-2 text-sm italic">
+                    Real Name image
+                  </div>
+                </div>
+                <div className="mx-4 my-4 flex flex-col">
+                  <form onSubmit={setRealName}>
+                    <div className="mb-4 w-48 pt-4">
+                      <Input
+                        labelPlaceholder="Real Name"
+                        ref={realName}
+                        status={isDarkTheme ? "default" : "secondary"}
+                        aria-label="name input"
+                      />
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-4">
+                        {realNameSetLoading ? (
+                          <Button disabled auto bordered>
+                            <Loading type="points" size="sm" />
+                          </Button>
+                        ) : (
+                          <Button shadow auto type="submit" color={"secondary"}>
+                            Set
+                          </Button>
+                        )}
+                      </div>
+                      <div className="ml-16">
+                        Currently:
+                        {currentUser.name ? (
+                          <div>{currentUser.name}</div>
+                        ) : (
+                          <div className="w-24 break-words">None Set</div>
+                        )}
+                      </div>
+                    </div>
+                  </form>
                 </div>
               </div>
-              <div>
-                <img
-                  src={`${
-                    currentUser.pseudonym_image
-                      ? currentUser.pseudonym_image
-                      : currentUser.image
-                  }?t=${timestamp}`}
-                  className={`h-32 w-32 rounded-full ${
-                    isDarkTheme ? "bg-zinc-800" : "bg-zinc-50"
-                  }`}
-                />
-                <label
-                  htmlFor="uploadPseudonym"
-                  className="absolute -mt-6 h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
-                >
-                  <span className="mt-1 flex justify-center">
-                    <PencilIcon height={14} width={14} color={"#27272a"} />
-                  </span>
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type={"file"}
-                  hidden
-                  id="uploadPseudonym"
-                  onChange={(e) => handleFileInput(e, "pseudonym")}
-                  accept="image/png, image/jpeg"
-                />
-                <div className="flex justify-center pt-2 text-sm italic">
-                  Pseudonym image
+              <div className="mx-auto flex flex-col pt-8 md:pt-0">
+                <div className="mx-auto">
+                  <img
+                    src={`${
+                      currentUser.pseudonym_image
+                        ? currentUser.pseudonym_image
+                        : currentUser.image
+                    }?t=${timestamp}`}
+                    className={`h-32 w-32 rounded-full ${
+                      isDarkTheme ? "bg-zinc-800" : "bg-zinc-50"
+                    }`}
+                  />
+                  <label
+                    htmlFor="uploadPseudonym"
+                    className="z-50 -mt-4 flex h-6 w-6 cursor-pointer rounded-lg bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400"
+                  >
+                    <span className="mx-auto mt-1 flex">
+                      <PencilIcon height={14} width={14} color={"#27272a"} />
+                    </span>
+                  </label>
+
+                  <input
+                    ref={fileInputRef}
+                    type={"file"}
+                    hidden
+                    id="uploadPseudonym"
+                    onChange={(e) => handleFileInput(e, "pseudonym")}
+                    accept="image/png, image/jpeg"
+                  />
+                  <div className="flex justify-center pt-2 text-sm italic">
+                    Pseudonym image
+                  </div>
+                </div>
+                <div className="mx-4 my-4 flex flex-col">
+                  <form onSubmit={setPseudonym}>
+                    <div className="mb-4 w-48 pt-4">
+                      <Input
+                        labelPlaceholder="Pseudonym"
+                        ref={pseudonym}
+                        status={isDarkTheme ? "default" : "secondary"}
+                        aria-label="pseudonym input"
+                      />
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-4">
+                        {pseudonymSetLoading ? (
+                          <Button disabled auto bordered>
+                            <Loading type="points" size="sm" />
+                          </Button>
+                        ) : (
+                          <Button shadow auto type="submit" color={"secondary"}>
+                            Set
+                          </Button>
+                        )}
+                      </div>
+                      <div className="ml-16">
+                        Currently:
+                        {currentUser.pseudonym ? (
+                          <div className="w-24 break-words">
+                            {currentUser.pseudonym}
+                          </div>
+                        ) : (
+                          <div className="w-24 break-words italic">
+                            None Set
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -324,76 +388,7 @@ const AccountPage = (props: {
                   Depending on the community they may require you to use your
                   real name. Others allow you to use a pseudonym.
                 </div>
-                <div className="mt-4 flex justify-center">
-                  <div className="mx-4 my-4 flex flex-col">
-                    <form onSubmit={setRealName}>
-                      <div className="mb-4 w-48">
-                        <Input
-                          labelPlaceholder="Real Name"
-                          ref={realName}
-                          status={isDarkTheme ? "default" : "secondary"}
-                          aria-label="name input"
-                        />
-                      </div>
-                      <div className="flex flex-row">
-                        <div className="w-4">
-                          {realNameSetLoading ? (
-                            <Button disabled auto bordered>
-                              <Loading type="points" size="sm" />
-                            </Button>
-                          ) : (
-                            <Button shadow auto type="submit">
-                              Set
-                            </Button>
-                          )}
-                        </div>
-                        <div className="ml-16">
-                          Currently:
-                          {currentUser.name ? (
-                            <div>{currentUser.name}</div>
-                          ) : (
-                            <div className="w-24 break-words">None Set</div>
-                          )}
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                  <div className="mx-4 my-4 flex flex-col">
-                    <form onSubmit={setPseudonym}>
-                      <div className="mb-4 w-48">
-                        <Input
-                          labelPlaceholder="Pseudonym"
-                          ref={pseudonym}
-                          status={isDarkTheme ? "default" : "secondary"}
-                          aria-label="pseudonym input"
-                        />
-                      </div>
-                      <div className="flex flex-row">
-                        <div className="w-4">
-                          {pseudonymSetLoading ? (
-                            <Button disabled auto bordered>
-                              <Loading type="points" size="sm" />
-                            </Button>
-                          ) : (
-                            <Button shadow auto type="submit">
-                              Set
-                            </Button>
-                          )}
-                        </div>
-                        <div className="ml-16">
-                          Currently:
-                          {currentUser.pseudonym ? (
-                            <div className="w-24 break-words">
-                              {currentUser.pseudonym}
-                            </div>
-                          ) : (
-                            <div className="w-24 break-words">None Set</div>
-                          )}
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                </div>
+                <div className="mt-4 flex justify-center"></div>
               </div>
             </div>
           </div>
@@ -467,13 +462,13 @@ const AccountPage = (props: {
   };
 
   return (
-    <div className="min-h-screen w-full md:flex">
+    <div className="h-screen w-full overflow-y-scroll bg-zinc-200 dark:bg-zinc-700 md:flex">
       <div id="settings-tabs flex">
-        <div className="fixed z-50 flex w-full flex-row px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit">
+        <div className="fixed z-[10000] flex w-full flex-row px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit">
           <div className="flex">Settings Menu</div>
           <div className="flex">
             <button
-              className={`my-auto ml-2 transform transition-all duration-700 ease-in-out md:hidden ${
+              className={`z-50 my-auto ml-2 transform transition-all duration-700 ease-in-out md:hidden ${
                 showingSettingsMenu ? "rotate-90" : "-rotate-90"
               }`}
               onClick={toggleSettingsMenu}
@@ -488,15 +483,14 @@ const AccountPage = (props: {
           </div>
         </div>
         <div
-          className={`rounded-br-md bg-purple-200 px-6 py-4 pr-10 transition-all duration-500 ease-in-out dark:bg-zinc-800 ${
-            showingSettingsMenu ? "" : "-translate-y-full"
+          className={`fixed z-[1000] rounded-br-2xl bg-purple-200 px-6 py-4 pr-10 transition-all duration-500 ease-in-out dark:bg-zinc-800 md:relative ${
+            showingSettingsMenu ? "" : "-translate-y-full md:translate-y-0"
           }`}
         >
           <ul
-            ref={menuItemListRef}
             className={`${
-              showingSettingsMenu ? "" : "-translate-y-[200%]"
-            } transform pt-6 transition-all duration-500 ease-in-out`}
+              showingSettingsMenu ? "" : "-translate-y-[100%] md:translate-y-0"
+            } transform pt-6 transition-all duration-700 ease-in-out`}
           >
             <li className="hvr-move-right">
               <button onClick={() => setSettingsSelection("User")}>User</button>
