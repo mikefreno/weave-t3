@@ -27,7 +27,6 @@ import {
 } from "@prisma/client";
 import LoadingOverlay from "@/src/components/app/LoadingOverlay";
 import VoiceChannel from "@/src/components/app/VoiceChannel";
-import DoubleChevrons from "@/src/icons/DoubleChevrons";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
 import ChevronDown from "@/src/icons/ChevronDown";
@@ -59,7 +58,6 @@ const App = () => {
     null
   );
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
   const [createChannelModalShowing, setCreateChannelModalShowing] =
@@ -206,40 +204,7 @@ const App = () => {
   }, [serverModalShowing, botModalShowing, directMessageModalShowing]);
 
   const microphoneToggle = async () => {
-    if (microphoneState) {
-      turnOffMicrophone();
-      setMicrophoneState(false);
-    } else {
-      const res = await requestMicrophoneAccess();
-      if (res) {
-        setMicrophoneState(true);
-      }
-    }
-  };
-
-  const requestMicrophoneAccess = async () => {
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-      newStream.getAudioTracks().forEach((track) => {
-        track.enabled = true;
-      });
-      setStream(newStream);
-      return true;
-    } catch (err) {
-      console.error("Error accessing microphone:", err);
-      return false;
-    }
-  };
-
-  const turnOffMicrophone = () => {
-    if (stream) {
-      // Disable all audio tracks in the MediaStream
-      stream.getAudioTracks().forEach((track) => {
-        track.enabled = false;
-      });
-    }
+    setMicrophoneState(!microphoneState);
   };
 
   useEffect(() => {
@@ -450,7 +415,6 @@ const App = () => {
                   audioState={audioState}
                   audioToggle={audioToggle}
                   microphoneToggle={microphoneToggle}
-                  stream={stream}
                   fullscreen={fullscreen}
                 />
               )

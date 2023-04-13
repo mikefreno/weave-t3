@@ -24,7 +24,6 @@ interface VoiceChannelProps {
   audioState: boolean;
   audioToggle: () => void;
   microphoneToggle: () => void;
-  stream: MediaStream | null;
   fullscreen: boolean;
 }
 
@@ -33,7 +32,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     selectedChannel,
     currentUser,
     socket,
-    stream,
     microphoneState,
     audioState,
     fullscreen,
@@ -47,6 +45,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
   const [joinButtonState, setJoinButtonState] = useState(false);
   const [leaveButtonState, setLeaveButtonState] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const [webSocketsInCall, setWebSocketsInCall] = useState<
     | (WSConnection & {
@@ -134,87 +133,104 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   }, [socket, localPeerConnection]);
 
-  useEffect(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => {
-        console.log("adding track");
-        localPeerConnection.current?.addTrack(track, stream);
+  const requestMicrophoneAccess = async () => {
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
       });
+      setStream(newStream);
+      return true;
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+      return false;
     }
-  }, [microphoneState, stream, localPeerConnection]);
+  };
 
   const joinCall = async () => {
-    setJoinButtonState(true);
-    if (socket && webSocketsInCall.length < 5) {
-      //add user to inCall field in database
-      await joinOrLeaveCallMutation.mutateAsync({
-        newState: true,
-        channelID: selectedChannel.id,
-      });
-      // refresh list of connections in the call, accessed with 'webSocketsInCall'
-      socket?.send(
-        JSON.stringify({
-          action: "audio",
-          type: "leave",
-        })
-      );
-      await connectedWSQuery.refetch();
-      setJoinButtonState(false);
-
-      // Set the onicecandidate event listener before creating the offer
-      localPeerConnection.current = new RTCPeerConnection();
-
-      if (stream) {
-        stream.getTracks().forEach((track) => {
-          console.log("adding track");
-          localPeerConnection.current?.addTrack(track, stream);
+    const res = await requestMicrophoneAccess();
+    if (res) {
+      setJoinButtonState(true);
+      if (socket && webSocketsInCall.length < 5) {
+        //add user to inCall field in database
+        await joinOrLeaveCallMutation.mutateAsync({
+          newState: true,
+          channelID: selectedChannel.id,
         });
-      }
-
-      localPeerConnection.current.oniceconnectionstatechange = () => {
-        console.log(
-          `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+        // refresh list of connections in the call, accessed with 'webSocketsInCall'
+        socket?.send(
+          JSON.stringify({
+            action: "audio",
+            type: "leave",
+          })
         );
-      };
-      localPeerConnection.current.onicecandidate = (event) => {
-        if (event.candidate) {
-          console.log("sending ice candidate");
-          socket.send(
-            JSON.stringify({
-              action: "audio",
-              type: "ice-candidate",
-              candidate: event.candidate,
-            })
+        await connectedWSQuery.refetch();
+        setJoinButtonState(false);
+
+        // Set the onicecandidate event listener before creating the offer
+        localPeerConnection.current = new RTCPeerConnection();
+
+        if (stream) {
+          stream.getTracks().forEach((track) => {
+            console.log("adding track");
+            localPeerConnection.current?.addTrack(track, stream);
+          });
+        }
+
+        localPeerConnection.current.oniceconnectionstatechange = () => {
+          console.log(
+            `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
           );
-        }
-      };
-      localPeerConnection.current.ontrack = (event) => {
-        console.log("track added");
-        // Play the received track (audio) in a new HTMLAudioElement
-        if (event.streams[0]) {
-          const audioElement = new Audio();
-          audioElement.srcObject = event.streams[0];
-          audioElement.play();
-        }
-      };
+        };
+        localPeerConnection.current.onicecandidate = (event) => {
+          if (event.candidate) {
+            console.log("sending ice candidate");
+            socket.send(
+              JSON.stringify({
+                action: "audio",
+                type: "ice-candidate",
+                candidate: event.candidate,
+              })
+            );
+          }
+        };
+        localPeerConnection.current.ontrack = (event) => {
+          console.log("track added");
+          // Play the received track (audio) in a new HTMLAudioElement
+          if (event.streams[0]) {
+            const audioElement = new Audio();
+            audioElement.srcObject = event.streams[0];
+            audioElement.play();
+          }
+        };
 
-      const offer = await localPeerConnection.current.createOffer();
-      await localPeerConnection.current.setLocalDescription(offer);
+        const offer = await localPeerConnection.current.createOffer();
+        await localPeerConnection.current.setLocalDescription(offer);
 
-      socket.send(
-        JSON.stringify({
-          action: "audio",
-          type: "offer",
-          offer: localPeerConnection.current.localDescription,
-        })
-      );
-
-      // Add event listener for iceconnectionstatechange
-      localPeerConnection.current.oniceconnectionstatechange = () => {
-        console.log(
-          `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+        socket.send(
+          JSON.stringify({
+            action: "audio",
+            type: "offer",
+            offer: localPeerConnection.current.localDescription,
+          })
         );
-      };
+
+        // Add event listener for iceconnectionstatechange
+        localPeerConnection.current.oniceconnectionstatechange = () => {
+          console.log(
+            `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
+          );
+        };
+      }
+    } else {
+      if (microphoneState === false) {
+        alert(
+          "Microphone access is needed to join the call. Currently your microphone is muted, so you would join the call muted."
+        );
+      } else {
+        alert(
+          "Microphone access is needed to join the call, you can mute yourself now, or after the call is joined."
+        );
+      }
     }
   };
 
@@ -231,15 +247,33 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       })
     );
     await connectedWSQuery.refetch();
+    turnOffMicrophone();
     setLeaveButtonState(false);
-
-    // await disconnectWS.mutateAsync();
   };
+
+  const turnOffMicrophone = () => {
+    if (stream) {
+      stream.getAudioTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (stream && userJoined) {
+      const audioTrack = stream
+        .getTracks()
+        .find((track) => track.kind === "audio");
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+      }
+    }
+  }, [microphoneState]);
 
   const joinCallButton = () => {
     if (joinButtonState) {
       return (
-        <Button auto shadow size={"lg"} color="secondary" animated disabled>
+        <Button auto shadow size={"lg"} animated disabled>
           <Loading type="points" />
         </Button>
       );
@@ -264,7 +298,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const leaveCallButton = () => {
     if (leaveButtonState) {
       return (
-        <Button auto shadow size={"lg"} color="secondary" animated disabled>
+        <Button auto shadow size={"lg"} animated disabled>
           <Loading type="points" />
         </Button>
       );
@@ -297,6 +331,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           {webSocketsInCall && webSocketsInCall?.length !== 0
             ? "Currently in Channel:"
             : "No one's here... yet"}
+        </div>
+        <div className="flex justify-center">
+          <div className="absolute text-2xl text-purple-600 dark:text-purple-400">
+            {microphoneState ? "" : userJoined ? "You are Muted" : ""}
+          </div>
         </div>
         {webSocketsInCall.length === 5 ? (
           <div className="py-4 text-center text-sm italic">
