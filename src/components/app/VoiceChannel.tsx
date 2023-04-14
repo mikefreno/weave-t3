@@ -72,6 +72,12 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   }, [connectedWSQuery]);
 
   useEffect(() => {
+    return () => {
+      leaveCall();
+    };
+  }, []);
+
+  useEffect(() => {
     if (webSocketsInChannel) {
       const wsInCall = webSocketsInChannel.filter(
         (connection) => connection.inCall
@@ -146,6 +152,21 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
+  const addTrackToStream = () => {
+    if (stream) {
+      console.log("stream check");
+      const audioTrack = stream
+        .getTracks()
+        .find((track) => track.kind === "audio");
+      if (audioTrack) {
+        localPeerConnection.current?.addTrack(audioTrack, stream);
+      }
+    }
+  };
+  // useEffect(()=>{
+  //   addTrackToStream()
+  // },[])
+
   const joinCall = async () => {
     const res = await requestMicrophoneAccess();
     if (res) {
@@ -169,12 +190,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         // Set the onicecandidate event listener before creating the offer
         localPeerConnection.current = new RTCPeerConnection();
 
-        if (stream) {
-          stream.getTracks().forEach((track) => {
-            console.log("adding track");
-            localPeerConnection.current?.addTrack(track, stream);
-          });
-        }
+        addTrackToStream();
 
         localPeerConnection.current.oniceconnectionstatechange = () => {
           console.log(
@@ -193,8 +209,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             );
           }
         };
+
         localPeerConnection.current.ontrack = (event) => {
-          console.log("track added");
+          console.log("track added from ontrack");
           // Play the received track (audio) in a new HTMLAudioElement
           if (event.streams[0]) {
             const audioElement = new Audio();

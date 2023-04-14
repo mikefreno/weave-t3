@@ -516,6 +516,9 @@ const AccountPage = (props: {
                   setSettingsSelection("User");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "User" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 User
               </button>
@@ -526,6 +529,9 @@ const AccountPage = (props: {
                   setSettingsSelection("App");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "App" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 App
               </button>
@@ -536,6 +542,9 @@ const AccountPage = (props: {
                   setSettingsSelection("Privacy");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "Privacy" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 Privacy
               </button>
@@ -546,6 +555,9 @@ const AccountPage = (props: {
                   setSettingsSelection("Notification");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "Notification" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 Notification
               </button>
@@ -556,6 +568,9 @@ const AccountPage = (props: {
                   setSettingsSelection("Accessibility");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "Accessibility" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 Accessibility
               </button>
@@ -566,6 +581,9 @@ const AccountPage = (props: {
                   setSettingsSelection("Community");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "Community" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 Community
               </button>
@@ -576,6 +594,9 @@ const AccountPage = (props: {
                   setSettingsSelection("Other");
                   toggleSettingsMenu();
                 }}
+                className={`${
+                  settingsSelection === "Other" ? "underline" : ""
+                }  underline-offset-4`}
               >
                 Other
               </button>
