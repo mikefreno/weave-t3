@@ -145,31 +145,29 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   }, [socket, localPeerConnection]);
 
-  const requestMicrophoneAccess = async () => {
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-      setStream(newStream);
-      return true;
-    } catch (err) {
-      console.error("Error accessing microphone:", err);
-      return false;
-    }
-  };
+  // const requestMicrophoneAccess = async () => {
+  //   try {
+  //     return true;
+  //   } catch (err) {
+  //     console.error("Error accessing microphone:", err);
+  //     return false;
+  //   }
+  // };
 
-  const addTrackToStream = () => {
-    if (stream) {
-      console.log("stream check");
-    }
-  };
+  // const addTrackToStream = () => {
+  //   if (stream) {
+  //     console.log("stream check");
+  //   }
+  // };
   // useEffect(()=>{
   //   addTrackToStream()
   // },[])
 
   const joinCall = async () => {
-    const res = await requestMicrophoneAccess();
-    if (res && stream) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
       setJoinButtonState(true);
       if (socket && webSocketsInCall.length < 5) {
         //add user to inCall field in database
@@ -236,8 +234,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             offer: localPeerConnection.current.localDescription,
           })
         );
+        setStream(stream);
       }
-    } else {
+    } catch {
       if (microphoneState === false) {
         alert(
           "Microphone access is needed to join the call. Currently your microphone is muted, so you would join the call muted."
@@ -275,16 +274,16 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
-  // useEffect(() => {
-  //   if (stream && userJoined) {
-  //     const audioTrack = stream
-  //       .getTracks()
-  //       .find((track) => track.kind === "audio");
-  //     if (audioTrack) {
-  //       audioTrack.enabled = !audioTrack.enabled;
-  //     }
-  //   }
-  // }, [microphoneState]);
+  useEffect(() => {
+    if (stream && userJoined) {
+      const audioTrack = stream
+        .getTracks()
+        .find((track) => track.kind === "audio");
+      if (audioTrack) {
+        audioTrack.enabled = microphoneState;
+      }
+    }
+  }, [microphoneState, userJoined]);
 
   const joinCallButton = () => {
     if (joinButtonState) {
