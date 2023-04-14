@@ -152,20 +152,49 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
-  const addTrackToStream = async () => {
+  const addTrackToStream = () => {
     if (stream) {
       console.log("stream check");
-      const audioTrack = stream
-        .getTracks()
-        .find((track) => track.kind === "audio");
-      if (audioTrack) {
-        localPeerConnection.current?.addTrack(audioTrack, stream);
-      }
     }
   };
   // useEffect(()=>{
   //   addTrackToStream()
   // },[])
+
+  const createPeerConnection = () => {
+    const peerConnection = new RTCPeerConnection();
+
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate && socket) {
+        console.log("sending ice candidate");
+        socket.send(
+          JSON.stringify({
+            action: "audio",
+            type: "ice-candidate",
+            candidate: event.candidate,
+          })
+        );
+      }
+    };
+    if (stream) {
+      console.log("adding local stream");
+      stream.getAudioTracks().forEach((track) => {
+        console.log("local stream");
+        peerConnection.addTrack(track, stream);
+      });
+    }
+
+    peerConnection.ontrack = (event) => {
+      console.log("track added from ontrack");
+      if (event.streams[0]) {
+        const audioElement = new Audio();
+        audioElement.srcObject = event.streams[0];
+        audioElement.play();
+      }
+    };
+
+    return peerConnection;
+  };
 
   const joinCall = async () => {
     const res = await requestMicrophoneAccess();
@@ -188,36 +217,14 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         setJoinButtonState(false);
 
         // Set the onicecandidate event listener before creating the offer
-        localPeerConnection.current = new RTCPeerConnection();
+        localPeerConnection.current = createPeerConnection();
 
-        await addTrackToStream();
+        // addTrackToStream();
 
         localPeerConnection.current.oniceconnectionstatechange = () => {
           console.log(
             `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
           );
-        };
-        localPeerConnection.current.onicecandidate = (event) => {
-          if (event.candidate) {
-            console.log("sending ice candidate");
-            socket.send(
-              JSON.stringify({
-                action: "audio",
-                type: "ice-candidate",
-                candidate: event.candidate,
-              })
-            );
-          }
-        };
-
-        localPeerConnection.current.ontrack = (event) => {
-          console.log("track added from ontrack");
-          // Play the received track (audio) in a new HTMLAudioElement
-          if (event.streams[0]) {
-            const audioElement = new Audio();
-            audioElement.srcObject = event.streams[0];
-            audioElement.play();
-          }
         };
 
         const offer = await localPeerConnection.current.createOffer();
@@ -276,16 +283,16 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
-  useEffect(() => {
-    if (stream && userJoined) {
-      const audioTrack = stream
-        .getTracks()
-        .find((track) => track.kind === "audio");
-      if (audioTrack) {
-        audioTrack.enabled = !audioTrack.enabled;
-      }
-    }
-  }, [microphoneState]);
+  // useEffect(() => {
+  //   if (stream && userJoined) {
+  //     const audioTrack = stream
+  //       .getTracks()
+  //       .find((track) => track.kind === "audio");
+  //     if (audioTrack) {
+  //       audioTrack.enabled = !audioTrack.enabled;
+  //     }
+  //   }
+  // }, [microphoneState]);
 
   const joinCallButton = () => {
     if (joinButtonState) {
