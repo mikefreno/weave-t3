@@ -21,9 +21,16 @@ export const websocketRouter = createTRPCRouter({
         data: {
           inCall: input.newState,
           channelID: input.channelID,
+          connected: false,
         },
       });
     }),
+  changeToConnected: protectedProcedure.mutation(async ({ ctx }) => {
+    await ctx.prisma.wSConnection.updateMany({
+      where: { userId: ctx.session.user.id },
+      data: { connected: true },
+    });
+  }),
   // getSocketState: protectedProcedure.input().query(),
   wssConnectedToChannel: protectedProcedure
     .input(z.number())

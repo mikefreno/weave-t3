@@ -46,7 +46,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const [joinButtonState, setJoinButtonState] = useState(false);
   const [leaveButtonState, setLeaveButtonState] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-
+  const updateToConnected = api.websocket.changeToConnected.useMutation();
   const [webSocketsInCall, setWebSocketsInCall] = useState<
     | (WSConnection & {
         user: User;
@@ -128,9 +128,15 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             );
           } else if (data.type === "ice-candidate") {
             console.log("receive ice candidate");
-            await localPeerConnection.current.addIceCandidate(
-              new RTCIceCandidate(data.candidate)
-            );
+            if (localPeerConnection.current.remoteDescription) {
+              await localPeerConnection.current.addIceCandidate(
+                new RTCIceCandidate(data.candidate)
+              );
+            } else {
+              console.error(
+                "Remote description is not set yet. Ignoring ICE candidate."
+              );
+            }
           } else if (data.type === "leave") {
             await connectedWSQuery.refetch();
           }
@@ -161,44 +167,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   //   addTrackToStream()
   // },[])
 
-  const createPeerConnection = () => {
-    const peerConnection = new RTCPeerConnection();
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate && socket) {
-        console.log("sending ice candidate");
-        socket.send(
-          JSON.stringify({
-            action: "audio",
-            type: "ice-candidate",
-            candidate: event.candidate,
-          })
-        );
-      }
-    };
-    if (stream) {
-      console.log("adding local stream");
-      stream.getAudioTracks().forEach((track) => {
-        console.log("local stream");
-        peerConnection.addTrack(track, stream);
-      });
-    }
-
-    peerConnection.ontrack = (event) => {
-      console.log("track added from ontrack");
-      if (event.streams[0]) {
-        const audioElement = new Audio();
-        audioElement.srcObject = event.streams[0];
-        audioElement.play();
-      }
-    };
-
-    return peerConnection;
-  };
-
   const joinCall = async () => {
     const res = await requestMicrophoneAccess();
-    if (res) {
+    if (res && stream) {
       setJoinButtonState(true);
       if (socket && webSocketsInCall.length < 5) {
         //add user to inCall field in database
@@ -217,14 +188,42 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         setJoinButtonState(false);
 
         // Set the onicecandidate event listener before creating the offer
-        localPeerConnection.current = createPeerConnection();
+        localPeerConnection.current = new RTCPeerConnection();
 
-        // addTrackToStream();
+        localPeerConnection.current.onicecandidate = (event) => {
+          if (event.candidate && socket) {
+            console.log("sending ice candidate");
+            socket.send(
+              JSON.stringify({
+                action: "audio",
+                type: "ice-candidate",
+                candidate: event.candidate,
+              })
+            );
+          }
+        };
 
-        localPeerConnection.current.oniceconnectionstatechange = () => {
+        stream.getAudioTracks().forEach((track) => {
+          console.log("local stream added");
+          localPeerConnection.current!.addTrack(track, stream);
+        });
+
+        localPeerConnection.current.ontrack = (event) => {
+          console.log("remote stream added");
+          if (event.streams[0]) {
+            const audioElement = new Audio();
+            audioElement.srcObject = event.streams[0];
+            audioElement.play();
+          }
+        };
+
+        localPeerConnection.current.oniceconnectionstatechange = async () => {
           console.log(
             `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
           );
+          if (localPeerConnection.current?.iceConnectionState === "connected") {
+            await updateToConnected.mutateAsync();
+          }
         };
 
         const offer = await localPeerConnection.current.createOffer();
@@ -237,13 +236,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             offer: localPeerConnection.current.localDescription,
           })
         );
-
-        // Add event listener for iceconnectionstatechange
-        localPeerConnection.current.oniceconnectionstatechange = () => {
-          console.log(
-            `ICE connection state changed to: ${localPeerConnection.current?.iceConnectionState}`
-          );
-        };
       }
     } else {
       if (microphoneState === false) {
