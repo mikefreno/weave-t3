@@ -152,7 +152,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
-  const addTrackToStream = () => {
+  const addTrackToStream = async () => {
     if (stream) {
       console.log("stream check");
       const audioTrack = stream
@@ -190,7 +190,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         // Set the onicecandidate event listener before creating the offer
         localPeerConnection.current = new RTCPeerConnection();
 
-        addTrackToStream();
+        await addTrackToStream();
 
         localPeerConnection.current.oniceconnectionstatechange = () => {
           console.log(
