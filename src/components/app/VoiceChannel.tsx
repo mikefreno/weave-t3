@@ -71,11 +71,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   }, [connectedWSQuery]);
 
-  useEffect(() => {
-    return () => {
-      leaveCall();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     leaveCall();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (webSocketsInChannel) {
@@ -169,6 +169,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             type: "join",
           })
         );
+
         localPeerConnection.current.onicecandidate = (event) => {
           if (event.candidate && socket) {
             console.log("sending ice candidate");
