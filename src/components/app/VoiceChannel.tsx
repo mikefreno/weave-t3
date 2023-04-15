@@ -137,31 +137,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                 "Remote description is not set yet. Ignoring ICE candidate."
               );
             }
-          } else if (data.type === "leave") {
+          } else if (data.type === "leave" || data.type === "join") {
             await connectedWSQuery.refetch();
           }
         }
       };
     }
   }, [socket, localPeerConnection]);
-
-  // const requestMicrophoneAccess = async () => {
-  //   try {
-  //     return true;
-  //   } catch (err) {
-  //     console.error("Error accessing microphone:", err);
-  //     return false;
-  //   }
-  // };
-
-  // const addTrackToStream = () => {
-  //   if (stream) {
-  //     console.log("stream check");
-  //   }
-  // };
-  // useEffect(()=>{
-  //   addTrackToStream()
-  // },[])
 
   const joinCall = async () => {
     try {
@@ -181,9 +163,14 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
         // Set the onicecandidate event listener before creating the offer
         localPeerConnection.current = new RTCPeerConnection();
-
+        socket?.send(
+          JSON.stringify({
+            action: "audio",
+            type: "join",
+          })
+        );
         localPeerConnection.current.onicecandidate = (event) => {
-          if (event.candidate && socket && webSocketsInCall.length > 1) {
+          if (event.candidate && socket) {
             console.log("sending ice candidate");
             socket.send(
               JSON.stringify({
