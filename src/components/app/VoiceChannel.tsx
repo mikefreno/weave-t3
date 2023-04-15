@@ -176,12 +176,6 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           channelID: selectedChannel.id,
         });
         // refresh list of connections in the call, accessed with 'webSocketsInCall'
-        socket?.send(
-          JSON.stringify({
-            action: "audio",
-            type: "leave",
-          })
-        );
         await connectedWSQuery.refetch();
         setJoinButtonState(false);
 
@@ -189,7 +183,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         localPeerConnection.current = new RTCPeerConnection();
 
         localPeerConnection.current.onicecandidate = (event) => {
-          if (event.candidate && socket) {
+          if (event.candidate && socket && webSocketsInCall.length > 1) {
             console.log("sending ice candidate");
             socket.send(
               JSON.stringify({
