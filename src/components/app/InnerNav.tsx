@@ -80,6 +80,12 @@ interface InnerNavProps {
   serverSetter: (server: Server) => void;
 }
 
+interface MongoUser {
+  id: string;
+  name: string | null;
+  pseudonym: string | null;
+}
+
 const InnerNav = (props: InnerNavProps) => {
   const {
     currentTabSetter,
@@ -105,8 +111,14 @@ const InnerNav = (props: InnerNavProps) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
-
   const deleteUser = api.server.deleteUserFromServer.useMutation({});
+
+  const [userSearchData, setUserSearchData] = useState<Map<
+    MongoUser,
+    string
+  > | null>(null);
+
+  const getUserSearchData = api.searchRouter.getMongoUsers.useMutation();
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -127,6 +139,19 @@ const InnerNav = (props: InnerNavProps) => {
 
   const channelSetter = (channel: Server_Channel) => {
     props.setSelectedChannel(channel);
+  };
+  const loadUserSearchData = async () => {
+    if (!userSearchData) {
+      const res: Map<MongoUser, string> | null =
+        await getUserSearchData.mutateAsync();
+      if (res) {
+        setUserSearchData(res);
+        console.log("user search data set: ");
+        console.log(res);
+      } else {
+        console.log("error retrieving user search data");
+      }
+    }
   };
 
   if (currentTab == "DMS") {
@@ -156,6 +181,7 @@ const InnerNav = (props: InnerNavProps) => {
             className="w-24 text-xs"
             placeholder="Search..."
             value={searchTerm}
+            onFocus={loadUserSearchData}
             onChange={(event) => setSearchTerm(event.target.value)}
             contentLeft={
               <SearchIcon

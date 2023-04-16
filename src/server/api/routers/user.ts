@@ -120,7 +120,7 @@ export const userRouter = createTRPCRouter({
       data: {
         name: "User Deleted",
         pseudonym: "User Deleted",
-        email: null,
+        email: userId,
         emailVerified: null,
         registered_at: null,
         image: null,

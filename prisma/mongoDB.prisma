@@ -15,8 +15,9 @@ model Server {
 
 model User {
   id        String @id @map("_id")
-  name      String
-  psuedonym String
+  name      String?
+  pseudonym String?
+  email     String
 }
 
 model Bot {

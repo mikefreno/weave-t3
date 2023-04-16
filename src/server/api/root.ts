@@ -3,6 +3,8 @@ import { userRouter } from "./routers/user";
 import { createTRPCRouter } from "./trpc";
 import { miscRouter } from "./routers/misc";
 import { websocketRouter } from "./routers/websocket";
+import { databaseMgmtRouter } from "./routers/databaseMgmt";
+import { searchRouter } from "./routers/search";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +16,8 @@ export const appRouter = createTRPCRouter({
   server: serverRouter,
   misc: miscRouter,
   websocket: websocketRouter,
+  databaseMgmtRouter: databaseMgmtRouter,
+  searchRouter: searchRouter,
 });
 
 // export type definition of API
