@@ -234,7 +234,7 @@ const Navbar = (props: {
                       </button>
                     </li>
                   </>
-                ) : pathname !== "/login" ? (
+                ) : pathname !== "/login/redirect" ? (
                   <li className="z-50 my-auto pr-2">
                     <button
                       className="underline-offset-[6px] hover:underline"

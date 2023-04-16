@@ -5,6 +5,7 @@ import { PrismaClient as PrismaClient2 } from "@prisma/client/mongo";
 declare global {
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
+  // eslint-disable-next-line no-var
   var prismaMongo: PrismaClient2 | undefined;
 }
 

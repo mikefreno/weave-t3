@@ -98,7 +98,7 @@ const Menu = (props: {
                   </button>
                 </li>
               </>
-            ) : pathname !== "/login" ? (
+            ) : pathname !== "/login/redirect" ? (
               <li className="my-auto text-lg">
                 <button
                   onClick={props.openLogin}
