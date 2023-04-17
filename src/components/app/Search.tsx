@@ -82,7 +82,7 @@ export default function Search(props: {
             ))
           ) : serverResults ? (
             serverResults.map((result) => (
-              <div className="w-full rounded bg-zinc-800">
+              <div className="w-full rounded bg-zinc-800" key={result.id}>
                 <div></div>
                 <div></div>
               </div>
