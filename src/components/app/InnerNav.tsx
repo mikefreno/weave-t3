@@ -38,7 +38,10 @@ import LoadingOverlay from "./LoadingOverlay";
 import SideNavSmallScreen from "./SideNavSmallScreen";
 import Search from "./Search";
 
-import { Server as MongoServer, User as MongoUser } from "@prisma/client/mongo";
+import {
+  type Server as MongoServer,
+  type User as MongoUser,
+} from "@prisma/client/mongo";
 
 type ServerIncludingChannel = {
   id: number;
@@ -82,6 +85,7 @@ interface InnerNavProps {
   inviteModalToggle: () => void;
   inviteModalButtonRef: RefObject<HTMLButtonElement>;
   serverSetter: (server: Server) => void;
+  userSelect: (input: MongoUser) => void;
 }
 
 const InnerNav = (props: InnerNavProps) => {
@@ -116,6 +120,11 @@ const InnerNav = (props: InnerNavProps) => {
   );
   const [showSearch, setShowSearch] = useState<boolean>();
   const getUserSearchData = api.searchRouter.getMongoUsers.useMutation();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside([searchInputRef, searchResultsRef], () => {
+    setShowSearch(false);
+  });
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -147,10 +156,6 @@ const InnerNav = (props: InnerNavProps) => {
       }
     }
   };
-  const select = (input: MongoUser) => {
-    console.log("Fired!");
-    console.log(input);
-  };
 
   if (currentTab == "DMS") {
     return (
@@ -174,6 +179,7 @@ const InnerNav = (props: InnerNavProps) => {
         />
         <div className="px-2 pt-2">
           <Input
+            ref={searchInputRef}
             aria-label="search input"
             type="search"
             className="w-24 text-xs"
@@ -183,7 +189,6 @@ const InnerNav = (props: InnerNavProps) => {
               loadUserSearchData();
               setShowSearch(true);
             }}
-            onBlur={() => setShowSearch(false)}
             onChange={(event) => setSearchTerm(event.target.value)}
             contentLeft={
               <SearchIcon
@@ -195,10 +200,10 @@ const InnerNav = (props: InnerNavProps) => {
           />
           {showSearch && userSearchData && searchTerm.length > 2 ? (
             <div className="flex justify-center">
-              <div className="fixed w-48">
+              <div className="fixed w-48 " ref={searchResultsRef}>
                 <Search
                   userInput={searchTerm}
-                  select={select}
+                  select={props.userSelect}
                   userData={userSearchData}
                 />
               </div>

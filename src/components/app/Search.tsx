@@ -7,9 +7,9 @@ export default function Search(props: {
   previousInput?: string;
   userData?: User[];
   serverData?: Server[];
-  select: (input: any) => void;
+  select: (input: User) => void;
 }) {
-  const { userInput, userData, serverData } = props;
+  const { userInput, userData, serverData, select } = props;
   const [userResults, setUserResults] = useState<User[] | null>(null);
   const [serverResults, setServerResults] = useState<Server[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -67,18 +67,21 @@ export default function Search(props: {
 
   return (
     <div className="-mt-3 rounded-b-lg bg-zinc-100 dark:bg-zinc-900">
-      <div className="px-2 pb-2 pt-3">
+      <div className="px-2 pb-2 pt-4">
         {!loading ? (
           userResults ? (
             userResults.map((result) => (
-              <button
-                key={result.id}
-                onClick={() => props.select(result)}
-                className="my-1 w-full rounded bg-zinc-800 py-2 hover:bg-zinc-700 active:bg-zinc-600"
-              >
-                <div className="text-md">{result.name}</div>
-                <div className="text-sm">{result.pseudonym}</div>
-              </button>
+              <div className="py-1" key={result.id}>
+                <button
+                  onClick={() => select(result)}
+                  className="w-full rounded bg-purple-300 py-2 hover:bg-purple-400 active:bg-purple-500 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:active:bg-zinc-600"
+                >
+                  <div className="text-md">{result.name}</div>
+                  <div className="text-sm">
+                    {result.pseudonym ? "@" + result.pseudonym : null}
+                  </div>
+                </button>
+              </div>
             ))
           ) : serverResults ? (
             serverResults.map((result) => (

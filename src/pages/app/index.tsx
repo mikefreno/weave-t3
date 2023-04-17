@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Navbar from "@/src/components/Navbar";
 import Head from "next/head";
 import ThemeContext from "@/src/components/ThemeContextProvider";
@@ -30,6 +30,9 @@ import VoiceChannel from "@/src/components/app/VoiceChannel";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
 import ChevronDown from "@/src/icons/ChevronDown";
+import UserProfileModal from "@/src/components/app/UserProfileModal";
+
+import { type User as MongoUser } from "@prisma/client/mongo";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -57,6 +60,13 @@ const App = () => {
   const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(
     null
   );
+
+  const UserProfileModalRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside([UserProfileModalRef], () => {
+    setSearchedUser(null);
+  });
+  const [searchedUser, setSearchedUser] = useState<MongoUser | null>(null);
+
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
 
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
@@ -101,10 +111,6 @@ const App = () => {
     }
 
     if (socket) {
-      socket.onopen = () => {
-        console.log("Socket opened");
-      };
-
       socket.onclose = () => {
         if (socket?.readyState !== WebSocket.OPEN) {
           socketRef.current = null;
@@ -214,7 +220,6 @@ const App = () => {
   }, []);
 
   const audioToggle = () => {
-    // localStorage.setItem("audioState", (!audioState).toString());
     setAudioState(!audioState);
   };
 
@@ -253,6 +258,14 @@ const App = () => {
   };
   const serverSetter = async (server: Server) => {
     setSelectedServer(server);
+  };
+
+  const userSelect = (user: MongoUser) => {
+    console.log("fired");
+    setSearchedUser(user);
+  };
+  const userProfileModalToggle = () => {
+    setSearchedUser(null);
   };
 
   return (
@@ -318,6 +331,7 @@ const App = () => {
               createChannelButtonRef={createChannelButtonRef}
               inviteModalToggle={inviteModalToggle}
               inviteModalButtonRef={inviteModalButtonRef}
+              userSelect={userSelect}
             />
             <InnerNavOverlay
               setSelectedInnerTab={setSelectedInnerTab}
@@ -464,6 +478,13 @@ const App = () => {
             createChannelToggle={createChannelToggle}
             selectedInnerTabID={selectedInnerTabID}
             createChannelRef={createChannelRef}
+          />
+        ) : null}
+        {searchedUser ? (
+          <UserProfileModal
+            userProfileModalToggle={userProfileModalToggle}
+            user={searchedUser}
+            UserProfileModalRef={UserProfileModalRef}
           />
         ) : null}
       </div>
