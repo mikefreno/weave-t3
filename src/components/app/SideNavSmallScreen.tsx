@@ -2,7 +2,7 @@ import AddIcon from "@/src/icons/AddIcon";
 import BullhornIcon from "@/src/icons/BullhornIcon";
 import ChevronDown from "@/src/icons/ChevronDown";
 import RobotForApp from "@/src/icons/RobotForApp";
-import { Raleway } from "@next/font/google";
+import { Raleway } from "next/font/google";
 import { Tooltip } from "@nextui-org/react";
 import {
   Server,

@@ -1,6 +1,6 @@
 import React, { RefObject, useRef, useState } from "react";
 import Link from "next/link";
-import { Nunito } from "@next/font/google";
+import { Nunito } from "next/font/google";
 import { Button, Loading, Tooltip } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";

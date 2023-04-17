@@ -8,7 +8,7 @@ import React, {
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
-import { Raleway } from "@next/font/google";
+import { Raleway } from "next/font/google";
 import MenuBars from "@/src/icons/MenuBars";
 import Menu from "./Menu";
 import LoginModal from "./loginModal";

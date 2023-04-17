@@ -16,7 +16,7 @@ import {
   Server_Member,
   User,
 } from "@prisma/client";
-import { Raleway } from "@next/font/google";
+import { Raleway } from "next/font/google";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 

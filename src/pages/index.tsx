@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import Image from "next/image";
-import { Inter } from "@next/font/google";
+import { Inter } from "next/font/google";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/home/Footer";
 import LightLogo from "@/public/Logo - light.png";
