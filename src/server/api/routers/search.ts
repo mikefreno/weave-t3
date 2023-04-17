@@ -13,10 +13,7 @@ export const searchRouter = createTRPCRouter({
     const userData: MongoUser[] | null = await ctx.prismaMongo.user.findMany();
     if (userData) {
       const filteredUsers = userData.filter((user) => user.id !== user.email);
-      const mongoUsersMap = new Map(
-        filteredUsers.map((user) => [user, user.id])
-      );
-      return mongoUsersMap;
+      return filteredUsers;
     } else {
       return null;
     }

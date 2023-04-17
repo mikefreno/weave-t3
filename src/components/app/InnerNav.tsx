@@ -28,6 +28,7 @@ import React, {
   MouseEventHandler,
   RefObject,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -35,6 +36,9 @@ import ThemeContext from "../ThemeContextProvider";
 import { api } from "@/src/utils/api";
 import LoadingOverlay from "./LoadingOverlay";
 import SideNavSmallScreen from "./SideNavSmallScreen";
+import Search from "./Search";
+
+import { Server as MongoServer, User as MongoUser } from "@prisma/client/mongo";
 
 type ServerIncludingChannel = {
   id: number;
@@ -80,12 +84,6 @@ interface InnerNavProps {
   serverSetter: (server: Server) => void;
 }
 
-interface MongoUser {
-  id: string;
-  name: string | null;
-  pseudonym: string | null;
-}
-
 const InnerNav = (props: InnerNavProps) => {
   const {
     currentTabSetter,
@@ -113,16 +111,14 @@ const InnerNav = (props: InnerNavProps) => {
   const [sortType, setSortType] = useState("Recent");
   const deleteUser = api.server.deleteUserFromServer.useMutation({});
 
-  const [userSearchData, setUserSearchData] = useState<Map<
-    MongoUser,
-    string
-  > | null>(null);
-
+  const [userSearchData, setUserSearchData] = useState<MongoUser[] | null>(
+    null
+  );
+  const [showSearch, setShowSearch] = useState<boolean>();
   const getUserSearchData = api.searchRouter.getMongoUsers.useMutation();
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    // Perform your search logic here
   };
 
   const leaveServerAlert = async () => {
@@ -140,18 +136,20 @@ const InnerNav = (props: InnerNavProps) => {
   const channelSetter = (channel: Server_Channel) => {
     props.setSelectedChannel(channel);
   };
+
   const loadUserSearchData = async () => {
     if (!userSearchData) {
-      const res: Map<MongoUser, string> | null =
-        await getUserSearchData.mutateAsync();
+      const res: MongoUser[] | null = await getUserSearchData.mutateAsync();
       if (res) {
         setUserSearchData(res);
-        console.log("user search data set: ");
-        console.log(res);
       } else {
         console.log("error retrieving user search data");
       }
     }
+  };
+  const select = (input: MongoUser) => {
+    console.log("Fired!");
+    console.log(input);
   };
 
   if (currentTab == "DMS") {
@@ -174,14 +172,18 @@ const InnerNav = (props: InnerNavProps) => {
           currentTab={props.currentTab}
           serverSetter={serverSetter}
         />
-        <form onSubmit={handleSubmit} className="mx-2 py-4">
+        <div className="px-2 pt-2">
           <Input
             aria-label="search input"
             type="search"
             className="w-24 text-xs"
             placeholder="Search..."
             value={searchTerm}
-            onFocus={loadUserSearchData}
+            onFocus={() => {
+              loadUserSearchData();
+              setShowSearch(true);
+            }}
+            onBlur={() => setShowSearch(false)}
             onChange={(event) => setSearchTerm(event.target.value)}
             contentLeft={
               <SearchIcon
@@ -191,7 +193,18 @@ const InnerNav = (props: InnerNavProps) => {
               />
             }
           />
-        </form>
+          {showSearch && userSearchData && searchTerm.length > 2 ? (
+            <div className="flex justify-center">
+              <div className="fixed w-48">
+                <Search
+                  userInput={searchTerm}
+                  select={select}
+                  userData={userSearchData}
+                />
+              </div>
+            </div>
+          ) : null}
+        </div>
         <div className="">
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${

@@ -1,6 +1,4 @@
 import { User } from "@prisma/client";
-import React from "react";
-import Image from "next/image";
 import { Button } from "@nextui-org/react";
 
 const UserTooltip = (props: { user: User }) => {
