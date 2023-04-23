@@ -6,6 +6,7 @@ import { Button, Loading } from "@nextui-org/react";
 import LoadingElement from "../loading";
 import ThemeContext from "../ThemeContextProvider";
 import Xmark from "@/src/icons/Xmark";
+import AddFriendIcon from "@/src/icons/AddFriendIcon";
 
 export default function UserProfileModal(props: {
   user: MongoUser;
@@ -36,25 +37,32 @@ export default function UserProfileModal(props: {
             <button onClick={props.userProfileModalToggle}>
               <Xmark className={"w-10"} />
             </button>
-            <Button color={"secondary"}>Request Friend</Button>
+            <Button color={"secondary"} auto>
+              <AddFriendIcon
+                height={20}
+                width={20}
+                stroke={"white"}
+                strokeWidth={1.5}
+              />
+            </Button>
           </div>
           <div className="flex flex-row justify-evenly">
-            <div className="my-auto flex justify-center">
-              {fullUser.image ? (
+            {fullUser.image ? (
+              <div className="my-auto flex justify-center">
                 <img className="h-36 w-36 rounded-full" src={fullUser.image} />
-              ) : null}
-            </div>
+              </div>
+            ) : null}
             <div className="my-auto flex justify-center">{fullUser.name}</div>
           </div>
           <div className="flex flex-row justify-evenly">
-            <div className="my-auto flex justify-center">
-              {fullUser.pseudonym_image ? (
+            {fullUser.pseudonym_image ? (
+              <div className="my-auto flex justify-center">
                 <img
                   className="h-36 w-36 rounded-full"
                   src={fullUser.pseudonym_image}
                 />
-              ) : null}
-            </div>
+              </div>
+            ) : null}
             <div className="my-auto flex justify-center">
               {fullUser.pseudonym ? "@" + fullUser.pseudonym : null}
             </div>
@@ -62,7 +70,7 @@ export default function UserProfileModal(props: {
         </>
       );
     } else {
-      return <LoadingElement isDarkTheme={isDarkTheme} />;
+      return <Loading size="lg" type="points" />;
     }
   };
 
