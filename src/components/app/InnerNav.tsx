@@ -142,10 +142,6 @@ const InnerNav = (props: InnerNavProps) => {
     }
   };
 
-  const channelSetter = (channel: Server_Channel) => {
-    props.setSelectedChannel(channel);
-  };
-
   const loadUserSearchData = async () => {
     if (!userSearchData) {
       const res: MongoUser[] | null = await getUserSearchData.mutateAsync();
@@ -159,7 +155,7 @@ const InnerNav = (props: InnerNavProps) => {
 
   if (currentTab == "DMS") {
     return (
-      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+      <div className="fixed h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
         <SideNavSmallScreen
           isDarkTheme={isDarkTheme}
           currentTabSetter={currentTabSetter}
@@ -252,7 +248,7 @@ const InnerNav = (props: InnerNavProps) => {
               trigger="hover"
               color={isDarkTheme ? "secondary" : "default"}
               placement="bottom"
-              css={{ width: "min-content" }}
+              css={{ width: "5rem" }}
             >
               <button onClick={() => setSortType("Frequency")}>
                 <FlameIcon
@@ -272,11 +268,11 @@ const InnerNav = (props: InnerNavProps) => {
               </button>
             </Tooltip>
             <Tooltip
-              content={"Sort by most recent messages"}
+              content={"Sort by most recent"}
               trigger="hover"
               color={isDarkTheme ? "secondary" : "default"}
               placement="bottom"
-              css={{ width: "min-content" }}
+              css={{ width: "5rem" }}
             >
               <button onClick={() => setSortType("Recent")}>
                 <ClockIcon
@@ -317,7 +313,7 @@ const InnerNav = (props: InnerNavProps) => {
     );
   } else if (currentTab == "PublicServers") {
     return (
-      <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+      <div className="fixed h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
         <SideNavSmallScreen
           isDarkTheme={isDarkTheme}
           currentTabSetter={currentTabSetter}
@@ -478,7 +474,7 @@ const InnerNav = (props: InnerNavProps) => {
   } else if (currentTab == "server") {
     return (
       <div>
-        <div className="fixed -ml-20 h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+        <div className="fixed h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
           <SideNavSmallScreen
             isDarkTheme={isDarkTheme}
             currentTabSetter={currentTabSetter}
@@ -522,7 +518,7 @@ const InnerNav = (props: InnerNavProps) => {
                   ?.channels.map((channel) => (
                     <div className="my-2" key={channel.id}>
                       <button
-                        onClick={() => channelSetter(channel)}
+                        onClick={() => props.setSelectedChannel(channel)}
                         className={`flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 ${
                           selectedChannel?.id == channel.id
                             ? "dark:border-purple-600"

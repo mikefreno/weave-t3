@@ -187,7 +187,6 @@ model WSConnection {
   userId       String? @unique
   channelID    Int?
   inCall       Boolean @default(false)
-  connected    Boolean @default(false)
 
   @@index([userId])
 }

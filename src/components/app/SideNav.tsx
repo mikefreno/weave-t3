@@ -82,7 +82,7 @@ const SideNav = (props: {
                 <div className="py-2" key={server.id}>
                   {props.selectedInnerTabID == server.id &&
                   props.currentTab == "server" ? (
-                    <span className="absolute -ml-[1.25rem] mt-4 h-4 w-4 rounded-full bg-zinc-200" />
+                    <span className="absolute -ml-[1.25rem] mt-5 h-4 w-4 rounded-full bg-zinc-200" />
                   ) : null}
                   <Tooltip
                     content={server.name}

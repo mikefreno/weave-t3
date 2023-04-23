@@ -31,7 +31,6 @@ import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
 import ChevronDown from "@/src/icons/ChevronDown";
 import UserProfileModal from "@/src/components/app/UserProfileModal";
-
 import { type User as MongoUser } from "@prisma/client/mongo";
 
 const App = () => {
@@ -60,7 +59,6 @@ const App = () => {
   const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(
     null
   );
-
   const UserProfileModalRef = useRef<HTMLDivElement>(null);
   useOnClickOutside([UserProfileModalRef], () => {
     setSearchedUser(null);
@@ -79,12 +77,14 @@ const App = () => {
   useOnClickOutside([inviteModalRef, inviteModalButtonRef], () => {
     setInviteModalShowing(false);
   });
+
   const createChannelButtonRef = useRef<HTMLButtonElement>(null);
   const createChannelRef = useRef<HTMLDivElement>(null);
 
   useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
     setCreateChannelModalShowing(false);
   });
+
   const [fullscreen, setFullscreen] = useState<boolean>(false);
   const currentUserReturn = api.users.getCurrentUser.useQuery();
   const [currentUser, setCurrentUser] = useState<
@@ -109,8 +109,10 @@ const App = () => {
       socketRef.current = newSocket;
       setSocket(newSocket);
     }
-
     if (socket) {
+      socket.onopen = () => {
+        console.log("Socket opened");
+      };
       socket.onclose = () => {
         if (socket?.readyState !== WebSocket.OPEN) {
           socketRef.current = null;
@@ -149,7 +151,7 @@ const App = () => {
     );
   };
 
-  const socketChannelUpdate = () => {
+  const socketChannelUpdate = async () => {
     socket?.send(
       JSON.stringify({
         senderID: currentUser?.id,
@@ -269,7 +271,7 @@ const App = () => {
   };
 
   return (
-    <div className="bg-zinc-100 dark:bg-zinc-700">
+    <div className="select-none bg-zinc-100 dark:bg-zinc-700">
       <Head>
         <title> Web App | Weave</title>
         <meta name="description" content="Weave's Web App" />
@@ -346,9 +348,9 @@ const App = () => {
           </div>
         </div>
         <div
-          className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out md:hidden ${
-            fullscreen ? "-ml-2" : "ml-40 pl-2 md:ml-72"
-          }`}
+          className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out ${
+            selectedChannel?.type === "voice" ? "" : "md:hidden"
+          } ${fullscreen ? "-ml-2" : "ml-40 pl-2 md:ml-64 md:pl-6"}`}
         >
           <button onClick={fullscreenToggle}>
             {fullscreen ? (
@@ -430,6 +432,7 @@ const App = () => {
                   audioToggle={audioToggle}
                   microphoneToggle={microphoneToggle}
                   fullscreen={fullscreen}
+                  socketChannelUpdate={socketChannelUpdate}
                 />
               )
             ) : (
