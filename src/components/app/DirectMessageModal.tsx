@@ -28,6 +28,7 @@ const DirectMessageModal = (props: {
           <div className="mt-4 flex justify-center">
             <form onSubmit={handleSubmit} className="mx-2 py-4">
               <Input
+                aria-label="search input"
                 type="search"
                 className="w-24 text-xs"
                 placeholder="Find ya mate"
