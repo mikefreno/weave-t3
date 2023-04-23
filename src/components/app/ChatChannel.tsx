@@ -52,6 +52,7 @@ const ChannelMain = (props: ChannelMainProps) => {
   const inputDivRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [thisChannel, setThisChannel] = useState<Server_Channel | null>(null);
 
   useEffect(() => {
     if (getMessages.data) {
@@ -78,7 +79,7 @@ const ChannelMain = (props: ChannelMainProps) => {
       const data = {
         message: input,
         senderID: currentUser.id,
-        channelID: selectedChannel.id,
+        channelID: thisChannel?.id,
         action: "message",
       };
       socket?.send(JSON.stringify(data));
@@ -116,7 +117,8 @@ const ChannelMain = (props: ChannelMainProps) => {
         >
           <div ref={bannerRef}>
             <TopBanner
-              currentChannel={selectedChannel}
+              key={selectedChannel.id}
+              selectedChannel={selectedChannel}
               fullscreen={fullscreen}
             />
           </div>
