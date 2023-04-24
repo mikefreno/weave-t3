@@ -12,6 +12,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import TopBanner from "./TopBanner";
 import { StringDecoder } from "string_decoder";
+import VideoElement from "./VideoElement";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
@@ -58,6 +59,10 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   // prettier-ignore
   const [videoTrackStatus, setVideoTrackStatus] = useState<Map<string, boolean>>(new Map());
 
+  const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(
+    new Map()
+  );
+
   useEffect(() => {
     if (connectedWSQuery.data) {
       setWebSocketsInChannel(connectedWSQuery.data);
@@ -94,6 +99,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     if (socket) {
       socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
+        console.log(data);
         const senderID = data.userID as string;
         const sendingConnection = peerConnections.current?.get(senderID);
 
@@ -206,21 +212,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     newPeerConnection.ontrack = (event) => {
       if (event.streams[0]) {
         console.log("adding remote stream");
-        // prettier-ignore
-        const videoElementTarget = document.getElementById(peerUserID) as HTMLVideoElement | null;
-        if (videoElementTarget !== null) {
-          videoElementTarget.srcObject = event.streams[0];
-
-          // Check if the track is a video track and enabled
-          const videoTrack = event.streams[0].getVideoTracks()[0];
-          if (videoTrack) {
-            setVideoTrackStatus((prevStatus) => {
-              return new Map(prevStatus).set(peerUserID, videoTrack.enabled);
-            });
-          }
-        } else {
-          console.warn(`Video element with id "${peerUserID}" not found.`);
-        }
+        setPeerStreams((prevStreams) => {
+          const newStreams = new Map(prevStreams);
+          newStreams.set(peerUserID, event.streams[0] as MediaStream);
+          return newStreams;
+        });
       }
     };
 
@@ -298,6 +294,22 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     setLeaveButtonLoadingState(false);
   };
 
+  useEffect(() => {
+    return () => {
+      joinOrLeaveCallMutation.mutate({
+        newState: false,
+        channelID: selectedChannel.id,
+      });
+      socket?.send(
+        JSON.stringify({
+          action: "audio",
+          type: "leave",
+          userID: currentUser.id,
+        })
+      );
+    };
+  }, []);
+
   // Helper functions to enable/disable tracks
   const setAudioTracksState = (state: boolean) => {
     stream.current.getAudioTracks().forEach((track) => {
@@ -334,18 +346,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   const setupChecker = async () => {
     setCheckCamButtonLoading(true);
-    const videoElementTarget = document.getElementById(
-      currentUser.id
-    ) as HTMLVideoElement;
-
-    try {
-      if (!userJoined) {
+    if (!userJoined) {
+      try {
         stream.current = await navigator.mediaDevices.getUserMedia(constraints);
-        videoElementTarget.srcObject = stream.current;
-      } else {
-        videoElementTarget.srcObject = stream.current;
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
     setCheckCamButtonLoading(false);
   };
 
@@ -453,9 +458,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             {microphoneState ? "" : userJoined ? "You are Muted" : ""}
           </div>
         </div>
-        {webSocketsInCall.length === 5 ? (
+        {webSocketsInCall.length === 6 ? (
           <div className="py-4 text-center text-sm italic">
-            Currently voice calls only support up to 5 people.
+            Currently voice calls only support up to 6 people.
           </div>
         ) : null}
         {webSocketsInCall ? (
@@ -465,13 +470,10 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                 className="m-4 h-64 w-5/12 rounded-xl bg-purple-200 dark:bg-zinc-700"
                 key={websocket.user.id}
               >
-                <video
-                  id={websocket.user.id}
-                  autoPlay
-                  playsInline
-                  className={`absolute z-50 h-64 rounded-md ${
-                    currentUser.id === websocket.user.id ? "scale-x-[-1]" : null
-                  }`}
+                <VideoElement
+                  peerUserID={websocket.user.id}
+                  stream={peerStreams.get(websocket.user.id) || stream.current}
+                  currentUserID={currentUser.id}
                 />
                 <div className="flex justify-center px-6 py-4">
                   <button className="flex flex-col content-center justify-center">
@@ -503,12 +505,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                   <div className="flex content-center justify-center">
                     <Loading css={{ zIndex: 0 }} />
                   </div>
-                  <div className="absolute z-50 h-[300px] w-[400px] scale-x-[-1]">
-                    <video
-                      id={currentUser.id}
-                      autoPlay
-                      playsInline
-                      className="-mt-12 rounded-md"
+                  <div className="-mt-8 flex justify-center">
+                    <VideoElement
+                      peerUserID={currentUser.id}
+                      stream={stream.current}
+                      currentUserID={currentUser.id}
                     />
                   </div>
                 </div>
