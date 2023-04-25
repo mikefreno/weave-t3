@@ -58,10 +58,12 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(selectedChannel.id);
   // prettier-ignore
   const [videoTrackStatus, setVideoTrackStatus] = useState<Map<string, boolean>>(new Map());
-
-  const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(
-    new Map()
-  );
+  //prettier-ignore
+  const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(new Map());
+  //prettier-ignore
+  const [videoTrackStates, setVideoTrackStates] = useState<Map<string, boolean>>(new Map());
+  //prettier-ignore
+  const [audioTrackStates, setAudioTrackStates] = useState<Map<string, boolean>>(new Map());
 
   useEffect(() => {
     if (connectedWSQuery.data) {
@@ -217,6 +219,32 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           newStreams.set(peerUserID, event.streams[0] as MediaStream);
           return newStreams;
         });
+
+        const videoTrack = event.streams[0].getVideoTracks()[0];
+        const videoTrackEnabled = videoTrack?.enabled || false;
+        setVideoTrackStates((prevVideoTrackStates) => {
+          const newVideoTrackStates = new Map(prevVideoTrackStates);
+          newVideoTrackStates.set(peerUserID, videoTrackEnabled);
+          return newVideoTrackStates;
+        });
+        if (videoTrack) {
+          videoTrack.onmute = () => {
+            console.log(`Video track muted for user ${peerUserID}`);
+            setVideoTrackStates((prevVideoTrackStates) => {
+              const newVideoTrackStates = new Map(prevVideoTrackStates);
+              newVideoTrackStates.set(peerUserID, false);
+              return newVideoTrackStates;
+            });
+          };
+          videoTrack.onunmute = () => {
+            console.log(`Video track unmuted for user ${peerUserID}`);
+            setVideoTrackStates((prevVideoTrackStates) => {
+              const newVideoTrackStates = new Map(prevVideoTrackStates);
+              newVideoTrackStates.set(peerUserID, true);
+              return newVideoTrackStates;
+            });
+          };
+        }
       }
     };
 
@@ -474,6 +502,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                   peerUserID={websocket.user.id}
                   stream={peerStreams.get(websocket.user.id) || stream.current}
                   currentUserID={currentUser.id}
+                  videoTrackState={
+                    videoTrackStates.get(websocket.user.id) || cameraState
+                  }
                 />
                 <div className="flex justify-center px-6 py-4">
                   <button className="flex flex-col content-center justify-center">
@@ -510,6 +541,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                       peerUserID={currentUser.id}
                       stream={stream.current}
                       currentUserID={currentUser.id}
+                      videoTrackState={cameraState}
                     />
                   </div>
                 </div>
