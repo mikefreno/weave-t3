@@ -10,6 +10,7 @@ import {
 } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import TopBanner from "./TopBanner";
+import VideoElement from "./VideoElement";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
@@ -395,7 +396,15 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         {webSocketsInCall ? (
           <div className="flex h-[60vh] justify-center px-4 pb-8 pt-12 md:px-6 lg:px-10 xl:px-12">
             {webSocketsInCall.map((websocket) => (
-              <div className="m-4" key={websocket.user.id}>
+              <div className="mx-4 my-2" key={websocket.user.id}>
+                <VideoElement
+                  peerUserID={websocket.user.id}
+                  stream={peerStreams.get(websocket.user.id) || stream.current}
+                  currentUserID={currentUser.id}
+                  videoTrackState={false}
+                  isLocal={currentUser.id === websocket.user.id}
+                  deafen={!audioState}
+                />
                 <div className="flex justify-center px-6 py-4">
                   <button className="flex flex-col content-center justify-center">
                     <img
