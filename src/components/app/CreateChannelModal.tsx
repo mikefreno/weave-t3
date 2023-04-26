@@ -1,9 +1,12 @@
 import BackArrow from "@/src/icons/BackArrow";
 import CommentsIcon from "@/src/icons/CommentsIcon";
+import InfoIcon from "@/src/icons/InfoIcon";
 import MicIcon from "@/src/icons/MicIcon";
+import UnfilledMicIcon from "@/src/icons/UnfilledMicIcon";
+import VideoCamIcon from "@/src/icons/VideoCamIcon";
 import Xmark from "@/src/icons/Xmark";
 import { api } from "@/src/utils/api";
-import { Button, Input, Loading, Textarea } from "@nextui-org/react";
+import { Button, Input, Loading, Textarea, Tooltip } from "@nextui-org/react";
 import React, { RefObject, useRef, useState } from "react";
 
 const CreateChannelModal = (props: {
@@ -66,24 +69,61 @@ const CreateChannelModal = (props: {
             <button
               className="m-4 mx-auto flex max-w-[45%] justify-between rounded-xl bg-blue-500 p-4 hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-800"
               onClick={() => {
-                setChannelType("voice");
+                setChannelType("audio");
                 setStep(1);
               }}
             >
               <div className="my-auto">
-                <MicIcon height={36} width={36} color="#e4e4e7" />
+                <UnfilledMicIcon
+                  height={36}
+                  width={36}
+                  color="#e4e4e7"
+                  strokeWidth={1.5}
+                />
               </div>
               <div className="my-auto text-xl text-zinc-200 md:pl-2">
-                Voice Channel
+                Audio Channel
               </div>
             </button>
+          </div>
+          <div className="flex justify-center">
+            <button
+              className="m-4 flex max-w-[45%] justify-between rounded-xl bg-purple-500 p-4 hover:bg-purple-600 active:bg-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:active:bg-purple-800"
+              onClick={() => {
+                setChannelType("video");
+                setStep(1);
+              }}
+            >
+              <div className="my-auto">
+                <VideoCamIcon
+                  height={36}
+                  width={36}
+                  color="#e4e4e7"
+                  strokeWidth={1.5}
+                />
+              </div>
+              <div className="my-auto text-xl text-zinc-200 md:pl-2">
+                Video Channel
+              </div>
+            </button>
+            <div className="-ml-4 mt-2">
+              <Tooltip
+                css={{ width: "180px", textAlign: "center" }}
+                content={
+                  "Video channels support camera, voice and screen sharing for up to 6 members at a time"
+                }
+              >
+                <InfoIcon height={12} width={12} fill={"#9333ea"} />
+              </Tooltip>
+            </div>
           </div>
         </>
       );
     } else if (step === 1) {
       return (
         <>
-          <div className="-mt-4 text-center text-xl">Give it a name!</div>
+          <div className="pl-8 text-lg">{channelType} Channel</div>
+          <div className="text-center text-xl">Give it a name!</div>
           <form
             onSubmit={(e) => {
               e.preventDefault;
@@ -126,8 +166,8 @@ const CreateChannelModal = (props: {
               }}
             >
               <BackArrow
-                height={12}
-                width={12}
+                height={16}
+                width={16}
                 stroke="#e4e4e7"
                 strokeWidth={1.5}
               />
@@ -170,8 +210,8 @@ const CreateChannelModal = (props: {
                 }}
               >
                 <BackArrow
-                  height={12}
-                  width={12}
+                  height={16}
+                  width={16}
                   stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
                   strokeWidth={1.5}
                 />
@@ -188,7 +228,8 @@ const CreateChannelModal = (props: {
       <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={createChannelRef}
-          className="fade-in -mt-24 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+          className="fade-in -mt-24 w-11/12 rounded-xl
+          bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
         >
           <div className="">
             <button

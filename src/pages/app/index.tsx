@@ -26,12 +26,13 @@ import {
   User,
 } from "@prisma/client";
 import LoadingOverlay from "@/src/components/app/LoadingOverlay";
-import VoiceChannel from "@/src/components/app/VoiceChannel";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
 import ChevronDown from "@/src/icons/ChevronDown";
 import UserProfileModal from "@/src/components/app/UserProfileModal";
 import { type User as MongoUser } from "@prisma/client/mongo";
+import VideoChannel from "@/src/components/app/VideoChannel";
+import VoiceChannel from "@/src/components/app/VoiceChannel";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -193,8 +194,8 @@ const App = () => {
   const loadingOverlaySetter = (boolean: boolean) => {
     setLoadingOverlayShowing(boolean);
   };
-  const serverRefetch = () => {
-    usersServers.refetch();
+  const serverRefetch = async () => {
+    await usersServers.refetch();
   };
   useEffect(() => {
     document.getElementById("html")?.classList.add("scrollDisabled");
@@ -305,7 +306,7 @@ const App = () => {
               serverSetter={serverSetter}
             />
           </div>
-          <div id="inner-nav" className="ml-20">
+          <div id="inner-nav" className="md:ml-20">
             <InnerNav
               serverSetter={serverSetter}
               botModalToggle={botModalToggle}
@@ -349,7 +350,7 @@ const App = () => {
         </div>
         <div
           className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out ${
-            selectedChannel?.type === "voice" ? "" : "md:hidden"
+            selectedChannel?.type === "video" ? "" : "md:hidden"
           } ${fullscreen ? "-ml-2" : "ml-40 pl-2 md:ml-64 md:pl-6"}`}
         >
           <button onClick={fullscreenToggle}>
@@ -379,8 +380,8 @@ const App = () => {
           ref={scrollableRef}
           className={
             !fullscreen
-              ? `ml-24 flex-1 transform transition-all duration-500 ease-in-out md:ml-52`
-              : "-ml-20 flex-1 transform transition-all duration-500 ease-in-out"
+              ? `ml-44 flex-1 transform transition-all duration-500 ease-in-out md:ml-52`
+              : "flex-1 transform transition-all duration-500 ease-in-out md:-ml-20"
           }
         >
           {selectedInnerTab === "AccountOverview" ? (
@@ -415,12 +416,24 @@ const App = () => {
           ) : null}
           {currentTab === "server" && usersServers ? (
             selectedChannel !== null ? (
-              selectedChannel.type == "text" ? (
+              selectedChannel.type === "text" ? (
                 <ChatChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
                   socket={socket}
                   fullscreen={fullscreen}
+                />
+              ) : selectedChannel.type === "video" ? (
+                <VideoChannel
+                  selectedChannel={selectedChannel}
+                  currentUser={currentUser}
+                  socket={socket}
+                  microphoneState={microphoneState}
+                  audioState={audioState}
+                  audioToggle={audioToggle}
+                  microphoneToggle={microphoneToggle}
+                  fullscreen={fullscreen}
+                  socketChannelUpdate={socketChannelUpdate}
                 />
               ) : (
                 <VoiceChannel

@@ -10,6 +10,7 @@ import {
 } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import TopBanner from "./TopBanner";
+import VideoElement from "./VideoElement";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
@@ -29,6 +30,7 @@ interface VoiceChannelProps {
 
 const constraints = {
   audio: true,
+  video: true,
 };
 
 export default function VoiceChannel(props: VoiceChannelProps) {
@@ -41,6 +43,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const [joinButtonLoadingState, setJoinButtonLoadingState] = useState(false);
   const [leaveButtonLoadingState, setLeaveButtonLoadingState] = useState(false);
   const stream = useRef<MediaStream>(new MediaStream());
+  const [cameraState, setCameraState] = useState<boolean>(false);
+  const [checkCamButtonLoading, setCheckCamButtonLoading] =
+    useState<boolean>(false);
   // prettier-ignore
   const peerConnections = useRef<Map<string, RTCPeerConnection>>(new Map());
   // prettier-ignore
@@ -50,11 +55,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   // prettier-ignore
   const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(selectedChannel.id);
   // prettier-ignore
+  const [videoTrackStatus, setVideoTrackStatus] = useState<Map<string, boolean>>(new Map());
   //prettier-ignore
   const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(new Map());
   //prettier-ignore
   const [videoTrackStates, setVideoTrackStates] = useState<Map<string, boolean>>(new Map());
   //prettier-ignore
+  const [audioTrackStates, setAudioTrackStates] = useState<Map<string, boolean>>(new Map());
 
   useEffect(() => {
     if (connectedWSQuery.data) {
@@ -210,6 +217,14 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           newStreams.set(peerUserID, event.streams[0] as MediaStream);
           return newStreams;
         });
+
+        const videoTrack = event.streams[0].getVideoTracks()[0];
+        const videoTrackEnabled = videoTrack?.enabled || false;
+        setVideoTrackStates((prevVideoTrackStates) => {
+          const newVideoTrackStates = new Map(prevVideoTrackStates);
+          newVideoTrackStates.set(peerUserID, videoTrackEnabled);
+          return newVideoTrackStates;
+        });
       }
     };
 
@@ -222,6 +237,39 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     peerConnections.current?.set(peerUserID, newPeerConnection);
     return newPeerConnection;
   };
+  //peer video handling
+  const updateVideoTrackListeners = (
+    peerUserID: string,
+    videoTrack: MediaStreamTrack
+  ) => {
+    videoTrack.onmute = () => {
+      console.log(`Video track muted for user ${peerUserID}`);
+      setVideoTrackStates((prevVideoTrackStates) => {
+        const newVideoTrackStates = new Map(prevVideoTrackStates);
+        newVideoTrackStates.set(peerUserID, false);
+        return newVideoTrackStates;
+      });
+    };
+
+    videoTrack.onunmute = () => {
+      console.log(`Video track unmuted for user ${peerUserID}`);
+      setVideoTrackStates((prevVideoTrackStates) => {
+        const newVideoTrackStates = new Map(prevVideoTrackStates);
+        newVideoTrackStates.set(peerUserID, true);
+        return newVideoTrackStates;
+      });
+    };
+  };
+
+  useEffect(() => {
+    peerStreams.forEach((stream, peerUserID) => {
+      const videoTrack = stream.getVideoTracks()[0];
+
+      if (videoTrack) {
+        updateVideoTrackListeners(peerUserID, videoTrack);
+      }
+    });
+  }, [peerStreams]);
 
   const removePeer = (peerUserID: string) => {
     const peerConnection = peerConnections.current?.get(peerUserID);
@@ -230,6 +278,11 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       peerConnection.close();
     }
     peerConnections.current?.delete(peerUserID);
+    setVideoTrackStatus((prevStatus) => {
+      const updatedStatus = new Map(prevStatus);
+      updatedStatus.delete(peerUserID);
+      return updatedStatus;
+    });
   };
 
   const joinCall = async () => {
@@ -306,10 +359,43 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     });
   };
 
+  const setVideoTracksState = (state: boolean) => {
+    stream.current.getVideoTracks().forEach((track) => {
+      track.enabled = state;
+    });
+  };
+
   // Update tracks states when microphoneState or cameraState change
   useEffect(() => {
     setAudioTracksState(microphoneState);
-  }, [microphoneState, stream, userJoined]);
+    setVideoTracksState(cameraState);
+  }, [microphoneState, cameraState, stream, userJoined]);
+
+  const cameraToggle = () => {
+    setCameraState(!cameraState);
+  };
+
+  // Handle camera state changes
+  useEffect(() => {
+    if (cameraState) {
+      setupChecker();
+    } else if (!userJoined) {
+      stream.current.getTracks().forEach((track) => track.stop());
+    } else {
+      setVideoTracksState(cameraState);
+    }
+  }, [cameraState]);
+
+  const setupChecker = async () => {
+    setCheckCamButtonLoading(true);
+    if (!userJoined) {
+      try {
+        stream.current = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (e) {}
+    }
+    setCheckCamButtonLoading(false);
+  };
+
   //ui
   const joinCallButton = () => {
     if (joinButtonLoadingState) {
@@ -361,6 +447,38 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     }
   };
 
+  const checkCamButton = () => {
+    if (checkCamButtonLoading) {
+      return (
+        <button className="h-12 w-20 rounded-xl bg-zinc-300 dark:bg-zinc-800">
+          <div className="my-auto">
+            <Loading type="points" />
+          </div>
+        </button>
+      );
+    } else {
+      if (cameraState) {
+        return (
+          <button
+            onClick={cameraToggle}
+            className="rounded-xl bg-purple-700 text-white shadow-md shadow-purple-500 hover:bg-purple-800 hover:shadow-purple-600 active:bg-purple-900 active:shadow-purple-700"
+          >
+            <div className="px-4 py-2">Switch off</div>
+          </button>
+        );
+      } else {
+        return (
+          <button
+            onClick={cameraToggle}
+            className="rounded-xl bg-purple-700 text-white shadow-md shadow-purple-500 hover:bg-purple-800 hover:shadow-purple-600 active:bg-purple-900 active:shadow-purple-700"
+          >
+            <div className="px-4 py-2">Check Camera</div>
+          </button>
+        );
+      }
+    }
+  };
+
   return (
     <div className="">
       <TopBanner
@@ -395,7 +513,20 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         {webSocketsInCall ? (
           <div className="flex h-[60vh] justify-center px-4 pb-8 pt-12 md:px-6 lg:px-10 xl:px-12">
             {webSocketsInCall.map((websocket) => (
-              <div className="m-4" key={websocket.user.id}>
+              <div
+                className="m-4 h-64 w-5/12 rounded-xl bg-purple-200 dark:bg-zinc-700"
+                key={websocket.user.id}
+              >
+                <VideoElement
+                  peerUserID={websocket.user.id}
+                  stream={peerStreams.get(websocket.user.id) || stream.current}
+                  currentUserID={currentUser.id}
+                  videoTrackState={
+                    videoTrackStates.get(websocket.user.id) || cameraState
+                  }
+                  isLocal={currentUser.id === websocket.user.id}
+                  deafen={!audioState}
+                />
                 <div className="flex justify-center px-6 py-4">
                   <button className="flex flex-col content-center justify-center">
                     <img
@@ -409,7 +540,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                       alt={"user-logo"}
                       className="h-24 w-24 rounded-full md:h-36 md:w-36"
                     />
-                    <div className="mx-auto pt-4 text-black dark:text-white">
+                    <div className="mx-auto pt-4 text-black">
                       {websocket.user.name}
                     </div>
                   </button>
@@ -420,6 +551,26 @@ export default function VoiceChannel(props: VoiceChannelProps) {
         ) : null}
         {!userJoined ? (
           <>
+            {cameraState ? (
+              <div className="absolute top-36 flex w-full justify-center">
+                <div className="h-[300px] w-[400px]">
+                  <div className="flex content-center justify-center">
+                    <Loading css={{ zIndex: 0 }} />
+                  </div>
+                  <div className="-mt-8 flex justify-center">
+                    <VideoElement
+                      peerUserID={currentUser.id}
+                      stream={stream.current}
+                      currentUserID={currentUser.id}
+                      videoTrackState={cameraState}
+                      isLocal={!microphoneState}
+                      deafen={!audioState}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            <div className="absolute right-24 -mt-24">{checkCamButton()}</div>
             <div className="flex flex-col justify-center">
               <div className="flex justify-center pb-4">{joinCallButton()}</div>
               <div className="flex flex-col">
@@ -487,6 +638,19 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                   <div className="px-2">
                     <Button auto onClick={props.audioToggle} className="px-2">
                       Turn Sound On
+                    </Button>
+                  </div>
+                )}
+                {cameraState ? (
+                  <div className="px-2">
+                    <Button auto onClick={cameraToggle}>
+                      Turn Camera Off
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="px-2">
+                    <Button auto onClick={cameraToggle} className="px-2">
+                      Turn Camera On
                     </Button>
                   </div>
                 )}

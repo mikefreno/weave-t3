@@ -42,6 +42,9 @@ import {
   type Server as MongoServer,
   type User as MongoUser,
 } from "@prisma/client/mongo";
+import VideoCamIcon from "@/src/icons/VideoCamIcon";
+import SpeakerOn from "@/src/icons/SpeakerOn";
+import { channel } from "diagnostics_channel";
 
 type ServerIncludingChannel = {
   id: number;
@@ -78,7 +81,7 @@ interface InnerNavProps {
     adminships: Server_Admin[];
   };
   loadingOverlaySetter: (boolean: boolean) => void;
-  serverRefetch: () => void;
+  serverRefetch: () => Promise<void>;
   socket: WebSocket | null;
   createChannelToggle: () => void;
   createChannelButtonRef: RefObject<HTMLButtonElement>;
@@ -113,7 +116,7 @@ const InnerNav = (props: InnerNavProps) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
-  const deleteUser = api.server.deleteUserFromServer.useMutation({});
+  const deleteUserFromServer = api.server.deleteUserFromServer.useMutation({});
 
   const [userSearchData, setUserSearchData] = useState<MongoUser[] | null>(
     null
@@ -136,8 +139,8 @@ const InnerNav = (props: InnerNavProps) => {
     );
     if (confirmed) {
       loadingOverlaySetter(true);
-      await deleteUser.mutateAsync(selectedInnerTabID);
-      serverRefetch();
+      await deleteUserFromServer.mutateAsync(selectedInnerTabID);
+      await serverRefetch();
       loadingOverlaySetter(false);
     }
   };
@@ -474,7 +477,7 @@ const InnerNav = (props: InnerNavProps) => {
   } else if (currentTab == "server") {
     return (
       <div>
-        <div className="fixed h-screen w-44 border-r border-zinc-700 bg-purple-500 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+        <div className="fixed h-screen w-44 overflow-y-scroll border-r border-zinc-700 bg-purple-500 pb-12 transition-colors duration-500 ease-in-out dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
           <SideNavSmallScreen
             isDarkTheme={isDarkTheme}
             currentTabSetter={currentTabSetter}
@@ -513,43 +516,126 @@ const InnerNav = (props: InnerNavProps) => {
             {/* end */}
             <div>
               <div>
-                {usersServers
-                  .find((server) => server.id === props.selectedInnerTabID)
-                  ?.channels.map((channel) => (
-                    <div className="my-2" key={channel.id}>
-                      <button
-                        onClick={() => props.setSelectedChannel(channel)}
-                        className={`flex h-12 w-full rounded-md border border-zinc-300 bg-zinc-100 px-4 hover:bg-zinc-200 active:bg-zinc-300 ${
-                          selectedChannel?.id == channel.id
-                            ? "dark:border-purple-600"
-                            : "border-zinc-300 dark:border-zinc-600"
-                        } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
-                      >
-                        {channel.type == "voice" ? (
-                          <span className="my-auto">
-                            <HeadphonesIcon
-                              height={24}
-                              width={24}
-                              color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                            />
-                          </span>
-                        ) : (
-                          <span className="my-auto">
-                            <CommentsIcon
-                              height={24}
-                              width={24}
-                              strokeWidth={0.5}
-                              color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                            />
-                          </span>
-                        )}
-                        <div className="my-auto ml-4 text-left">
-                          {channel.name}
-                        </div>
-                      </button>
-                    </div>
-                  ))}
+                <div>
+                  {(() => {
+                    const filteredChannels = usersServers
+                      .find((server) => server.id === props.selectedInnerTabID)
+                      ?.channels.filter((channel) => channel.type === "text");
 
+                    return filteredChannels &&
+                      filteredChannels.length === 0 ? null : (
+                      <div className="pb-4">
+                        <div className="rule-around -mx-4 text-center text-sm">
+                          Text Channels
+                        </div>
+                        {filteredChannels?.map((channel) => (
+                          <div className="my-2" key={channel.id}>
+                            <button
+                              onClick={() => props.setSelectedChannel(channel)}
+                              className={`flex h-10 w-full rounded-md border border-zinc-300 bg-zinc-100 px-2 hover:bg-zinc-200 active:bg-zinc-300 ${
+                                selectedChannel?.id == channel.id
+                                  ? "dark:border-purple-600"
+                                  : "border-zinc-300 dark:border-zinc-600"
+                              } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
+                            >
+                              <span className="my-auto">
+                                <CommentsIcon
+                                  height={24}
+                                  width={24}
+                                  strokeWidth={0.5}
+                                  color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                                />
+                              </span>
+                              <div className="my-auto ml-4 text-left">
+                                {channel.name}
+                              </div>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+                <div>
+                  {(() => {
+                    const filteredChannels = usersServers
+                      .find((server) => server.id === props.selectedInnerTabID)
+                      ?.channels.filter((channel) => channel.type === "audio");
+
+                    return filteredChannels &&
+                      filteredChannels.length === 0 ? null : (
+                      <div className="pb-4">
+                        <div className="rule-around -mx-4 text-center text-sm">
+                          Audio Channels
+                        </div>
+                        {filteredChannels?.map((channel) => (
+                          <div className="my-2" key={channel.id}>
+                            <button
+                              onClick={() => props.setSelectedChannel(channel)}
+                              className={`flex h-10 w-full rounded-md border border-zinc-300 bg-zinc-100 px-2 hover:bg-zinc-200 active:bg-zinc-300 ${
+                                selectedChannel?.id == channel.id
+                                  ? "dark:border-purple-600"
+                                  : "border-zinc-300 dark:border-zinc-600"
+                              } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
+                            >
+                              <span className="my-auto">
+                                <SpeakerOn
+                                  height={24}
+                                  width={24}
+                                  stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                                  strokeWidth={0.5}
+                                />
+                              </span>
+                              <div className="my-auto ml-4 text-left">
+                                {channel.name}
+                              </div>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+                <div>
+                  {(() => {
+                    const filteredChannels = usersServers
+                      .find((server) => server.id === props.selectedInnerTabID)
+                      ?.channels.filter((channel) => channel.type === "video");
+
+                    return filteredChannels &&
+                      filteredChannels.length === 0 ? null : (
+                      <div className="pb-4">
+                        <div className="rule-around -mx-4 text-center text-sm">
+                          Video Channels
+                        </div>
+                        {filteredChannels?.map((channel) => (
+                          <div className="my-2" key={channel.id}>
+                            <button
+                              onClick={() => props.setSelectedChannel(channel)}
+                              className={`flex h-10 w-full rounded-md border border-zinc-300 bg-zinc-100 px-2 hover:bg-zinc-200 active:bg-zinc-300 ${
+                                selectedChannel?.id == channel.id
+                                  ? "dark:border-purple-600"
+                                  : "border-zinc-300 dark:border-zinc-600"
+                              } dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:active:bg-zinc-700`}
+                            >
+                              <span className="my-auto">
+                                <VideoCamIcon
+                                  height={24}
+                                  width={24}
+                                  strokeWidth={0.5}
+                                  color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                                />
+                              </span>
+                              <div className="my-auto ml-4 text-left">
+                                {channel.name}
+                              </div>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
                 <button
                   onClick={createChannelToggle}
                   className="flex underline-offset-2 hover:underline"

@@ -77,7 +77,7 @@ const SideNav = (props: {
         </div>
         <div id="joined-server-list">
           <div id="users-owned-servers">
-            <div className="flex flex-col items-center border-b border-zinc-200 py-2 dark:border-zinc-600">
+            <div className="flex transform flex-col items-center border-b border-zinc-200 py-2 transition-transform duration-500 dark:border-zinc-600">
               {usersServers?.map((server: Server) => (
                 <div className="py-2" key={server.id}>
                   {props.selectedInnerTabID == server.id &&
