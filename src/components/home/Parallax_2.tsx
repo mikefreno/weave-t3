@@ -5,8 +5,9 @@ import GameModal from "./GameModal";
 import WorkModal from "./WorkModal";
 
 const Parallax_2 = (props: { isDarkTheme: boolean }) => {
-  const parallaxRef = useRef<HTMLDivElement>(null);
   const { isDarkTheme } = props;
+
+  const parallaxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,9 +17,7 @@ const Parallax_2 = (props: { isDarkTheme: boolean }) => {
         if (index === 0 || index === 2) {
           speed = speed * -1;
         }
-        (layer as HTMLElement).style.transform = `translateY(${
-          offset * speed
-        }px)`;
+        (layer as HTMLElement).style.transform = `translateY(${offset * speed}px)`;
       });
     };
     window.addEventListener("scroll", handleScroll);
@@ -28,10 +27,7 @@ const Parallax_2 = (props: { isDarkTheme: boolean }) => {
     };
   }, []);
   return (
-    <div
-      className="parallax-container absolute z-20 mt-48 w-full"
-      ref={parallaxRef}
-    >
+    <div className="parallax-container absolute z-20 mt-48 w-full" ref={parallaxRef}>
       <div className="parallax-layer" data-speed="0.2">
         <div className="animate-up-down layer1 absolute right-16 mt-60 xl:right-36">
           <ChatModal isDarkTheme={isDarkTheme} />

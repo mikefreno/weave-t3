@@ -9,12 +9,7 @@ const DownloadButton = () => {
 
   return (
     <>
-      <Tooltip
-        content={"Coming Soon!"}
-        trigger="click"
-        color={"secondary"}
-        placement="topEnd"
-      >
+      <Tooltip content={"Coming Soon!"} trigger="click" color={"secondary"} placement="topEnd">
         <Button shadow color={"gradient"} size="xl" className="z-0">
           Download {platform === "Unknown" ? "" : `for ${platform}`}
           <DownloadIcon className="ml-2 h-4 w-4" />

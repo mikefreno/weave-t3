@@ -17,13 +17,13 @@ const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
   loginRef: React.LegacyRef<HTMLDivElement> | undefined;
 }) => {
-  const [loginButtonLoading, setLoginButtonLoading] = useState(false);
-  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(
-    null
-  );
   const { isDarkTheme } = useContext(ThemeContext);
-  const emailLoginInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter().route;
+
+  const [loginButtonLoading, setLoginButtonLoading] = useState(false);
+  const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
+
+  const emailLoginInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const handleFocus = (event: FocusEvent) => {
@@ -50,14 +50,10 @@ const LoginModal = (props: {
     loginButtonLoadingToggle();
   }
   async function googleLogin() {
-    signIn("google", { callbackUrl: "/api/providerUserCreationCheck" }).catch(
-      console.log
-    );
+    signIn("google", { callbackUrl: "/api/providerUserCreationCheck" }).catch(console.log);
   }
   async function githubLogin() {
-    signIn("github", { callbackUrl: "/api/providerUserCreationCheck" }).catch(
-      console.log
-    );
+    signIn("github", { callbackUrl: "/api/providerUserCreationCheck" }).catch(console.log);
   }
   function loginButtonLoadingToggle() {
     setLoginButtonLoading(!loginButtonLoading);
@@ -87,22 +83,13 @@ const LoginModal = (props: {
         <div className="absolute z-50 -mb-6 max-w-[25vw] pl-2 text-2xl">
           {router === "/login/redirect" ? "Login" : "Login / Register"}
         </div>
-        {router === "/login/redirect" ||
-        router === "/login/_standalone" ? null : (
-          <button
-            className="absolute right-4 -mt-2 w-10"
-            onClick={props.onClose}
-          >
+        {router === "/login/redirect" || router === "/login/_standalone" ? null : (
+          <button className="absolute right-4 -mt-2 w-10" onClick={props.onClose}>
             <Xmark className="text-zinc-800 dark:text-zinc-200" />
           </button>
         )}
         <div className="z-0 -mb-12 flex justify-center">
-          <Image
-            src={isDarkTheme ? DarkLogo : LightLogo}
-            alt="logo"
-            width={80}
-            height={80}
-          />
+          <Image src={isDarkTheme ? DarkLogo : LightLogo} alt="logo" width={80} height={80} />
         </div>
         <div className="mt-12">
           <form onSubmit={emailLogin} className="flex flex-col px-2">
@@ -137,7 +124,7 @@ const LoginModal = (props: {
                 onClick={googleLogin}
               >
                 Sign in with Google
-                <span className="my-auto ml-4 -mr-2">
+                <span className="my-auto -mr-2 ml-4">
                   <GoogleLogo height={24} width={24} />
                 </span>
               </button>
@@ -147,7 +134,7 @@ const LoginModal = (props: {
                 onClick={githubLogin}
               >
                 Sign in with Github
-                <span className="my-auto ml-4 -mr-2">
+                <span className="my-auto -mr-2 ml-4">
                   <GitHub height={24} width={24} fill={"white"} />
                 </span>
               </button>

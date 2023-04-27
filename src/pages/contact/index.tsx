@@ -8,24 +8,22 @@ import Head from "next/head";
 import { useContext, useRef, useState } from "react";
 
 export default function PrivacyPolicy() {
-  const switchRef = useRef<HTMLDivElement>(null);
   const { isDarkTheme } = useContext(ThemeContext);
   const { data: session, status } = useSession();
+  //state
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const [responseText, setResponseText] = useState<string>("");
   const [submitState, setSubmitState] = useState<boolean>(false);
-
+  //ref
+  const switchRef = useRef<HTMLDivElement>(null);
+  //trpc (api)
   const sendContactRequestMutation = api.misc.sendContactRequest.useMutation();
 
   const submitForm = async (e: any) => {
     e.preventDefault();
-    if (
-      nameInputRef.current &&
-      emailInputRef.current &&
-      messageInputRef.current
-    ) {
+    if (nameInputRef.current && emailInputRef.current && messageInputRef.current) {
       setSubmitState(true);
       const res = await sendContactRequestMutation.mutateAsync({
         name: nameInputRef.current.value,
@@ -33,9 +31,7 @@ export default function PrivacyPolicy() {
         message: messageInputRef.current.value,
       });
       if (res === 201) {
-        setResponseText(
-          "Message sent successfully, we will get back a soon as possible!"
-        );
+        setResponseText("Message sent successfully, we will get back a soon as possible!");
       } else {
         console.log(res + "error");
       }
@@ -60,9 +56,7 @@ export default function PrivacyPolicy() {
           <Navbar switchRef={switchRef} />
           <div className="flex min-h-screen justify-center px-12">
             <div className="pt-[20vh]">
-              <div className="text-center text-3xl tracking-widest">
-                Contact
-              </div>
+              <div className="text-center text-3xl tracking-widest">Contact</div>
               <form onSubmit={submitForm}>
                 <div className="mt-24">
                   <div className="flex">
@@ -75,9 +69,7 @@ export default function PrivacyPolicy() {
                         labelPlaceholder="Your Name"
                         required
                         color="secondary"
-                        initialValue={
-                          session?.user?.name ? session.user.name : ""
-                        }
+                        initialValue={session?.user?.name ? session.user.name : ""}
                       />
                     </div>
                     <Input
@@ -88,9 +80,7 @@ export default function PrivacyPolicy() {
                       labelPlaceholder="Your email"
                       required
                       color="secondary"
-                      initialValue={
-                        session?.user?.email ? session.user.email : ""
-                      }
+                      initialValue={session?.user?.email ? session.user.email : ""}
                     />
                   </div>
                   <div className="pl-7 pt-12">
@@ -112,14 +102,7 @@ export default function PrivacyPolicy() {
                         <Loading type="points" />
                       </Button>
                     ) : (
-                      <Button
-                        auto
-                        shadow
-                        ghost
-                        ripple
-                        type="submit"
-                        color={"secondary"}
-                      >
+                      <Button auto shadow ghost ripple type="submit" color={"secondary"}>
                         Send Message
                       </Button>
                     )}

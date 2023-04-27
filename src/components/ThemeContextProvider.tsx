@@ -1,7 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useTheme as useNextTheme } from "next-themes";
-import { useTheme } from "@nextui-org/react";
-import { usePathname } from "next/navigation";
 
 const ThemeContext = createContext({
   isDarkTheme: false,
@@ -16,8 +14,6 @@ interface Props {
 export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
   const [isDarkTheme, setDarkTheme] = useState(false);
   const { setTheme } = useNextTheme();
-  const { isDark, type } = useTheme();
-  const pathname = usePathname();
 
   useEffect(() => {
     setDarkTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -43,9 +39,7 @@ export const ThemeContextProvider: React.FC<Props> = ({ children }) => {
     switchDarkTheme: changeDarkMode,
   };
 
-  return (
-    <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>;
 };
 
 export default ThemeContext;

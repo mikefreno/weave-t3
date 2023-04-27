@@ -4,20 +4,8 @@ import ChevronDown from "@/src/icons/ChevronDown";
 import RobotForApp from "@/src/icons/RobotForApp";
 import { Raleway } from "next/font/google";
 import { Tooltip } from "@nextui-org/react";
-import {
-  Server,
-  Server_Admin,
-  Server_Channel,
-  Server_Member,
-  User,
-} from "@prisma/client";
-import React, {
-  Dispatch,
-  MouseEventHandler,
-  RefObject,
-  useRef,
-  useState,
-} from "react";
+import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
+import { RefObject, useRef, useState } from "react";
 import useOnClickOutside from "@/src/components/ClickOutsideHook";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
@@ -25,7 +13,7 @@ const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 const SideNavSmallScreen = (props: {
   isDarkTheme: boolean;
   currentTabSetter(id: string): void;
-  setSelectedInnerTab: any;
+  innerTabSetter: (tab: string) => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -39,24 +27,25 @@ const SideNavSmallScreen = (props: {
   selectedInnerTabID: number;
   currentTab: string;
   setSelectedInnerTabID: (id: number) => void;
-  setSelectedChannel: Dispatch<React.SetStateAction<Server_Channel | null>>;
+  channelSetter: (input: Server_Channel | null) => void;
   serverModalToggle: any;
   serverSetter: (server: Server) => void;
 }) => {
   const {
     isDarkTheme,
     currentTabSetter,
-    setSelectedInnerTab,
+    innerTabSetter,
     currentUser,
     timestamp,
-    selectedInnerTabID,
     currentTab,
+    selectedInnerTabID,
     usersServers,
     setSelectedInnerTabID,
-    setSelectedChannel,
+    channelSetter,
     serverModalToggle,
     botModalToggle,
     serverSetter,
+    botButtonRef,
   } = props;
   const [navDropDownShowing, setNavDropDownShowing] = useState(false);
   const navDropdownRef = useRef<HTMLDivElement>(null);
@@ -84,12 +73,7 @@ const SideNavSmallScreen = (props: {
           onClick={() => setNavDropDownShowing(!navDropDownShowing)}
         >
           <div className="my-auto pr-1">
-            <ChevronDown
-              height={20}
-              width={20}
-              stroke={isDarkTheme ? "#f4f4f5" : "#27272a"}
-              strokeWidth={1}
-            />
+            <ChevronDown height={20} width={20} stroke={isDarkTheme ? "#f4f4f5" : "#27272a"} strokeWidth={1} />
           </div>
           <div className="my-auto">Navigation</div>
         </button>
@@ -111,7 +95,7 @@ const SideNavSmallScreen = (props: {
                     className="z-50"
                     onClick={() => {
                       currentTabSetter("DMS");
-                      setSelectedInnerTab("AccountOverview");
+                      innerTabSetter("AccountOverview");
                     }}
                   >
                     <img
@@ -133,8 +117,7 @@ const SideNavSmallScreen = (props: {
                   <div className="flex flex-col items-center border-b border-zinc-200 py-2 dark:border-zinc-600">
                     {usersServers?.map((server: Server) => (
                       <div className="py-2" key={server.id}>
-                        {selectedInnerTabID == server.id &&
-                        props.currentTab == "server" ? (
+                        {selectedInnerTabID == server.id && currentTab == "server" ? (
                           <span className="absolute -ml-3 -mt-1 h-4 w-4 rounded-full bg-purple-200" />
                         ) : null}
                         <Tooltip
@@ -146,11 +129,11 @@ const SideNavSmallScreen = (props: {
                           <button
                             className=""
                             onClick={() => {
-                              setSelectedInnerTab(server.name);
+                              innerTabSetter(server.name);
                               setSelectedInnerTabID(server.id);
                               serverSetter(server);
                               currentTabSetter("server");
-                              setSelectedChannel(null);
+                              channelSetter(null);
                               setNavDropDownShowing(false);
                             }}
                           >
@@ -189,17 +172,12 @@ const SideNavSmallScreen = (props: {
                       className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={serverModalTrigger}
                     >
-                      <AddIcon
-                        height={48}
-                        width={48}
-                        stroke={isDarkTheme ? "#9333ea" : "#8b5cf6"}
-                        strokeWidth={1}
-                      />
+                      <AddIcon height={48} width={48} stroke={isDarkTheme ? "#9333ea" : "#8b5cf6"} strokeWidth={1} />
                     </button>
                   </Tooltip>
                 </div>
                 <div className="flex justify-center">
-                  {props.currentTab === "PublicServers" ? (
+                  {currentTab === "PublicServers" ? (
                     <span className="absolute -mt-1 ml-1 mr-20 h-4 w-4 rounded-full bg-zinc-200" />
                   ) : null}
                   <Tooltip
@@ -211,8 +189,8 @@ const SideNavSmallScreen = (props: {
                     <button
                       className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-4 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={() => {
-                        props.currentTabSetter("PublicServers");
-                        props.setSelectedInnerTab("");
+                        currentTabSetter("PublicServers");
+                        innerTabSetter("");
                         setNavDropDownShowing(false);
                       }}
                     >
@@ -233,15 +211,11 @@ const SideNavSmallScreen = (props: {
                     placement="rightEnd"
                   >
                     <button
-                      ref={props.botButtonRef}
+                      ref={botButtonRef}
                       className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={botModalTrigger}
                     >
-                      <RobotForApp
-                        height={48}
-                        width={48}
-                        fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
-                      />
+                      <RobotForApp height={48} width={48} fill={isDarkTheme ? "#9333ea" : "#8b5cf6"} />
                     </button>
                   </Tooltip>
                 </div>

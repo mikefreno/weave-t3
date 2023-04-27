@@ -1,4 +1,4 @@
-import { Button, Input, Loading } from "@nextui-org/react";
+import { Button, FormElement, Input, Loading } from "@nextui-org/react";
 import React, { MutableRefObject, RefObject, useRef, useState } from "react";
 import SendIcon from "@/src/icons/SendIcon";
 import QRCode from "react-qr-code";
@@ -12,13 +12,8 @@ const InviteModal = (props: {
   selectedInnerTab: string;
   inviteModalRef: RefObject<HTMLDivElement>;
 }) => {
-  const {
-    isDarkTheme,
-    inviteModalToggle,
-    selectedInnerTabID,
-    selectedInnerTab,
-    inviteModalRef,
-  } = props;
+  const { isDarkTheme, inviteModalToggle, selectedInnerTabID, selectedInnerTab, inviteModalRef } = props;
+
   const [iconClass, setIconClass] = useState("");
   const [emailSendLoading, setEmailSendLoading] = useState(false);
   const [emailSendReport, setEmailSendReport] = useState("");
@@ -26,43 +21,46 @@ const InviteModal = (props: {
   const [QRCodeValue, setQRCodeValue] = useState("");
   const [showingGenericCode, setShowingGenericCode] = useState(false);
   const [genericCodeData, setGenericCodeData] = useState("");
-  const invitee =
-    useRef<HTMLInputElement>() as MutableRefObject<HTMLInputElement>;
+
+  const invitee = useRef<FormElement>(null);
+
   const createJWTInvite = api.server.createJWTInvite.useMutation({});
   const sendServerInvite = api.server.sendServerInvite.useMutation({});
   const userCheck = api.server.checkForMemberEmail.useMutation({});
 
   const sendEmail = async () => {
-    const email = invitee.current.value;
-    const token = await createJWTInvite.mutateAsync({
-      email: email,
-      serverID: selectedInnerTabID,
-    });
-    if (email.length >= 3) {
-      setIconClass("move-fade");
-      setEmailSendLoading(true);
-      const res = await userCheck.mutateAsync({
+    if (invitee.current) {
+      const email = invitee.current.value;
+      const token = await createJWTInvite.mutateAsync({
         email: email,
         serverID: selectedInnerTabID,
       });
-      if (res === false) {
-        await sendServerInvite.mutateAsync({
-          invitee: invitee.current.value,
-          token: token as string,
-          serverName: selectedInnerTab,
+      if (email.length >= 3) {
+        setIconClass("move-fade");
+        setEmailSendLoading(true);
+        const res = await userCheck.mutateAsync({
+          email: email,
+          serverID: selectedInnerTabID,
         });
-        setEmailSendReport("Email Sent!");
-      } else if (res === true) {
-        setEmailSendReport("User Exists!");
+        if (res === false) {
+          await sendServerInvite.mutateAsync({
+            invitee: invitee.current.value,
+            token: token as string,
+            serverName: selectedInnerTab,
+          });
+          setEmailSendReport("Email Sent!");
+        } else if (res === true) {
+          setEmailSendReport("User Exists!");
+        }
+        setEmailSendLoading(false);
       }
-      setEmailSendLoading(false);
     }
   };
 
   const showCode = async () => {
     if (showingGenericCode) {
       setShowingGenericCode(false);
-    } else {
+    } else if (invitee.current) {
       const email = invitee.current.value;
       if (email.length >= 3) {
         const token = await createJWTInvite.mutateAsync({
@@ -78,16 +76,18 @@ const InviteModal = (props: {
   };
 
   const generateQRCode = async () => {
-    const email = invitee.current.value;
-    if (email.length >= 3) {
-      const token = await createJWTInvite.mutateAsync({
-        email: email,
-        serverID: selectedInnerTabID,
-      });
-      setQRCodeValue(`localhost:3000/api/joinServer?token=${token}`);
-      setQRCodeShowing(!QRCodeShowing);
-    } else {
-      alert("Please enter a valid email address in above field!");
+    if (invitee.current) {
+      const email = invitee.current.value;
+      if (email.length >= 3) {
+        const token = await createJWTInvite.mutateAsync({
+          email: email,
+          serverID: selectedInnerTabID,
+        });
+        setQRCodeValue(`localhost:3000/api/joinServer?token=${token}`);
+        setQRCodeShowing(!QRCodeShowing);
+      } else {
+        alert("Please enter a valid email address in above field!");
+      }
     }
   };
 
@@ -107,9 +107,7 @@ const InviteModal = (props: {
             >
               <Xmark className="text-zinc-800 dark:text-zinc-200" />
             </button>
-            <div className="-mt-6 pb-4 text-center text-2xl">
-              Send an Invite
-            </div>
+            <div className="-mt-6 pb-4 text-center text-2xl">Send an Invite</div>
             <div className="mt-6 flex justify-center">
               <div className="mx-4 my-auto">Send by email</div>
               <Input
@@ -130,12 +128,7 @@ const InviteModal = (props: {
                       <Loading size="xs" />
                     ) : (
                       <div className={iconClass}>
-                        <SendIcon
-                          height={12}
-                          strokeWidth={1}
-                          width={12}
-                          color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                        />
+                        <SendIcon height={12} strokeWidth={1} width={12} color={isDarkTheme ? "#e4e4e7" : "#27272a"} />
                       </div>
                     )}
                   </button>
@@ -177,26 +170,14 @@ const InviteModal = (props: {
               <div className="flex justify-evenly">
                 <div className="flex flex-col items-center">
                   <div className="mb-2">Generate Code</div>
-                  <Button
-                    auto
-                    size={"sm"}
-                    color={"secondary"}
-                    onClick={showCode}
-                  >
+                  <Button auto size={"sm"} color={"secondary"} onClick={showCode}>
                     Get
                   </Button>
-                  <div className="mt-2 w-40 break-words">
-                    {showingGenericCode ? genericCodeData : null}
-                  </div>
+                  <div className="mt-2 w-40 break-words">{showingGenericCode ? genericCodeData : null}</div>
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="mb-2">Generate QR Code</div>
-                  <Button
-                    auto
-                    size={"sm"}
-                    color={"secondary"}
-                    onClick={generateQRCode}
-                  >
+                  <Button auto size={"sm"} color={"secondary"} onClick={generateQRCode}>
                     Get
                   </Button>
                   {QRCodeShowing ? (

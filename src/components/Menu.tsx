@@ -22,17 +22,12 @@ const Menu = (props: {
   setSelectedInnerTab?: (innerTab: string) => void;
   setMenuOpen: (open: boolean) => void;
 }) => {
+  const { session, status, isDarkTheme, currentTabSetter, setSelectedInnerTab } = props;
   const pathname = usePathname();
-  const {
-    session,
-    status,
-    isDarkTheme,
-    currentTabSetter,
-    setSelectedInnerTab,
-  } = props;
+
   const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
+
   const infoButtonRef = useRef<HTMLButtonElement>(null);
-  const infoModalRef = useRef<HTMLDivElement>(null);
 
   const infoDropdownToggle = () => {
     setInfoDropdownShowing(!infoDropdownShowing);
@@ -64,9 +59,7 @@ const Menu = (props: {
             session ? (
               <>
                 <li className="flex justify-center text-lg">
-                  {pathname === "/app" &&
-                  setSelectedInnerTab &&
-                  currentTabSetter ? (
+                  {pathname === "/app" && setSelectedInnerTab && currentTabSetter ? (
                     <button
                       onClick={() => {
                         currentTabSetter("DMS");
@@ -129,11 +122,7 @@ const Menu = (props: {
                   </Link>
                 </Button>
               ) : (
-                <Tooltip
-                  content={"Login to use!"}
-                  placement="bottomStart"
-                  color={"secondary"}
-                >
+                <Tooltip content={"Login to use!"} placement="bottomStart" color={"secondary"}>
                   <Button shadow color="gradient" auto size={"md"}>
                     Web App
                   </Button>
@@ -152,12 +141,7 @@ const Menu = (props: {
           >
             <div className="pl-2">Back</div>
             <div className="my-auto rotate-180">
-              <BackArrow
-                height={24}
-                width={24}
-                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                strokeWidth={1}
-              />
+              <BackArrow height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
             </div>
           </button>
           <InfoModalContent isDarkTheme={isDarkTheme} />
@@ -169,9 +153,7 @@ const Menu = (props: {
     <div
       id="menu"
       ref={props.menuRef}
-      className={`fade-in absolute right-4 top-2 z-[100] mr-2 ${
-        pathname === "/app" ? "" : "md:hidden"
-      }`}
+      className={`fade-in absolute right-4 top-2 z-[100] mr-2 ${pathname === "/app" ? "" : "md:hidden"}`}
     >
       <div
         className={`${nunito_200} rounded-b-3xl rounded-tl-3xl rounded-tr-sm border border-zinc-400 bg-zinc-200 shadow-xl dark:border-zinc-500 dark:bg-zinc-900`}

@@ -1,10 +1,4 @@
-import React, {
-  RefObject,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { RefObject, useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
@@ -38,19 +32,22 @@ const Navbar = (props: {
   setSelectedInnerTab?: (innerTab: string) => void;
 }) => {
   const { setSelectedInnerTab, currentTabSetter } = props;
-  const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [showingLoginModal, setShowingLoginModal] = useState(false);
+
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
+  //state
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showingLoginModal, setShowingLoginModal] = useState(false);
+  const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
+  //ref
   const menuRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const loginRef = useRef<HTMLDivElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
-  const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoModalRef = useRef<HTMLDivElement>(null);
-  const [currentUser, setCurrentUser] = useState<UserData | null>(null);
 
   const currentUserReturn = api.users.getCurrentUser.useQuery();
 
@@ -74,23 +71,17 @@ const Navbar = (props: {
     }
   }, [showingLoginModal]);
 
-  useOnClickOutside(
-    [menuRef, closeRef, props.switchRef as RefObject<HTMLDivElement>],
-    () => {
-      setMenuOpen(false);
-    }
-  );
+  useOnClickOutside([menuRef, closeRef, props.switchRef as RefObject<HTMLDivElement>], () => {
+    setMenuOpen(false);
+  });
 
   useOnClickOutside([infoModalRef, infoButtonRef], () => {
     setInfoDropdownShowing(false);
   });
 
-  useOnClickOutside(
-    [loginRef, loginButtonRef, props.switchRef as RefObject<HTMLDivElement>],
-    () => {
-      setShowingLoginModal(false);
-    }
-  );
+  useOnClickOutside([loginRef, loginButtonRef, props.switchRef as RefObject<HTMLDivElement>], () => {
+    setShowingLoginModal(false);
+  });
 
   useEffect(() => {
     rotateBars();
@@ -127,15 +118,9 @@ const Navbar = (props: {
 
   return (
     <div className="stopIT">
-      <nav
-        className={`fixed z-50 flex p-2 ${
-          pathname !== "/app" ? "w-screen backdrop-blur" : "right-0 rounded-lg"
-        }`}
-      >
+      <nav className={`fixed z-50 flex p-2 ${pathname !== "/app" ? "w-screen backdrop-blur" : "right-0 rounded-lg"}`}>
         {pathname == "/app" ? null : (
-          <div
-            className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_300.className} flex flex-1`}
-          >
+          <div className={`mx-4 my-2 text-[#171717] dark:text-[#E2E2E2] ${railway_300.className} flex flex-1`}>
             <Link href={"/"} className="flex">
               <Image
                 src={isDarkTheme ? DarkLogo : LightLogo}
@@ -144,19 +129,14 @@ const Navbar = (props: {
                 height={40}
                 className="logoSpinner"
               />
-              <span className="z-10 mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">
-                Weave
-              </span>
+              <span className="z-10 mx-2 my-auto text-2xl text-[#171717] dark:text-[#E2E2E2]">Weave</span>
             </Link>
           </div>
         )}
         <div className="my-auto flex justify-end" style={{ flex: 3 }}>
           <div className={pathname == "/app" ? "hidden" : "hidden md:block"}>
             <ul className="flex text-sm text-[#171717] dark:text-[#E2E2E2]">
-              <div
-                ref={props.switchRef}
-                className={`${pathname == "/" ? "-mr-4" : null} z-50 mt-1`}
-              >
+              <div ref={props.switchRef} className={`${pathname == "/" ? "-mr-4" : null} z-50 mt-1`}>
                 <Switch
                   checked={isDarkTheme}
                   shadow
@@ -189,10 +169,7 @@ const Navbar = (props: {
                   Info
                 </button>
                 {infoDropdownShowing ? (
-                  <div
-                    className="fade-in absolute -ml-1 p-2"
-                    ref={infoModalRef}
-                  >
+                  <div className="fade-in absolute -ml-1 p-2" ref={infoModalRef}>
                     <div className="-ml-40 mt-8 rounded-b-3xl rounded-tl-3xl rounded-tr-sm border border-zinc-500 bg-zinc-200 shadow-xl dark:bg-zinc-900">
                       <div className="p-1">
                         <InfoModalContent isDarkTheme={isDarkTheme} />
@@ -226,20 +203,14 @@ const Navbar = (props: {
                       </li>
                     </Tooltip> */}
                     <li className="z-50 my-auto pr-2">
-                      <button
-                        className="underline-offset-[6px] hover:underline"
-                        onClick={() => signOut()}
-                      >
+                      <button className="underline-offset-[6px] hover:underline" onClick={() => signOut()}>
                         Sign out
                       </button>
                     </li>
                   </>
                 ) : pathname !== "/login/redirect" ? (
                   <li className="z-50 my-auto pr-2">
-                    <button
-                      className="underline-offset-[6px] hover:underline"
-                      onClick={loginToggle}
-                    >
+                    <button className="underline-offset-[6px] hover:underline" onClick={loginToggle}>
                       Login / Register
                     </button>
                   </li>
@@ -257,19 +228,14 @@ const Navbar = (props: {
                 </div>
               )}
               <li className="mx-2 my-auto text-sm ">
-                {status === "authenticated" &&
-                (session.user?.name || currentUser?.pseudonym) ? (
+                {status === "authenticated" && (session.user?.name || currentUser?.pseudonym) ? (
                   <Button shadow color="gradient" auto size={"sm"}>
                     <Link href={"/app"} className="text-[#E2E2E2]">
                       Web App
                     </Link>
                   </Button>
                 ) : status === "authenticated" ? (
-                  <Tooltip
-                    content={"Finish account setup!"}
-                    placement="bottomStart"
-                    color={"secondary"}
-                  >
+                  <Tooltip content={"Finish account setup!"} placement="bottomStart" color={"secondary"}>
                     <Button shadow color="gradient" auto size={"sm"}>
                       <Link href={"/account-set-up"} className="text-[#E2E2E2]">
                         Web App
@@ -277,11 +243,7 @@ const Navbar = (props: {
                     </Button>
                   </Tooltip>
                 ) : (
-                  <Tooltip
-                    content={"Login to use!"}
-                    placement="bottomStart"
-                    color={"secondary"}
-                  >
+                  <Tooltip content={"Login to use!"} placement="bottomStart" color={"secondary"}>
                     <Button shadow color="gradient" auto size={"sm"}>
                       Web App
                     </Button>
@@ -292,10 +254,7 @@ const Navbar = (props: {
           </div>
         </div>
         <div className={pathname == "/app" ? "my-2" : "my-2 md:hidden"}>
-          <div
-            className="z-10 my-auto flex justify-end px-4 text-lg"
-            ref={props.switchRef}
-          >
+          <div className="z-10 my-auto flex justify-end px-4 text-lg" ref={props.switchRef}>
             <Switch
               checked={isDarkTheme}
               shadow
@@ -308,19 +267,11 @@ const Navbar = (props: {
               className="z-[1000] my-auto mr-2"
             />
             {isDarkTheme ? (
-              <button
-                onClick={menuToggle}
-                className="z-[1000] my-auto"
-                ref={closeRef}
-              >
+              <button onClick={menuToggle} className="z-[1000] my-auto" ref={closeRef}>
                 <MenuBars stroke="white" />
               </button>
             ) : (
-              <button
-                onClick={menuToggle}
-                className="z-[1000] my-auto"
-                ref={closeRef}
-              >
+              <button onClick={menuToggle} className="z-[1000] my-auto" ref={closeRef}>
                 <MenuBars stroke="black" />
               </button>
             )}
@@ -341,9 +292,7 @@ const Navbar = (props: {
           ) : null}
         </div>
       </nav>
-      {showingLoginModal ? (
-        <LoginModal onClose={loginToggle} loginRef={loginRef} />
-      ) : null}
+      {showingLoginModal ? <LoginModal onClose={loginToggle} loginRef={loginRef} /> : null}
     </div>
   );
 };

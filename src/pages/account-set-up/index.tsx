@@ -1,24 +1,16 @@
 import { api } from "@/src/utils/api";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Dropzone from "@/src/components/app/Dropzone";
 import Navbar from "@/src/components/Navbar";
 import { Button, Input, Loading, Tooltip } from "@nextui-org/react";
 import BackArrow from "@/src/icons/BackArrow";
 import ThemeContext from "@/src/components/ThemeContextProvider";
-import axios from "axios";
 import Link from "next/link";
 import LoadingElement from "@/src/components/loading";
 import { useSession } from "next-auth/react";
 import router from "next/router";
 import Resizer from "react-image-file-resizer";
 import Head from "next/head";
-import crypto from "crypto";
 import { toSvg } from "jdenticon";
 
 const resizeFile = (file: File, extension: string) =>
@@ -38,45 +30,35 @@ const resizeFile = (file: File, extension: string) =>
   });
 
 const UserSetup = () => {
-  const userQuery = api.users.getCurrentUser.useQuery();
-  const [realNamePicture, setRealNamePicture] = useState<File | Blob | null>(
-    null
-  );
-  const [realNamePictureExt, setRealNamePictureExt] = useState<string | null>(
-    null
-  );
-  const [realNamePicHolder, setRealNamePicHolder] = useState<
-    string | ArrayBuffer | null
-  >(null);
-  const [pseudonymPicture, setPseudonymPicture] = useState<File | Blob | null>(
-    null
-  );
-  const [pseudonymPictureExt, setPseudonymPictureExt] = useState<string | null>(
-    null
-  );
-  const [pseudonymPicHolder, setPseudonymPicHolder] = useState<
-    string | ArrayBuffer | null
-  >(null);
-  const [step, setStep] = useState(0);
-  const realName = useRef<HTMLInputElement>(null);
-  const pseudonym = useRef<HTMLInputElement>(null);
-  const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const [buttonPassState, setButtonPassState] = useState(false);
+  const { isDarkTheme } = useContext(ThemeContext);
   const { data: session, status } = useSession();
 
-  const nameMutation = api.users.setUserName.useMutation();
-  const pseudonymMutation = api.users.setUserPseudonym.useMutation();
-  const imageMutation = api.users.setUserImage.useMutation();
-  const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
-  const identiconImageMutation = api.users.setIdenticonAsImage.useMutation();
+  //state
+  const [realNamePicture, setRealNamePicture] = useState<File | Blob | null>(null);
+  const [realNamePictureExt, setRealNamePictureExt] = useState<string | null>(null);
+  const [realNamePicHolder, setRealNamePicHolder] = useState<string | ArrayBuffer | null>(null);
+  const [pseudonymPicture, setPseudonymPicture] = useState<File | Blob | null>(null);
+  const [pseudonymPictureExt, setPseudonymPictureExt] = useState<string | null>(null);
+  const [pseudonymPicHolder, setPseudonymPicHolder] = useState<string | ArrayBuffer | null>(null);
+  const [step, setStep] = useState(0);
   const [nameField, setNameField] = useState("-");
   const [pseudonymField, setPseudonymField] = useState("-");
   const switchRef = useRef<HTMLDivElement | null>(null);
   const [nameError, setNameError] = useState("");
   const [identicon, setIdenticon] = useState<string | null>(null);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+  const realName = useRef<HTMLInputElement>(null);
+  const pseudonym = useRef<HTMLInputElement>(null);
+
+  //trpc (api)
+  const nameMutation = api.users.setUserName.useMutation();
+  const pseudonymMutation = api.users.setUserPseudonym.useMutation();
+  const imageMutation = api.users.setUserImage.useMutation();
+  const pseudonymImageMutation = api.users.setUserPseudonymImage.useMutation();
+  const identiconImageMutation = api.users.setIdenticonAsImage.useMutation();
+  const userQuery = api.users.getCurrentUser.useQuery();
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
-  const svgDivRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
     if (userQuery.data) {
@@ -149,9 +131,12 @@ const UserSetup = () => {
         s3key: s3TokenReturn.key,
       });
     } else if (realNamePicture !== null) {
-      const resizedFile = await resizeFile(realNamePicture as File, ext);
+      const resizedFile = (await resizeFile(realNamePicture as File, ext)) as File;
 
-      await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
+      await fetch(s3TokenReturn.uploadURL, {
+        method: "PUT",
+        body: resizedFile,
+      }).catch((err) => {
         console.log(err);
       });
 
@@ -173,9 +158,12 @@ const UserSetup = () => {
         s3key: s3TokenReturn.key,
       });
     } else if (pseudonymPicture !== null) {
-      const resizedFile = await resizeFile(pseudonymPicture as File, ext);
+      const resizedFile = (await resizeFile(pseudonymPicture as File, ext)) as File;
 
-      await axios.put(s3TokenReturn.uploadURL, resizedFile).catch((err) => {
+      await fetch(s3TokenReturn.uploadURL, {
+        method: "PUT",
+        body: resizedFile,
+      }).catch((err) => {
         console.log(err);
       });
 
@@ -196,9 +184,7 @@ const UserSetup = () => {
       // Set Names
       return (
         <div className="text-center">
-          <div className="text-3xl">
-            At least one of these is needed, but both are encouraged
-          </div>
+          <div className="text-3xl">At least one of these is needed, but both are encouraged</div>
           <form onSubmit={setNames}>
             <div className="flex flex-row">
               <div className="flex w-1/2 flex-col items-center">
@@ -211,14 +197,10 @@ const UserSetup = () => {
                     clearable
                     underlined
                     color="secondary"
-                    initialValue={
-                      userQuery.data?.name ? userQuery.data.name : ""
-                    }
+                    initialValue={userQuery.data?.name ? userQuery.data.name : ""}
                   />
                 </div>
-                <div className="mx-12  text-sm">
-                  This is generally only used for workspaces.
-                </div>
+                <div className="mx-12  text-sm">This is generally only used for workspaces.</div>
               </div>
               <div className="flex w-1/2 flex-col items-center border-l border-zinc-500">
                 <div className="pt-8">
@@ -230,25 +212,15 @@ const UserSetup = () => {
                     clearable
                     underlined
                     color="secondary"
-                    initialValue={
-                      userQuery.data?.pseudonym ? userQuery.data.pseudonym : ""
-                    }
+                    initialValue={userQuery.data?.pseudonym ? userQuery.data.pseudonym : ""}
                   />
                 </div>
-                <div className="mx-12 text-sm">
-                  Used in more casual communities.
-                </div>
+                <div className="mx-12 text-sm">Used in more casual communities.</div>
               </div>
             </div>
             <div className="flex justify-end pt-8">
               {buttonLoading ? (
-                <Button
-                  disabled
-                  auto
-                  bordered
-                  color="gradient"
-                  css={{ px: "$13" }}
-                >
+                <Button disabled auto bordered color="gradient" css={{ px: "$13" }}>
                   <Loading type="points" size="sm" />
                 </Button>
               ) : (
@@ -257,9 +229,7 @@ const UserSetup = () => {
                 </Button>
               )}
             </div>
-            <span className="text-center text-lg text-red-500">
-              {nameError}
-            </span>
+            <span className="text-center text-lg text-red-500">{nameError}</span>
           </form>
         </div>
       );
@@ -268,21 +238,10 @@ const UserSetup = () => {
       return (
         <>
           <div className="text-center">
-            <div className="text-3xl">
-              Choose a profile picture, or two - squared images work best
-            </div>
+            <div className="text-3xl">Choose a profile picture, or two - squared images work best</div>
             <div className="-mt-6">
-              <Button
-                auto
-                color={"secondary"}
-                onClick={() => setStep(step - 1)}
-              >
-                <BackArrow
-                  height={12}
-                  width={12}
-                  stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                  strokeWidth={3}
-                />
+              <Button auto color={"secondary"} onClick={() => setStep(step - 1)}>
+                <BackArrow height={12} width={12} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={3} />
               </Button>
             </div>
             <div className="flex flex-row">
@@ -318,22 +277,14 @@ const UserSetup = () => {
                   </div>
                 }
               >
-                <span className="px-1 text-blue-400 underline underline-offset-4">
-                  identicon
-                </span>
+                <span className="px-1 text-blue-400 underline underline-offset-4">identicon</span>
               </Tooltip>
               will be used in its place.
             </div>
             <div className="w-full">
               <div className="float-right flex justify-end">
                 {buttonLoading ? (
-                  <Button
-                    disabled
-                    auto
-                    bordered
-                    color="gradient"
-                    css={{ px: "$13" }}
-                  >
+                  <Button disabled auto bordered color="gradient" css={{ px: "$13" }}>
                     <Loading type="points" size="sm" />
                   </Button>
                 ) : (
@@ -349,19 +300,17 @@ const UserSetup = () => {
     } else if (step == 2) {
       return (
         <div>
-          <div className="mb-4 text-center text-xl">
-            All good for now! Thanks!
-          </div>
+          <div className="mb-4 text-center text-xl">All good for now! Thanks!</div>
           <div className="flex flex-row justify-evenly">
             <Link
               href={"/downloads"}
-              className="rounded-md border border-zinc-600 py-2 px-4 text-center text-zinc-600 hover:bg-zinc-500 active:bg-zinc-600 dark:border-zinc-100 dark:text-zinc-100"
+              className="rounded-md border border-zinc-600 px-4 py-2 text-center text-zinc-600 hover:bg-zinc-500 active:bg-zinc-600 dark:border-zinc-100 dark:text-zinc-100"
             >
               Jump to Downloads
             </Link>
             <Link
               href={"/app"}
-              className="rounded-md border border-zinc-600 py-2 px-4 text-center text-zinc-600 hover:bg-zinc-500 active:bg-zinc-600 dark:border-zinc-100 dark:text-zinc-100"
+              className="rounded-md border border-zinc-600 px-4 py-2 text-center text-zinc-600 hover:bg-zinc-500 active:bg-zinc-600 dark:border-zinc-100 dark:text-zinc-100"
             >
               Continue to Web App
             </Link>
@@ -382,9 +331,7 @@ const UserSetup = () => {
       </Head>
       <Navbar switchRef={switchRef} />
       <div className="flex h-screen flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-800">
-        <div className="-mt-24 mb-12 text-3xl">
-          Lets Get a Few Things Set Up...
-        </div>
+        <div className="-mt-24 mb-12 text-3xl">Lets Get a Few Things Set Up...</div>
         <div className="fade-in min-h-96 w-5/6 rounded-lg bg-zinc-300 p-4 shadow-xl dark:bg-zinc-700 md:w-2/3 lg:w-1/2 xl:w-2/5">
           {contextualContentRenderer()}
         </div>

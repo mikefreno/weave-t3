@@ -1,13 +1,7 @@
 // usePlatform.ts
 import { useEffect, useState } from "react";
 
-export type Platform =
-  | "Windows"
-  | "Mac"
-  | "Linux"
-  | "Android"
-  | "iOS"
-  | "Unknown";
+export type Platform = "Windows" | "Mac" | "Linux" | "Android" | "iOS" | "Unknown";
 
 const detectPlatform = (userAgent: string): Platform => {
   if (/Android/i.test(userAgent)) {

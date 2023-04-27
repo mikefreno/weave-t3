@@ -1,6 +1,5 @@
 import { Loading } from "@nextui-org/react";
 import Image from "next/image";
-import React from "react";
 import LightLogo from "@/public/Logo - light.png";
 import DarkLogo from "@/public/Logo - dark.png";
 

@@ -9,8 +9,8 @@ const BotServiceModal = (props: {
   botModalRef: RefObject<HTMLDivElement>;
   botModalToggle: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -21,9 +21,7 @@ const BotServiceModal = (props: {
   // };
 
   const showGoTo = (event: any) => {
-    document
-      .getElementById("goto")
-      ?.classList.remove("opacity-0", "cursor-default");
+    document.getElementById("goto")?.classList.remove("opacity-0", "cursor-default");
   };
 
   return (
@@ -36,9 +34,7 @@ const BotServiceModal = (props: {
           <button onClick={props.botModalToggle}>
             <Xmark className={"w-10"} />
           </button>
-          <div className="mb-4 text-center text-2xl">
-            Beep Boop. Find a bot here!
-          </div>
+          <div className="mb-4 text-center text-2xl">Beep Boop. Find a bot here!</div>
           <div id="modal-body text-center">
             <div className="my-4 flex flex-col">
               <div className="text-center">Search by Category</div>
@@ -83,13 +79,7 @@ const BotServiceModal = (props: {
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                contentLeft={
-                  <SearchIcon
-                    height={12}
-                    width={12}
-                    stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                  />
-                }
+                contentLeft={<SearchIcon height={12} width={12} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} />}
               />
             </form>
           </div>

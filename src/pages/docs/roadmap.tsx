@@ -6,9 +6,11 @@ import Head from "next/head";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 const RoadMap = () => {
-  const switchRef = useRef<HTMLDivElement>(null);
   const { isDarkTheme } = useContext(ThemeContext);
+
   const [showingAside, setShowingAside] = useState(true);
+  const switchRef = useRef<HTMLDivElement>(null);
+
   const toggleNav = () => {
     setShowingAside(!showingAside);
   };
@@ -50,10 +52,7 @@ const RoadMap = () => {
           } `}
         >
           <div className="pl-2 text-xl font-semibold underline underline-offset-4">
-            <a
-              href="#top"
-              className="cursor-pointer text-zinc-900 dark:text-zinc-100"
-            >
+            <a href="#top" className="cursor-pointer text-zinc-900 dark:text-zinc-100">
               Roadmap Overview
             </a>
           </div>
@@ -123,12 +122,7 @@ const RoadMap = () => {
             }
             onClick={toggleNav}
           >
-            <DoubleChevrons
-              height={36}
-              width={36}
-              stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              strokeWidth={1}
-            />
+            <DoubleChevrons height={36} width={36} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
           </button>
         </div>
         <div id="top" className="absolute -mt-20" />
@@ -139,14 +133,11 @@ const RoadMap = () => {
           } scrollXDisabled transition-margin overflow-y-scroll px-6 text-zinc-900 duration-300 ease-in-out dark:text-zinc-100 md:px-10 lg:px-16`}
         >
           <div className="pt-16">
-            <div className="text-3xl font-semibold tracking-wider">
-              Weave Roadmap
-            </div>
+            <div className="text-3xl font-semibold tracking-wider">Weave Roadmap</div>
             <p className="pt-12 tracking-wide">
-              This page is to outline the vision and progress of Weave. Broken
-              down into the sections on the right, this roadmap will go over the
-              various features planned and in development. Each feature will be
-              labeled in the following way:{" "}
+              This page is to outline the vision and progress of Weave. Broken down into the sections on the right, this
+              roadmap will go over the various features planned and in development. Each feature will be labeled in the
+              following way:{" "}
             </p>
             <ul className="">
               <li className="flex">
@@ -155,9 +146,7 @@ const RoadMap = () => {
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
-                <div className="pl-2">
-                  indicates the feature is in active development
-                </div>
+                <div className="pl-2">indicates the feature is in active development</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
@@ -165,26 +154,17 @@ const RoadMap = () => {
               </li>
             </ul>
             <p className="pt-2 tracking-wide">
-              Everything is subject to change, feature that are launched may be
-              unlaunched, and features in development may be axed at any given
-              time. Feel free to reach out on the github repo at{" "}
-              <a
-                href="https://github.com/MikeFreno/weave-t3"
-                className="hover:underline"
-              >
+              Everything is subject to change, feature that are launched may be unlaunched, and features in development
+              may be axed at any given time. Feel free to reach out on the github repo at{" "}
+              <a href="https://github.com/MikeFreno/weave-t3" className="hover:underline">
                 https://github.com/MikeFreno/weave-t3{" "}
               </a>{" "}
-              or by email at{" "}
-              <span className="underline underline-offset-2">
-                michael@freno.me
-              </span>
+              or by email at <span className="underline underline-offset-2">michael@freno.me</span>
             </p>
           </div>
           <div id="core" className="absolute -mt-20"></div>
           <div className="pt-16">
-            <div className="text-2xl font-semibold tracking-wider">
-              Core Features
-            </div>
+            <div className="text-2xl font-semibold tracking-wider">Core Features</div>
             <p className="pt-12 tracking-wide">The main feature of the app.</p>
             <ul className="">
               <li className="flex">
@@ -199,31 +179,24 @@ const RoadMap = () => {
           </div>
           <div id="UI" className="absolute -mt-20"></div>
           <div className="pt-16">
-            <div className="text-2xl font-semibold tracking-wider">
-              User Interface
-            </div>
+            <div className="text-2xl font-semibold tracking-wider">User Interface</div>
             <p className="pt-12 tracking-wide">
-              These features are mainly in reference to the way the app looks,
-              and the way that you as a user interact with it
+              These features are mainly in reference to the way the app looks, and the way that you as a user interact
+              with it
             </p>
             <ul className="">
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
-                <div className="pl-2">
-                  Mobile experience improvements to web app
-                </div>
+                <div className="pl-2">Mobile experience improvements to web app</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
-                <div className="pl-2">
-                  Mobile experience improvements to front-page
-                </div>
+                <div className="pl-2">Mobile experience improvements to front-page</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
                 <div className="pl-2">
-                  Accessibility improvements (catch all for blindness, color
-                  blindness support, font-size changes, etc.)
+                  Accessibility improvements (catch all for blindness, color blindness support, font-size changes, etc.)
                 </div>
               </li>
               <li className="flex">
@@ -240,33 +213,22 @@ const RoadMap = () => {
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
-                <div className="pl-2">
-                  Show user on comment icon click/hover
-                </div>
+                <div className="pl-2">Show user on comment icon click/hover</div>
               </li>
             </ul>
           </div>
           <div id="useraccount" className="absolute -mt-20"></div>
           <div className="pt-16">
-            <div className="text-2xl font-semibold tracking-wider">
-              User / Account
-            </div>
-            <p className="pt-12 tracking-wide">
-              These features regard your control over your account
-            </p>
+            <div className="text-2xl font-semibold tracking-wider">User / Account</div>
+            <p className="pt-12 tracking-wide">These features regard your control over your account</p>
             <ul className="">
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
-                <div className="pl-2">
-                  Getting Google authentication enabled
-                </div>
+                <div className="pl-2">Getting Google authentication enabled</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
-                <div className="pl-2">
-                  Multiple auth methods for one account, such as Email, and
-                  Google
-                </div>
+                <div className="pl-2">Multiple auth methods for one account, such as Email, and Google</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
@@ -285,9 +247,7 @@ const RoadMap = () => {
           <div id="server" className="absolute -mt-20"></div>
           <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">Server</div>
-            <p className="pt-12 tracking-wide">
-              These features regard how servers function
-            </p>
+            <p className="pt-12 tracking-wide">These features regard how servers function</p>
             <ul className="">
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
@@ -304,15 +264,12 @@ const RoadMap = () => {
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
                 <div className="pl-2">
-                  Syntactical Highlighting in code blocks - language will need
-                  to be declared for this
+                  Syntactical Highlighting in code blocks - language will need to be declared for this
                 </div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
-                <div className="pl-2">
-                  Server Aesthetics defined by owner / admin
-                </div>
+                <div className="pl-2">Server Aesthetics defined by owner / admin</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
@@ -343,9 +300,7 @@ const RoadMap = () => {
           <div id="bots" className="absolute -mt-20"></div>
           <div className="pt-16">
             <div className="text-2xl font-semibold tracking-wider">Bots</div>
-            <p className="pt-12 tracking-wide">
-              These features regard the usage of bots
-            </p>
+            <p className="pt-12 tracking-wide">These features regard the usage of bots</p>
             <ul className="">
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
@@ -359,12 +314,9 @@ const RoadMap = () => {
           </div>
           <div id="misc" className="absolute -mt-20"></div>
           <div className="pt-16">
-            <div className="text-2xl font-semibold tracking-wider">
-              Miscellaneous
-            </div>
+            <div className="text-2xl font-semibold tracking-wider">Miscellaneous</div>
             <p className="pt-12 tracking-wide">
-              These features don&apos;t neatly fall into any of the previous
-              categories
+              These features don&apos;t neatly fall into any of the previous categories
             </p>
             <ul className="">
               <li className="flex">

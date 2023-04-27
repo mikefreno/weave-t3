@@ -25,17 +25,11 @@ const ServerMainScreen = (props: {
       <div className="flex justify-center pt-12">
         <div className="flex max-w-[60vw] flex-col text-center">
           <div className="text-xl">
-            Welcome to{" "}
-            <span className="tracking-wider underline underline-offset-4">
-              {selectedServer?.name}
-            </span>
+            Welcome to <span className="tracking-wider underline underline-offset-4">{selectedServer?.name}</span>
           </div>
           <div className="py-4">- {selectedServer?.blurb}</div>
           <div className="mx-auto py-4">
-            <img
-              src={selectedServer?.logo_url as string}
-              className="h-32 w-32 md:h-64 md:w-64"
-            />
+            <img src={selectedServer?.logo_url as string} className="h-32 w-32 md:h-64 md:w-64" />
           </div>
         </div>
       </div>

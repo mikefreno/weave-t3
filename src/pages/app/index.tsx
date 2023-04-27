@@ -10,7 +10,6 @@ import InnerNav from "@/src/components/app/InnerNav";
 import DirectMessageModal from "@/src/components/app/DirectMessageModal";
 import PublicServersPages from "@/src/components/app/PublicServersPages";
 import DMPages from "@/src/components/app/DMPages";
-import InnerNavOverlay from "@/src/components/app/InnerNavOverlay";
 import AccountPage from "@/src/components/app/AccountPage";
 import { useSession } from "next-auth/react";
 import { api } from "@/src/utils/api";
@@ -18,13 +17,7 @@ import LoadingElement from "@/src/components/loading";
 import router from "next/router";
 import ServerMainScreen from "@/src/components/app/ServerMainScreen";
 import ChatChannel from "@/src/components/app/ChatChannel";
-import {
-  Server,
-  Server_Admin,
-  Server_Channel,
-  Server_Member,
-  User,
-} from "@prisma/client";
+import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
 import LoadingOverlay from "@/src/components/app/LoadingOverlay";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
@@ -36,58 +29,24 @@ import VoiceChannel from "@/src/components/app/VoiceChannel";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
+  const { data: session, status } = useSession();
+  //state
   const [serverModalShowing, setServerModalShowing] = useState(false);
   const [botModalShowing, setBotModalShowing] = useState(false);
-  const { data: session, status } = useSession();
   const [microphoneState, setMicrophoneState] = useState(false);
   const [audioState, setAudioState] = useState(true);
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("AccountOverview");
   const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
-  const [directMessageModalShowing, setDirectMessageModalShowing] =
-    useState(false);
+  const [directMessageModalShowing, setDirectMessageModalShowing] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
-
-  const switchRef = useRef<HTMLDivElement>(null);
-  const serverModalRef = useRef<HTMLDivElement>(null);
-
-  const serverButtonRef = useRef<HTMLButtonElement>(null);
-  const botModalRef = useRef<HTMLDivElement>(null);
-  const botButtonRef = useRef<HTMLButtonElement>(null);
-  const scrollableRef = useRef<HTMLDivElement>(null);
-  const directMessageButtonRef = useRef<HTMLButtonElement>(null);
-  const directMessageModalRef = useRef<HTMLDivElement>(null);
-  const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(
-    null
-  );
+  const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(null);
   const UserProfileModalRef = useRef<HTMLDivElement>(null);
-  useOnClickOutside([UserProfileModalRef], () => {
-    setSearchedUser(null);
-  });
   const [searchedUser, setSearchedUser] = useState<MongoUser | null>(null);
-
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
-
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
-  const [createChannelModalShowing, setCreateChannelModalShowing] =
-    useState(false);
-
-  const inviteModalButtonRef = useRef<HTMLButtonElement>(null);
-  const inviteModalRef = useRef<HTMLDivElement>(null);
-
-  useOnClickOutside([inviteModalRef, inviteModalButtonRef], () => {
-    setInviteModalShowing(false);
-  });
-
-  const createChannelButtonRef = useRef<HTMLButtonElement>(null);
-  const createChannelRef = useRef<HTMLDivElement>(null);
-
-  useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
-    setCreateChannelModalShowing(false);
-  });
-
+  const [createChannelModalShowing, setCreateChannelModalShowing] = useState(false);
   const [fullscreen, setFullscreen] = useState<boolean>(false);
-  const currentUserReturn = api.users.getCurrentUser.useQuery();
   const [currentUser, setCurrentUser] = useState<
     User & {
       servers: Server[];
@@ -96,17 +55,50 @@ const App = () => {
     }
   >();
   const [selectedServer, setSelectedServer] = useState<Server | null>(null);
-  const usersServers = api.server.getAllCurrentUserServers.useQuery();
-
   const [socket, setSocket] = useState<WebSocket | null>(null);
-
   const socketRef = useRef<WebSocket | null>(null);
+  //refs
+  const switchRef = useRef<HTMLDivElement>(null);
+  const serverModalRef = useRef<HTMLDivElement>(null);
+  const serverButtonRef = useRef<HTMLButtonElement>(null);
+  const botModalRef = useRef<HTMLDivElement>(null);
+  const botButtonRef = useRef<HTMLButtonElement>(null);
+  const scrollableRef = useRef<HTMLDivElement>(null);
+  const directMessageButtonRef = useRef<HTMLButtonElement>(null);
+  const directMessageModalRef = useRef<HTMLDivElement>(null);
+  const inviteModalButtonRef = useRef<HTMLButtonElement>(null);
+  const inviteModalRef = useRef<HTMLDivElement>(null);
+  const createChannelButtonRef = useRef<HTMLButtonElement>(null);
+  const createChannelRef = useRef<HTMLDivElement>(null);
 
+  //trpc (api) hooks
+  const usersServers = api.server.getAllCurrentUserServers.useQuery();
+  const currentUserReturn = api.users.getCurrentUser.useQuery();
+
+  //click outside hooks
+  useOnClickOutside([UserProfileModalRef], () => {
+    setSearchedUser(null);
+  });
+  useOnClickOutside([inviteModalRef, inviteModalButtonRef], () => {
+    setInviteModalShowing(false);
+  });
+  useOnClickOutside([createChannelRef, createChannelButtonRef], () => {
+    setCreateChannelModalShowing(false);
+  });
+
+  useOnClickOutside([directMessageModalRef, directMessageButtonRef], () => {
+    setDirectMessageModalShowing(false);
+  });
+
+  useOnClickOutside([serverModalRef, serverButtonRef], () => {
+    setServerModalShowing(false);
+  });
+  useOnClickOutside([botModalRef, botButtonRef, switchRef], () => setBotModalShowing(false));
+
+  //socket management
   useEffect(() => {
     if (!socketRef.current) {
-      const newSocket = new WebSocket(
-        process.env.NEXT_PUBLIC_WEBSOCKET as string
-      );
+      const newSocket = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET as string);
       socketRef.current = newSocket;
       setSocket(newSocket);
     }
@@ -126,23 +118,6 @@ const App = () => {
       };
     }
   }, [socket]);
-
-  useEffect(() => {
-    if (currentUserReturn.data) {
-      setCurrentUser(currentUserReturn.data);
-    }
-  }, [currentUserReturn]);
-
-  useEffect(() => {
-    if (socket && socket.readyState === WebSocket.OPEN && currentUser) {
-      if (selectedChannel) {
-        socketChannelUpdate();
-      } else {
-        socketUserUpdate();
-      }
-    }
-  }, [socket, currentUser]);
-
   const socketUserUpdate = () => {
     socket?.send(
       JSON.stringify({
@@ -163,40 +138,32 @@ const App = () => {
   };
 
   useEffect(() => {
+    if (currentUserReturn.data) {
+      setCurrentUser(currentUserReturn.data);
+    }
+  }, [currentUserReturn]);
+
+  useEffect(() => {
+    if (socket && socket.readyState === WebSocket.OPEN && currentUser) {
+      if (selectedChannel) {
+        socketChannelUpdate();
+      } else {
+        socketUserUpdate();
+      }
+    }
+  }, [socket, currentUser]);
+
+  useEffect(() => {
     socketChannelUpdate();
   }, [selectedChannel]);
 
-  const triggerUserRefresh = async () => {
-    await currentUserReturn.refetch();
-  };
-
+  //other useEffects
   useEffect(() => {
     if (scrollableRef.current) {
       scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
     }
   }, []);
 
-  useOnClickOutside([directMessageModalRef, directMessageButtonRef], () => {
-    setDirectMessageModalShowing(false);
-  });
-
-  useOnClickOutside([serverModalRef, serverButtonRef], () => {
-    setServerModalShowing(false);
-  });
-
-  function dmModalToggle() {
-    setDirectMessageModalShowing(!directMessageModalShowing);
-  }
-
-  function currentTabSetter(id: string) {
-    setCurrentTab(id);
-  }
-  const loadingOverlaySetter = (boolean: boolean) => {
-    setLoadingOverlayShowing(boolean);
-  };
-  const serverRefetch = async () => {
-    await usersServers.refetch();
-  };
   useEffect(() => {
     document.getElementById("html")?.classList.add("scrollDisabled");
     // document
@@ -212,31 +179,74 @@ const App = () => {
     }
   }, [serverModalShowing, botModalShowing, directMessageModalShowing]);
 
-  const microphoneToggle = async () => {
-    setMicrophoneState(!microphoneState);
-  };
-
   useEffect(() => {
     return () => {
       document.getElementById("html")?.classList.remove("scrollDisabled");
     };
   }, []);
 
+  //refreshers
+  const refreshUserServers = async () => {
+    await usersServers.refetch();
+  };
+  const serverRefetch = async () => {
+    await usersServers.refetch();
+  };
+  const triggerUserRefresh = async () => {
+    await currentUserReturn.refetch();
+  };
+
+  //toggles
+  const fullscreenToggle = () => {
+    setFullscreen(!fullscreen);
+  };
+  const userProfileModalToggle = () => {
+    setSearchedUser(null);
+  };
+  const inviteModalToggle = () => {
+    setInviteModalShowing(!inviteModalShowing);
+  };
+  const createChannelToggle = () => {
+    setCreateChannelModalShowing(!createChannelModalShowing);
+  };
+  const serverModalToggle = () => {
+    setServerModalShowing(!serverModalShowing);
+  };
+
+  const botModalToggle = () => {
+    setBotModalShowing(!botModalShowing);
+  };
+  function dmModalToggle() {
+    setDirectMessageModalShowing(!directMessageModalShowing);
+  }
   const audioToggle = () => {
     setAudioState(!audioState);
   };
+  const microphoneToggle = async () => {
+    setMicrophoneState(!microphoneState);
+  };
 
-  useOnClickOutside([botModalRef, botButtonRef, switchRef], () =>
-    setBotModalShowing(false)
-  );
+  //setters
+  const serverSetter = async (server: Server) => {
+    setSelectedServer(server);
+  };
+  const channelSetter = (input: Server_Channel | null) => {
+    setSelectedChannel(input);
+  };
+  const innerTabSetter = (input: string) => {
+    setSelectedInnerTab(input);
+  };
 
-  function serverModalToggle() {
-    setServerModalShowing(!serverModalShowing);
+  const userSelect = (user: MongoUser) => {
+    setSearchedUser(user);
+  };
+  function currentTabSetter(id: string) {
+    setCurrentTab(id);
   }
-
-  function botModalToggle() {
-    setBotModalShowing(!botModalShowing);
-  }
+  const loadingOverlaySetter = (boolean: boolean) => {
+    setLoadingOverlayShowing(boolean);
+  };
+  //auth check
   if (currentUser === undefined || currentUser === null) {
     setTimeout(() => {
       if (status == "unauthenticated") {
@@ -245,31 +255,6 @@ const App = () => {
     }, 1000);
     return <LoadingElement isDarkTheme={isDarkTheme} />;
   }
-  const refreshUserServers = async () => {
-    await usersServers.refetch();
-  };
-
-  const fullscreenToggle = () => {
-    setFullscreen(!fullscreen);
-  };
-
-  const inviteModalToggle = () => {
-    setInviteModalShowing(!inviteModalShowing);
-  };
-  const createChannelToggle = () => {
-    setCreateChannelModalShowing(!createChannelModalShowing);
-  };
-  const serverSetter = async (server: Server) => {
-    setSelectedServer(server);
-  };
-
-  const userSelect = (user: MongoUser) => {
-    console.log("fired");
-    setSearchedUser(user);
-  };
-  const userProfileModalToggle = () => {
-    setSearchedUser(null);
-  };
 
   return (
     <div className="select-none bg-zinc-100 dark:bg-zinc-700">
@@ -277,20 +262,12 @@ const App = () => {
         <title> Web App | Weave</title>
         <meta name="description" content="Weave's Web App" />
       </Head>
-      <Navbar
-        switchRef={switchRef}
-        currentTabSetter={currentTabSetter}
-        setSelectedInnerTab={setSelectedInnerTab}
-      />
+      <Navbar switchRef={switchRef} currentTabSetter={currentTabSetter} setSelectedInnerTab={setSelectedInnerTab} />
       <div id="app-body" className={`flex h-screen w-screen`}>
-        <div
-          className={`${
-            fullscreen ? "-translate-x-72" : ""
-          } transform transition-all duration-500 ease-in-out`}
-        >
+        <div className={`${fullscreen ? "-translate-x-72" : ""} transform transition-all duration-500 ease-in-out`}>
           <div id="outer-nav" className="flex">
             <SideNav
-              setSelectedChannel={setSelectedChannel}
+              channelSetter={channelSetter}
               serverModalToggle={serverModalToggle}
               serverButtonRef={serverButtonRef}
               botModalToggle={botModalToggle}
@@ -314,7 +291,7 @@ const App = () => {
               serverModalToggle={serverModalToggle}
               serverButtonRef={serverButtonRef}
               currentTabSetter={currentTabSetter}
-              setSelectedInnerTab={setSelectedInnerTab}
+              innerTabSetter={innerTabSetter}
               refreshUserServers={refreshUserServers}
               currentTab={currentTab}
               directMessageButtonRef={directMessageButtonRef}
@@ -323,7 +300,7 @@ const App = () => {
               setSelectedInnerTabID={setSelectedInnerTabID}
               currentUser={currentUser}
               selectedInnerTabID={selectedInnerTabID}
-              setSelectedChannel={setSelectedChannel}
+              channelSetter={channelSetter}
               selectedChannel={selectedChannel}
               loadingOverlaySetter={loadingOverlaySetter}
               serverRefetch={serverRefetch}
@@ -335,16 +312,10 @@ const App = () => {
               inviteModalToggle={inviteModalToggle}
               inviteModalButtonRef={inviteModalButtonRef}
               userSelect={userSelect}
-            />
-            <InnerNavOverlay
-              setSelectedInnerTab={setSelectedInnerTab}
-              currentUser={currentUser}
               microphoneState={microphoneState}
               microphoneToggle={microphoneToggle}
               audioState={audioState}
               audioToggle={audioToggle}
-              currentTabSetter={currentTabSetter}
-              timestamp={timestamp}
             />
           </div>
         </div>
@@ -356,21 +327,11 @@ const App = () => {
           <button onClick={fullscreenToggle}>
             {fullscreen ? (
               <div className="-rotate-90 transform transition-all duration-500 ease-in-out">
-                <ChevronDown
-                  height={44}
-                  width={44}
-                  stroke={isDarkTheme ? "#fafafa" : "#18181b"}
-                  strokeWidth={1}
-                />
+                <ChevronDown height={44} width={44} stroke={isDarkTheme ? "#fafafa" : "#18181b"} strokeWidth={1} />
               </div>
             ) : (
               <div className="rotate-90 transform transition-all duration-300 ease-in-out">
-                <ChevronDown
-                  height={44}
-                  width={44}
-                  stroke={isDarkTheme ? "#fafafa" : "#18181b"}
-                  strokeWidth={1}
-                />
+                <ChevronDown height={44} width={44} stroke={isDarkTheme ? "#fafafa" : "#18181b"} strokeWidth={1} />
               </div>
             )}
           </button>
@@ -457,9 +418,7 @@ const App = () => {
             )
           ) : null}
         </div>
-        {loadingOverlayShowing ? (
-          <LoadingOverlay isDarkTheme={isDarkTheme} />
-        ) : null}
+        {loadingOverlayShowing ? <LoadingOverlay isDarkTheme={isDarkTheme} /> : null}
       </div>
       <div>
         {serverModalShowing ? (
@@ -469,15 +428,8 @@ const App = () => {
             serverModalRef={serverModalRef}
           />
         ) : null}
-        {botModalShowing ? (
-          <BotServiceModal
-            botModalRef={botModalRef}
-            botModalToggle={botModalToggle}
-          />
-        ) : null}
-        {directMessageModalShowing ? (
-          <DirectMessageModal directMessageModalRef={directMessageModalRef} />
-        ) : null}
+        {botModalShowing ? <BotServiceModal botModalRef={botModalRef} botModalToggle={botModalToggle} /> : null}
+        {directMessageModalShowing ? <DirectMessageModal directMessageModalRef={directMessageModalRef} /> : null}
         {inviteModalShowing ? (
           <InviteModal
             isDarkTheme={isDarkTheme}

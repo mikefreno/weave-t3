@@ -3,13 +3,7 @@ import PaperClip from "@/src/icons/PaperClip";
 import SendIcon from "@/src/icons/SendIcon";
 import { api } from "@/src/utils/api";
 import { Input, Loading, Tooltip } from "@nextui-org/react";
-import {
-  Server,
-  Server_Admin,
-  Server_Channel,
-  Server_Member,
-  User,
-} from "@prisma/client";
+import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import useOnClickOutside from "../ClickOutsideHook";
 import ThemeContext from "../ThemeContextProvider";
@@ -38,21 +32,22 @@ interface ChannelMainProps {
 
 const ChannelMain = (props: ChannelMainProps) => {
   const { selectedChannel, currentUser, socket, fullscreen } = props;
+  //state
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
   const [attachmentModalShowing, setAttachmentModalShowing] = useState(false);
+  const [messages, setMessages] = useState<CommentWithUser[]>([]);
+  const [thisChannel, setThisChannel] = useState<Server_Channel | null>(null);
+  //ref
+  const messageInputRef = useRef<HTMLInputElement>(null);
   const attachmentButtonRef = useRef<HTMLButtonElement>(null);
   const attachmentModalRef = useRef<HTMLDivElement>(null);
-  const messageInputRef = useRef<HTMLInputElement>(null);
-  const [messages, setMessages] = useState<CommentWithUser[]>([]);
-  const getMessages = api.server.getChannelComments.useQuery(
-    selectedChannel.id
-  );
   const inputDivRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [thisChannel, setThisChannel] = useState<Server_Channel | null>(null);
+  //trpc (api)
+  const getMessages = api.server.getChannelComments.useQuery(selectedChannel.id);
 
   useEffect(() => {
     if (getMessages.data) {
@@ -116,49 +111,25 @@ const ChannelMain = (props: ChannelMainProps) => {
           } scrollXDisabled h-screen  rounded bg-zinc-50 transition-colors duration-300 ease-in-out dark:bg-zinc-900`}
         >
           <div ref={bannerRef}>
-            <TopBanner
-              key={selectedChannel.id}
-              selectedChannel={selectedChannel}
-              fullscreen={fullscreen}
-            />
+            <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} fullscreen={fullscreen} />
           </div>
           <div className="scrollXDisabled overflow-y-scroll pb-24 pt-8">
             <ul className={`${fullscreen ? "w-screen" : "w-full"} px-4 pt-6`}>
               {messages.map((message, index) => (
                 <div
                   key={index}
-                  className={
-                    message.userId == currentUser.id
-                      ? "my-4 flex justify-end pr-9"
-                      : "my-4 flex"
-                  }
+                  className={message.userId == currentUser.id ? "my-4 flex justify-end pr-9" : "my-4 flex"}
                 >
-                  <li
-                    className={
-                      message.userId == currentUser.id
-                        ? UsersCommentClass
-                        : OtherCommentsClass
-                    }
-                  >
-                    <div className="-ml-3 -mt-3 text-xs font-semibold">
-                      {message.user.name}
-                    </div>
-                    <div
-                      className={`${
-                        message.user.id == currentUser.id ? "text-right" : ""
-                      } relative w-fit`}
-                    >
+                  <li className={message.userId == currentUser.id ? UsersCommentClass : OtherCommentsClass}>
+                    <div className="-ml-3 -mt-3 text-xs font-semibold">{message.user.name}</div>
+                    <div className={`${message.user.id == currentUser.id ? "text-right" : ""} relative w-fit`}>
                       {message.message}
                     </div>
                     {message.userId == currentUser.id ? null : (
                       <div>
                         <div className="-mb-12 -ml-8 mt-1">
                           {message.user.name !== "User Deleted" ? (
-                            <Tooltip
-                              content={<UserTooltip user={message.user} />}
-                              color="default"
-                              placement="topStart"
-                            >
+                            <Tooltip content={<UserTooltip user={message.user} />} color="default" placement="topStart">
                               <button>
                                 <img
                                   src={message.user.image as string}
@@ -181,13 +152,8 @@ const ChannelMain = (props: ChannelMainProps) => {
             </ul>
             <div ref={bottomRef}></div>
           </div>
-          <div
-            className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}
-          >
-            <div
-              ref={inputDivRef}
-              className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0"
-            >
+          <div className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}>
+            <div ref={inputDivRef} className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>
                   <Input
@@ -234,10 +200,7 @@ const ChannelMain = (props: ChannelMainProps) => {
           </div>
         </div>
         {attachmentModalShowing ? (
-          <AttachmentModal
-            toggle={attachmentModalToggle}
-            attachmentModalRef={attachmentModalRef}
-          />
+          <AttachmentModal toggle={attachmentModalToggle} attachmentModalRef={attachmentModalRef} />
         ) : null}
       </div>
     </>

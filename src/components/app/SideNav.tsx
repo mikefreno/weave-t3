@@ -1,31 +1,20 @@
-import React, {
-  Dispatch,
-  MouseEventHandler,
-  RefObject,
-  useContext,
-} from "react";
+import React, { Dispatch, MouseEventHandler, RefObject, useContext } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import { Tooltip } from "@nextui-org/react";
 import AddIcon from "@/src/icons/AddIcon";
 import BullhornIcon from "@/src/icons/BullhornIcon";
 import RobotForApp from "@/src/icons/RobotForApp";
-import {
-  Server,
-  Server_Admin,
-  Server_Channel,
-  Server_Member,
-  User,
-} from "@prisma/client";
+import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
 import { Raleway } from "next/font/google";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
 
 const SideNav = (props: {
   timestamp: number;
-  setSelectedChannel: Dispatch<React.SetStateAction<Server_Channel | null>>;
-  serverModalToggle: MouseEventHandler<HTMLButtonElement>;
+  channelSetter: (input: Server_Channel | null) => void;
+  serverModalToggle: () => void;
   serverButtonRef: RefObject<HTMLButtonElement>;
-  botModalToggle: MouseEventHandler<HTMLButtonElement>;
+  botModalToggle: () => void;
   botButtonRef: RefObject<HTMLButtonElement>;
   currentTab: string;
   currentTabSetter(id: string): void;
@@ -41,11 +30,26 @@ const SideNav = (props: {
   serverSetter: (server: Server) => void;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
-  const { currentUser, usersServers, timestamp, serverSetter } = props;
+  const {
+    currentUser,
+    usersServers,
+    timestamp,
+    serverSetter,
+    botModalToggle,
+    currentTabSetter,
+    setSelectedInnerTab,
+    botButtonRef,
+    currentTab,
+    selectedInnerTabID,
+    setSelectedInnerTabID,
+    channelSetter,
+    serverModalToggle,
+    serverButtonRef,
+  } = props;
 
   return (
     <>
-      <aside className="stopIT fixed hidden h-screen w-20 border-r border-zinc-200 bg-purple-700 transition-colors duration-500 ease-in-out dark:border-zinc-400 dark:bg-zinc-900 md:block">
+      <aside className="stopIT fixed hidden h-screen w-20 border-r border-zinc-200 bg-purple-700 transition-colors duration-300 ease-in-out dark:border-zinc-400 dark:bg-zinc-900 md:block">
         <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
           <Tooltip
             content={"Direct Messaging"}
@@ -57,8 +61,8 @@ const SideNav = (props: {
               id="DMS"
               className="z-50"
               onClick={() => {
-                props.currentTabSetter("DMS");
-                props.setSelectedInnerTab("AccountOverview");
+                currentTabSetter("DMS");
+                setSelectedInnerTab("AccountOverview");
               }}
             >
               <img
@@ -80,8 +84,7 @@ const SideNav = (props: {
             <div className="flex transform flex-col items-center border-b border-zinc-200 py-2 transition-transform duration-500 dark:border-zinc-600">
               {usersServers?.map((server: Server) => (
                 <div className="py-2" key={server.id}>
-                  {props.selectedInnerTabID == server.id &&
-                  props.currentTab == "server" ? (
+                  {selectedInnerTabID == server.id && currentTab == "server" ? (
                     <span className="absolute -ml-[1.25rem] mt-5 h-4 w-4 rounded-full bg-zinc-200" />
                   ) : null}
                   <Tooltip
@@ -93,11 +96,11 @@ const SideNav = (props: {
                     <button
                       className=""
                       onClick={() => {
-                        props.setSelectedInnerTab(server.name);
-                        props.setSelectedInnerTabID(server.id);
-                        props.serverSetter(server);
-                        props.currentTabSetter("server");
-                        props.setSelectedChannel(null);
+                        setSelectedInnerTab(server.name);
+                        setSelectedInnerTabID(server.id);
+                        serverSetter(server);
+                        currentTabSetter("server");
+                        channelSetter(null);
                       }}
                     >
                       {server.logo_url ? (
@@ -131,16 +134,11 @@ const SideNav = (props: {
               placement="rightEnd"
             >
               <button
-                ref={props.serverButtonRef}
+                ref={serverButtonRef}
                 className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
-                onClick={props.serverModalToggle}
+                onClick={serverModalToggle}
               >
-                <AddIcon
-                  height={40}
-                  width={40}
-                  stroke={isDarkTheme ? "#9333ea" : "#8b5cf6"}
-                  strokeWidth={1.5}
-                />
+                <AddIcon height={40} width={40} stroke={isDarkTheme ? "#9333ea" : "#8b5cf6"} strokeWidth={1.5} />
               </button>
             </Tooltip>
           </div>
@@ -154,21 +152,16 @@ const SideNav = (props: {
               <button
                 className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                 onClick={() => {
-                  props.currentTabSetter("PublicServers");
-                  props.setSelectedInnerTab("");
+                  currentTabSetter("PublicServers");
+                  setSelectedInnerTab("");
                 }}
               >
                 <div className="flex h-[40px] w-[40px] items-center justify-center">
-                  <BullhornIcon
-                    height={30}
-                    width={30}
-                    fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
-                    strokeWidth={1.5}
-                  />
+                  <BullhornIcon height={30} width={30} fill={isDarkTheme ? "#9333ea" : "#8b5cf6"} strokeWidth={1.5} />
                 </div>
               </button>
             </Tooltip>
-            {props.currentTab === "PublicServers" ? (
+            {currentTab === "PublicServers" ? (
               <span className="absolute mr-20 mt-4 h-4 w-4 rounded-full bg-zinc-200" />
             ) : null}
           </div>
@@ -180,15 +173,11 @@ const SideNav = (props: {
               placement="rightEnd"
             >
               <button
-                ref={props.botButtonRef}
+                ref={botButtonRef}
                 className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
-                onClick={props.botModalToggle}
+                onClick={botModalToggle}
               >
-                <RobotForApp
-                  height={40}
-                  width={40}
-                  fill={isDarkTheme ? "#9333ea" : "#8b5cf6"}
-                />
+                <RobotForApp height={40} width={40} fill={isDarkTheme ? "#9333ea" : "#8b5cf6"} />
               </button>
             </Tooltip>
           </div>

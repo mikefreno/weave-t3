@@ -8,10 +8,11 @@ import NamingsImage from "@/public/namings.jpg";
 import Head from "next/head";
 
 export default function WhatIsWeave() {
-  const switchRef = useRef<HTMLDivElement>(null);
+  const { isDarkTheme } = useContext(ThemeContext);
 
   const [scrollPosition, setScrollPosition] = useState(0);
 
+  const switchRef = useRef<HTMLDivElement>(null);
   const firstHighlight = useRef<HTMLSpanElement>(null);
   const secondHighlight = useRef<HTMLSpanElement>(null);
   const thirdHighlight = useRef<HTMLSpanElement>(null);
@@ -21,7 +22,6 @@ export default function WhatIsWeave() {
   const seventhHighlight = useRef<HTMLSpanElement>(null);
   const eighthHighlight = useRef<HTMLSpanElement>(null);
   const ninthHighlight = useRef<HTMLSpanElement>(null);
-  const { isDarkTheme } = useContext(ThemeContext);
 
   const handleScroll = () => {
     const position = window.pageYOffset;
@@ -77,17 +77,9 @@ export default function WhatIsWeave() {
       </Head>
       <Navbar switchRef={switchRef} />
       <div className="fade-in">
-        <div className="pt-20 text-center text-4xl tracking-wider">
-          What is Weave?
-        </div>
+        <div className="pt-20 text-center text-4xl tracking-wider">What is Weave?</div>
         <div className="flex justify-center py-14">
-          <Image
-            src={isDarkTheme ? DarkLogo : LightLogo}
-            alt="logo"
-            width={160}
-            height={160}
-            priority
-          />
+          <Image src={isDarkTheme ? DarkLogo : LightLogo} alt="logo" width={160} height={160} priority />
         </div>
         <p className="mx-auto w-3/4 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
           Weave is a communication platform that empowers communities with{" "}
@@ -95,38 +87,24 @@ export default function WhatIsWeave() {
             powerful tools
           </span>{" "}
           and puts{" "}
-          <span
-            ref={secondHighlight}
-            className="highlightSpacings inline-block"
-          >
+          <span ref={secondHighlight} className="highlightSpacings inline-block">
             {" "}
             users in control of their data,
           </span>{" "}
           with customizable privacy settings at every level.
         </p>
-        <div className="pt-20 text-center text-3xl tracking-wide">
-          Real names vs Pseudonyms
-        </div>
+        <div className="pt-20 text-center text-3xl tracking-wide">Real names vs Pseudonyms</div>
         <div className="flex justify-center py-14">
-          <Image
-            src={NamingsImage}
-            alt="RealName&Pseudonym"
-            width={350}
-            height={160}
-            className="rounded-lg"
-          />
+          <Image src={NamingsImage} alt="RealName&Pseudonym" width={350} height={160} className="rounded-lg" />
         </div>
         <p className="mx-auto w-3/4 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
           Just like in world of atoms, in the world of bits,{" "}
           <span ref={thirdHighlight} className="highlightSpacings inline-block">
             first impressions
           </span>{" "}
-          dictate to a large degree how interactions will go. It is for this
-          reason that Weave allows for both real names and pseudonyms
-          <span
-            ref={fourthHighlight}
-            className="highlightSpacings inline-block"
-          >
+          dictate to a large degree how interactions will go. It is for this reason that Weave allows for both real
+          names and pseudonyms
+          <span ref={fourthHighlight} className="highlightSpacings inline-block">
             dictated at the server and channel level.
           </span>
         </p>
@@ -149,17 +127,12 @@ export default function WhatIsWeave() {
         </div>
         <p className="mx-auto w-3/4 py-2 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
           There are also some significant drawbacks to it anonymity as well that{" "}
-          <span
-            ref={seventhHighlight}
-            className="highlightSpacings inline-block"
-          >
+          <span ref={seventhHighlight} className="highlightSpacings inline-block">
             can not
           </span>{" "}
           be overlooked.
         </p>
-        <p className="mx-auto w-3/4 py-2 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
-          Such as:
-        </p>
+        <p className="mx-auto w-3/4 py-2 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">Such as:</p>
         <ul className="mx-auto w-3/4 pb-4 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
           <li>Lack of empathy towards others</li>
           <li>Increases in spam / harassment / misinformation</li>
@@ -167,12 +140,9 @@ export default function WhatIsWeave() {
           <li>Lack of accountability</li>
         </ul>
         <p className="mx-auto w-3/4 pb-36 text-center text-xl tracking-wide md:w-1/2 xl:w-1/3">
-          And it is due to the conflict above that Weave allows for communities
-          to decide between pseudonymity and the use of real names.{" "}
-          <span
-            ref={eighthHighlight}
-            className="highlightSpacings inline-block"
-          >
+          And it is due to the conflict above that Weave allows for communities to decide between pseudonymity and the
+          use of real names.{" "}
+          <span ref={eighthHighlight} className="highlightSpacings inline-block">
             It allows communities
           </span>{" "}
           to foster the environment they desire.

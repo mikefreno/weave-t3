@@ -10,6 +10,7 @@ export default function Search(props: {
   select: (input: User) => void;
 }) {
   const { userInput, userData, serverData, select } = props;
+
   const [userResults, setUserResults] = useState<User[] | null>(null);
   const [serverResults, setServerResults] = useState<Server[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,18 +30,12 @@ export default function Search(props: {
     const results: User[] = [];
     if (userData) {
       for (let n = 0; n < userData.length; n++) {
-        if (
-          userData[n]?.name?.toLowerCase().includes(userInput.toLowerCase())
-        ) {
+        if (userData[n]?.name?.toLowerCase().includes(userInput.toLowerCase())) {
           results.push(userData[n] as User);
           continue;
         }
         if (results.length >= 5) break;
-        if (
-          userData[n]?.pseudonym
-            ?.toLowerCase()
-            .includes(userInput.toLowerCase())
-        ) {
+        if (userData[n]?.pseudonym?.toLowerCase().includes(userInput.toLowerCase())) {
           results.push(userData[n] as User);
         }
         if (results.length >= 5) break;
@@ -54,9 +49,7 @@ export default function Search(props: {
     const results: Server[] = [];
     if (serverData) {
       for (let n = 0; n < serverData.length; n++) {
-        if (
-          serverData[n]?.name?.toLowerCase().includes(userInput.toLowerCase())
-        ) {
+        if (serverData[n]?.name?.toLowerCase().includes(userInput.toLowerCase())) {
           results.push(serverData[n] as Server);
         }
         if (results.length >= 5) break;
@@ -77,9 +70,7 @@ export default function Search(props: {
                   className="w-full rounded bg-purple-300 py-2 hover:bg-purple-400 active:bg-purple-500 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:active:bg-zinc-600"
                 >
                   <div className="text-md">{result.name}</div>
-                  <div className="text-sm">
-                    {result.pseudonym ? "@" + result.pseudonym : null}
-                  </div>
+                  <div className="text-sm">{result.pseudonym ? "@" + result.pseudonym : null}</div>
                 </button>
               </div>
             ))

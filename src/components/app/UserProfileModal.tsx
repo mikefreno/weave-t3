@@ -13,11 +13,10 @@ export default function UserProfileModal(props: {
   UserProfileModalRef: RefObject<HTMLDivElement>;
   userProfileModalToggle: () => void;
 }) {
-  const { isDarkTheme } = useContext(ThemeContext);
-
   const { user, UserProfileModalRef } = props;
-  const getUserByID = api.users.getById.useQuery(user.id);
   const [fullUser, setFullUser] = useState<User | null>(null);
+
+  const getUserByID = api.users.getById.useQuery(user.id);
 
   useEffect(() => {
     getUserByID.refetch();
@@ -38,12 +37,7 @@ export default function UserProfileModal(props: {
               <Xmark className={"w-10"} />
             </button>
             <Button color={"secondary"} auto>
-              <AddFriendIcon
-                height={20}
-                width={20}
-                stroke={"white"}
-                strokeWidth={1.5}
-              />
+              <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
             </Button>
           </div>
           <div className="flex flex-row justify-evenly">
@@ -57,15 +51,10 @@ export default function UserProfileModal(props: {
           <div className="flex flex-row justify-evenly">
             {fullUser.pseudonym_image ? (
               <div className="my-auto flex justify-center">
-                <img
-                  className="h-36 w-36 rounded-full"
-                  src={fullUser.pseudonym_image}
-                />
+                <img className="h-36 w-36 rounded-full" src={fullUser.pseudonym_image} />
               </div>
             ) : null}
-            <div className="my-auto flex justify-center">
-              {fullUser.pseudonym ? "@" + fullUser.pseudonym : null}
-            </div>
+            <div className="my-auto flex justify-center">{fullUser.pseudonym ? "@" + fullUser.pseudonym : null}</div>
           </div>
         </>
       );

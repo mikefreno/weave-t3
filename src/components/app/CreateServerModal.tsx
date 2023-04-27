@@ -7,13 +7,7 @@ import LongArrow from "@/src/icons/LongArrow";
 import StackedBoxesIcon from "@/src/icons/StackedBoxesIcon";
 import Xmark from "@/src/icons/Xmark";
 import { Button, Checkbox, Input, Loading, Textarea } from "@nextui-org/react";
-import React, {
-  RefObject,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
+import React, { RefObject, useCallback, useContext, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import Dropzone from "@/src/components/app/Dropzone";
 import { api } from "@/src/utils/api";
@@ -41,33 +35,30 @@ const CreateServerModal = (props: {
   serverModalRef: RefObject<HTMLDivElement>;
   refreshUserServers: () => any;
 }) => {
+  const { isDarkTheme } = useContext(ThemeContext);
+  //state
   const [logoImage, setLogoImage] = useState<File | Blob | null>(null);
   const [bannerImage, setBannerImage] = useState<File | Blob | null>(null);
   const [logoImageExt, setLogoImageExt] = useState<string | null>(null);
   const [bannerImageExt, setBannerImageExt] = useState<string | null>(null);
-  const [logoImageHolder, setLogoImageHolder] = useState<
-    string | ArrayBuffer | null
-  >(null);
-  const [bannerImageHolder, setBannerImageHolder] = useState<
-    string | ArrayBuffer | null
-  >(null);
-  const { isDarkTheme } = useContext(ThemeContext);
+  const [logoImageHolder, setLogoImageHolder] = useState<string | ArrayBuffer | null>(null);
+  const [bannerImageHolder, setBannerImageHolder] = useState<string | ArrayBuffer | null>(null);
   const [specifiedTemplate, setSpecifiedTemplate] = useState("selector");
   const [serverPublic, setServerPublic] = useState(false);
   const [serverType, setServerType] = useState("");
-  const createServerMutation = api.server.createServer.useMutation({});
-  const serverNameRef = useRef<HTMLInputElement>(null);
-  const serverSelectRef = useRef<HTMLSelectElement>(null);
-  const serverDescriptionRef = useRef<HTMLTextAreaElement>(null);
   const [serverDescriptionLength, setServerDescriptionLength] = useState(0);
-  const [serverDescriptionColor, setServerDescriptionColor] =
-    useState("default");
-  const serverLogoMutation = api.server.updateServerLogo.useMutation({});
-  const serverBannerMutation = api.server.updateServerBanner.useMutation({});
+  const [serverDescriptionColor, setServerDescriptionColor] = useState("default");
   const [createButtonLoading, setCreateButtonLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [serverImageLoading, setServerImageLoading] = useState(false);
-
+  //ref
+  const serverNameRef = useRef<HTMLInputElement>(null);
+  const serverSelectRef = useRef<HTMLSelectElement>(null);
+  const serverDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  //trpc (api)
+  const createServerMutation = api.server.createServer.useMutation({});
+  const serverLogoMutation = api.server.updateServerLogo.useMutation({});
+  const serverBannerMutation = api.server.updateServerBanner.useMutation({});
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
 
   const templateSetter = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -150,11 +141,9 @@ const CreateServerModal = (props: {
         category: "servers",
       });
       //update server with image url
-      await axios
-        .put(s3TokenReturn.uploadURL, bannerImage as File)
-        .catch((err) => {
-          console.log(err);
-        });
+      await axios.put(s3TokenReturn.uploadURL, bannerImage as File).catch((err) => {
+        console.log(err);
+      });
       serverBannerMutation.mutate({
         serverID: createServerMutation.data!.id,
         url: s3TokenReturn.key,
@@ -167,11 +156,9 @@ const CreateServerModal = (props: {
         ext: logoImageExt as string,
         category: "servers",
       });
-      await axios
-        .put(s3TokenReturn.uploadURL, logoImage as File)
-        .catch((err) => {
-          console.log(err);
-        });
+      await axios.put(s3TokenReturn.uploadURL, logoImage as File).catch((err) => {
+        console.log(err);
+      });
       serverLogoMutation.mutate({
         serverID: createServerMutation.data!.id,
         url: s3TokenReturn.key,
@@ -198,20 +185,10 @@ const CreateServerModal = (props: {
               <div className="flex">
                 <span className="my-auto mr-4">Joining a server?</span>
                 <span className="animate-left-right mr my-auto">
-                  <LongArrow
-                    height={30}
-                    width={30}
-                    stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                    strokeWidth={1}
-                  />
+                  <LongArrow height={30} width={30} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
                 </span>
                 <button id="add" onClick={templateSetter}>
-                  <AddIcon
-                    height={36}
-                    width={36}
-                    stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                    strokeWidth={1.5}
-                  />
+                  <AddIcon height={36} width={36} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1.5} />
                 </button>
               </div>
             </div>
@@ -221,12 +198,7 @@ const CreateServerModal = (props: {
               onClick={templateSetter}
               className="m-4 mx-auto flex w-4/5 rounded-xl bg-zinc-200 p-4 hover:bg-zinc-300 active:bg-zinc-500 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:active:bg-zinc-900"
             >
-              <ClipboardIcon
-                height={20}
-                width={20}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                strokeWidth={1.5}
-              />
+              <ClipboardIcon height={20} width={20} color={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1.5} />
               <div className="mx-auto text-lg">Generic Server</div>
             </button>
             <div className="py-2 text-center text-xl">Server Templates</div>
@@ -235,17 +207,11 @@ const CreateServerModal = (props: {
               onClick={templateSetter}
               className="m-4 mx-auto flex w-4/5 rounded-xl bg-blue-500 p-4 hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-800"
             >
-              <BriefcaseIcon
-                height={20}
-                width={20}
-                stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                strokeWidth={1}
-              />
+              <BriefcaseIcon height={20} width={20} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
               <div className="mx-auto text-lg">
                 Work centric
                 <div className="text-sm">
-                  Start with text channels, real names enforced and others
-                  security features enabled.
+                  Start with text channels, real names enforced and others security features enabled.
                 </div>
               </div>
             </button>
@@ -254,16 +220,11 @@ const CreateServerModal = (props: {
               onClick={templateSetter}
               className="m-4 mx-auto flex w-4/5 rounded-xl bg-emerald-500 p-4  hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:active:bg-emerald-800"
             >
-              <GamepadIcon
-                height={24}
-                width={24}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              />
+              <GamepadIcon height={24} width={24} color={isDarkTheme ? "#e4e4e7" : "#27272a"} />
               <div className="mx-auto text-lg">
                 Gaming Centric
                 <div className="text-sm">
-                  Text, and voice channels. Currently playing tooltips and
-                  in-game overlays.
+                  Text, and voice channels. Currently playing tooltips and in-game overlays.
                 </div>
               </div>
             </button>
@@ -272,16 +233,11 @@ const CreateServerModal = (props: {
               onClick={templateSetter}
               className="m-4 mx-auto flex w-4/5 rounded-xl bg-violet-500 p-4 hover:bg-violet-600 active:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-700 dark:active:bg-violet-800"
             >
-              <StackedBoxesIcon
-                height={24}
-                width={24}
-                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-              />
+              <StackedBoxesIcon height={24} width={24} color={isDarkTheme ? "#e4e4e7" : "#27272a"} />
               <div className="mx-auto text-lg">
                 Fully Stacked
                 <div className="text-sm">
-                  Start with text channels, voice channels, and a bunch of
-                  commonly used settings.
+                  Start with text channels, voice channels, and a bunch of commonly used settings.
                 </div>
               </div>
             </button>
@@ -300,12 +256,7 @@ const CreateServerModal = (props: {
           >
             <div className="flex w-full justify-between">
               <button id="selector" onClick={templateSetter}>
-                <BackArrow
-                  height={30}
-                  width={30}
-                  stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                  strokeWidth={1}
-                />
+                <BackArrow height={30} width={30} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
               </button>
             </div>
             <div className="text-center text-2xl">Join a server</div>
@@ -348,17 +299,10 @@ const CreateServerModal = (props: {
             >
               <div className="flex w-full justify-between">
                 <button id="selector" onClick={templateSetter}>
-                  <BackArrow
-                    height={30}
-                    width={30}
-                    stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                    strokeWidth={1}
-                  />
+                  <BackArrow height={30} width={30} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
                 </button>
               </div>
-              <div className="flex justify-center text-2xl">
-                {specifiedTemplate} Template
-              </div>
+              <div className="flex justify-center text-2xl">{specifiedTemplate} Template</div>
               <form onSubmit={createServerRequest}>
                 <div className="flex flex-col items-center pt-12">
                   <Input
@@ -391,24 +335,19 @@ const CreateServerModal = (props: {
                         <option value="" disabled>
                           Select Server Type
                         </option>
-                        <option value="Finance & Economics">
-                          Finance & Economics
-                        </option>
+                        <option value="Finance & Economics">Finance & Economics</option>
                         <option value="Music">Music</option>
                         <option value="Entertainment">Entertainment</option>
                         <option value="Gaming">Gaming</option>
                         <option value="Education">Education</option>
-                        <option value="Science & Technology">
-                          Science & Technology
-                        </option>
+                        <option value="Science & Technology">Science & Technology</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>
                   ) : null}
                   {serverType === "Other" ? (
                     <div className="mx-12 mb-6 text-center">
-                      Your server will not be listed under any category, it will
-                      only be found by searching directly
+                      Your server will not be listed under any category, it will only be found by searching directly
                     </div>
                   ) : null}
                 </div>
@@ -419,30 +358,17 @@ const CreateServerModal = (props: {
                     placeholder="Community to discuss the..."
                     onChange={descriptionLengthReport}
                     size="xl"
-                    status={
-                      serverDescriptionLength > 100
-                        ? "error"
-                        : isDarkTheme
-                        ? "default"
-                        : "secondary"
-                    }
+                    status={serverDescriptionLength > 100 ? "error" : isDarkTheme ? "default" : "secondary"}
                   />
                 </div>
-                <div className="flex justify-center pl-36">
-                  {serverDescriptionLength}/100
-                </div>
+                <div className="flex justify-center pl-36">{serverDescriptionLength}/100</div>
                 <div className="my-4 flex justify-center">
                   {createButtonLoading ? (
                     <Button disabled auto bordered size={"lg"} color="gradient">
                       <Loading type="points" size="sm" />
                     </Button>
                   ) : serverDescriptionLength > 100 ? (
-                    <Button
-                      color={"gradient"}
-                      size={"lg"}
-                      type="submit"
-                      disabled
-                    >
+                    <Button color={"gradient"} size={"lg"} type="submit" disabled>
                       Description too long
                     </Button>
                   ) : (
@@ -471,9 +397,7 @@ const CreateServerModal = (props: {
                 </button>
               </div>
               <form onSubmit={updateServerImages}>
-                <div className="my-4 text-center text-2xl">
-                  Server Created! Bring it to Life
-                </div>
+                <div className="my-4 text-center text-2xl">Server Created! Bring it to Life</div>
                 <div className="mx-12 flex">
                   <div className="mx-8 flex flex-1 flex-col">
                     <div className="text-center">Server Logo (optional)</div>
@@ -495,9 +419,7 @@ const CreateServerModal = (props: {
                   </div>
                 </div>
                 <div className="flex flex-col items-center">
-                  <div className="pb-6 pt-2">
-                    Logo / Banner can be uploaded at any time
-                  </div>
+                  <div className="pb-6 pt-2">Logo / Banner can be uploaded at any time</div>
                 </div>
                 <div className="flex justify-end">
                   {serverImageLoading ? (
@@ -508,12 +430,7 @@ const CreateServerModal = (props: {
                     <Button auto color={"secondary"} type="submit">
                       Next
                       <div className="rotate-180">
-                        <BackArrow
-                          height={24}
-                          width={24}
-                          stroke="#e4e4e7"
-                          strokeWidth={1.5}
-                        />
+                        <BackArrow height={24} width={24} stroke="#e4e4e7" strokeWidth={1.5} />
                       </div>
                     </Button>
                   )}
@@ -542,12 +459,7 @@ const CreateServerModal = (props: {
                 <div>You can quickly set server settings here</div>
                 <form>
                   <div className="flex justify-end">
-                    <Button
-                      auto
-                      color={"secondary"}
-                      type="submit"
-                      onClick={() => setStep(3)}
-                    >
+                    <Button auto color={"secondary"} type="submit" onClick={() => setStep(3)}>
                       Next
                       <div className="rotate-180">
                         <BackArrow
@@ -585,12 +497,7 @@ const CreateServerModal = (props: {
                 <Button auto color={"secondary"} type="submit">
                   Go To Server
                   <div className="rotate-180">
-                    <BackArrow
-                      height={24}
-                      width={24}
-                      stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                      strokeWidth={1.5}
-                    />
+                    <BackArrow height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1.5} />
                   </div>
                 </Button>
               </div>

@@ -18,7 +18,7 @@ export default function PublicServersPages(props: PublicServersPagesProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const { isDarkTheme } = useContext(ThemeContext);
   const [servers, setServers] = useState<Server[]>();
-  //need to grab all of the servers for the given page and pass them to be used in the map function that uses the following
+
   const serverMutation = api.server.getAllPublicServers.useMutation();
 
   const getServers = async () => {
@@ -58,11 +58,7 @@ export default function PublicServersPages(props: PublicServersPagesProps) {
                 contentClickable
                 contentRight={
                   <button className="">
-                    <SearchIcon
-                      height={24}
-                      width={24}
-                      stroke={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                    />
+                    <SearchIcon height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} />
                   </button>
                 }
               />
@@ -88,9 +84,7 @@ export default function PublicServersPages(props: PublicServersPagesProps) {
                   </div>
                 ))
               ) : (
-                <div className="text-center text-xl">
-                  No public servers in this category yet!
-                </div>
+                <div className="text-center text-xl">No public servers in this category yet!</div>
               )}
             </div>
           </div>

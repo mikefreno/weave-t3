@@ -1,9 +1,6 @@
 import React, { RefObject } from "react";
 
-const AttachmentModal = (props: {
-  toggle: any;
-  attachmentModalRef: RefObject<HTMLDivElement>;
-}) => {
+const AttachmentModal = (props: { toggle: any; attachmentModalRef: RefObject<HTMLDivElement> }) => {
   return (
     <div className="fixed -ml-36">
       <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">

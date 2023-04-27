@@ -1,16 +1,7 @@
 import InfoIcon from "@/src/icons/InfoIcon";
 import { api } from "@/src/utils/api";
-import {
-  Card,
-  Col,
-  Row,
-  Button,
-  Text,
-  Avatar,
-  Tooltip,
-  Loading,
-} from "@nextui-org/react";
-import React, { useState } from "react";
+import { Card, Col, Row, Button, Text, Avatar, Tooltip, Loading } from "@nextui-org/react";
+import { useState } from "react";
 import ServerTooltip from "./ServerTooltip";
 
 const ServerCard = (props: {
@@ -23,18 +14,11 @@ const ServerCard = (props: {
   serverID: number;
   refreshUserServers: () => void;
 }) => {
-  const {
-    logo,
-    banner,
-    name,
-    blurb,
-    members,
-    membersOnline,
-    serverID,
-    refreshUserServers,
-  } = props;
-  const serverJoinMutation = api.server.joinPublicServer.useMutation();
+  const { logo, banner, name, blurb, members, membersOnline, serverID, refreshUserServers } = props;
+
   const [joinButtonLoading, setJoinButtonLoading] = useState(false);
+
+  const serverJoinMutation = api.server.joinPublicServer.useMutation();
 
   const joinPublicServer = async () => {
     setJoinButtonLoading(true);
@@ -50,12 +34,7 @@ const ServerCard = (props: {
           <Row>
             <Avatar src={logo} />
             <div className="absolute right-0">
-              <Tooltip
-                content={
-                  <ServerTooltip serverName={name} serverBlurb={blurb} />
-                }
-                placement="rightStart"
-              >
+              <Tooltip content={<ServerTooltip serverName={name} serverBlurb={blurb} />} placement="rightStart">
                 <InfoIcon height={20} width={20} fill={"#9333ea"} />
               </Tooltip>
             </div>
@@ -66,13 +45,7 @@ const ServerCard = (props: {
         </Col>
       </Card.Header>
       <Card.Body css={{ p: 0 }}>
-        <Card.Image
-          src={banner}
-          width="100%"
-          height="100%"
-          objectFit="cover"
-          alt={`${name} banner`}
-        />
+        <Card.Image src={banner} width="100%" height="100%" objectFit="cover" alt={`${name} banner`} />
       </Card.Body>
       <Card.Footer
         isBlurred
@@ -100,19 +73,8 @@ const ServerCard = (props: {
                   <Loading type="points" size="sm" />
                 </Button>
               ) : (
-                <Button
-                  flat
-                  auto
-                  rounded
-                  color="secondary"
-                  onClick={joinPublicServer}
-                >
-                  <Text
-                    css={{ color: "inherit" }}
-                    size={12}
-                    weight="bold"
-                    transform="uppercase"
-                  >
+                <Button flat auto rounded color="secondary" onClick={joinPublicServer}>
+                  <Text css={{ color: "inherit" }} size={12} weight="bold" transform="uppercase">
                     Join
                   </Text>
                 </Button>

@@ -5,8 +5,9 @@ import SecurityModal from "./SecurityModal";
 import ThemeContext from "../ThemeContextProvider";
 
 const Parallax = () => {
-  const parallaxRef = useRef<HTMLDivElement>(null);
   const { isDarkTheme } = useContext(ThemeContext);
+
+  const parallaxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,9 +17,7 @@ const Parallax = () => {
         if (index === 0 || index === 2) {
           speed = speed * -1;
         }
-        (layer as HTMLElement).style.transform = `translateY(${
-          offset * speed
-        }px)`;
+        (layer as HTMLElement).style.transform = `translateY(${offset * speed}px)`;
       });
     };
 

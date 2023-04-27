@@ -1,13 +1,6 @@
 import { api } from "@/src/utils/api";
 import { Button, Loading } from "@nextui-org/react";
-import {
-  Server_Channel,
-  Server,
-  Server_Member,
-  Server_Admin,
-  User,
-  WSConnection,
-} from "@prisma/client";
+import { Server_Channel, Server, Server_Member, Server_Admin, User, WSConnection } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 import TopBanner from "./TopBanner";
 import VideoElement from "./VideoElement";
@@ -36,32 +29,27 @@ const constraints = {
 export default function VoiceChannel(props: VoiceChannelProps) {
   // prettier-ignore
   const {selectedChannel, currentUser, socket, microphoneState, audioState, fullscreen, socketChannelUpdate} = props;
+  //state
   const [userJoined, setUserJoined] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
-  const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
-  const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
   const [joinButtonLoadingState, setJoinButtonLoadingState] = useState(false);
   const [leaveButtonLoadingState, setLeaveButtonLoadingState] = useState(false);
-  const stream = useRef<MediaStream>(new MediaStream());
   const [cameraState, setCameraState] = useState<boolean>(false);
-  const [checkCamButtonLoading, setCheckCamButtonLoading] =
-    useState<boolean>(false);
-  // prettier-ignore
-  const peerConnections = useRef<Map<string, RTCPeerConnection>>(new Map());
-  // prettier-ignore
-  const [webSocketsInCall, setWebSocketsInCall] = useState<(WSConnection & {user: User;})[]>([]);
-  // prettier-ignore
-  const [webSocketsInChannel, setWebSocketsInChannel] = useState<(WSConnection & {user: User;})[]>([]);
-  // prettier-ignore
-  const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(selectedChannel.id);
-  // prettier-ignore
+  const [checkCamButtonLoading, setCheckCamButtonLoading] = useState<boolean>(false);
+  const [webSocketsInCall, setWebSocketsInCall] = useState<(WSConnection & { user: User })[]>([]);
+  const [webSocketsInChannel, setWebSocketsInChannel] = useState<(WSConnection & { user: User })[]>([]);
   const [videoTrackStatus, setVideoTrackStatus] = useState<Map<string, boolean>>(new Map());
-  //prettier-ignore
   const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(new Map());
-  //prettier-ignore
   const [videoTrackStates, setVideoTrackStates] = useState<Map<string, boolean>>(new Map());
-  //prettier-ignore
   const [audioTrackStates, setAudioTrackStates] = useState<Map<string, boolean>>(new Map());
+  //ref
+  const stream = useRef<MediaStream>(new MediaStream());
+  const peerConnections = useRef<Map<string, RTCPeerConnection>>(new Map());
+  //trpc (api)
+  const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(selectedChannel.id);
+  const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
+
+  const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
 
   useEffect(() => {
     if (connectedWSQuery.data) {
@@ -71,12 +59,8 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   useEffect(() => {
     if (webSocketsInChannel) {
-      const wsInCall = webSocketsInChannel.filter(
-        (connection) => connection.inCall
-      );
-      const userInCallBoolean = wsInCall.some(
-        (connection) => connection.user.id === currentUser.id
-      );
+      const wsInCall = webSocketsInChannel.filter((connection) => connection.inCall);
+      const userInCallBoolean = wsInCall.some((connection) => connection.user.id === currentUser.id);
       setUserJoined(userInCallBoolean);
       setWebSocketsInCall(wsInCall);
     }
@@ -113,9 +97,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             await addPeer(senderID, false);
             const newPeer = peerConnections.current.get(senderID);
             if (newPeer) {
-              await newPeer.setRemoteDescription(
-                new RTCSessionDescription(data.offer)
-              );
+              await newPeer.setRemoteDescription(new RTCSessionDescription(data.offer));
               const answer = await newPeer.createAnswer();
               await newPeer.setLocalDescription(answer);
               console.log("Sending answer");
@@ -137,9 +119,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           case "answer":
             console.log("receive answer");
             if (sendingConnection) {
-              await sendingConnection.setRemoteDescription(
-                new RTCSessionDescription(data.answer)
-              );
+              await sendingConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
             } else {
               console.error("Peer Creation Failed!");
               console.log(peerConnections.current);
@@ -150,13 +130,9 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             console.log("received ice candidate");
             if (sendingConnection) {
               if (sendingConnection.remoteDescription) {
-                await sendingConnection.addIceCandidate(
-                  new RTCIceCandidate(data.candidate)
-                );
+                await sendingConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
               } else {
-                console.error(
-                  "Remote description is not set yet. Ignoring ICE candidate."
-                );
+                console.error("Remote description is not set yet. Ignoring ICE candidate.");
               }
             }
             break;
@@ -229,19 +205,14 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     };
 
     newPeerConnection.oniceconnectionstatechange = async () => {
-      console.log(
-        `ICE connection state with ${peerUserID} changed to: ${newPeerConnection.iceConnectionState}`
-      );
+      console.log(`ICE connection state with ${peerUserID} changed to: ${newPeerConnection.iceConnectionState}`);
     };
 
     peerConnections.current?.set(peerUserID, newPeerConnection);
     return newPeerConnection;
   };
   //peer video handling
-  const updateVideoTrackListeners = (
-    peerUserID: string,
-    videoTrack: MediaStreamTrack
-  ) => {
+  const updateVideoTrackListeners = (peerUserID: string, videoTrack: MediaStreamTrack) => {
     videoTrack.onmute = () => {
       console.log(`Video track muted for user ${peerUserID}`);
       setVideoTrackStates((prevVideoTrackStates) => {
@@ -481,19 +452,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   return (
     <div className="">
-      <TopBanner
-        key={selectedChannel.id}
-        selectedChannel={selectedChannel}
-        fullscreen={fullscreen}
-      />
+      <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} fullscreen={fullscreen} />
       <div
         className={`scrollXDisabled h-screen overflow-y-hidden rounded bg-zinc-50 pt-14 dark:bg-zinc-900`}
         style={{ width: fullscreen ? "100vw" : bodySizing }}
       >
         <div className="pt-8 text-center text-lg">
-          {webSocketsInCall && webSocketsInCall?.length !== 0
-            ? "Currently in Channel:"
-            : "No one's here... yet"}
+          {webSocketsInCall && webSocketsInCall?.length !== 0 ? "Currently in Channel:" : "No one's here... yet"}
         </div>
         <div className="absolute flex w-full justify-center">
           <div className="flex flex-col text-center">
@@ -506,24 +471,17 @@ export default function VoiceChannel(props: VoiceChannelProps) {
           </div>
         </div>
         {webSocketsInCall.length === 6 ? (
-          <div className="py-4 text-center text-sm italic">
-            Currently voice calls only support up to 6 people.
-          </div>
+          <div className="py-4 text-center text-sm italic">Currently voice calls only support up to 6 people.</div>
         ) : null}
         {webSocketsInCall ? (
           <div className="flex h-[60vh] justify-center px-4 pb-8 pt-12 md:px-6 lg:px-10 xl:px-12">
             {webSocketsInCall.map((websocket) => (
-              <div
-                className="m-4 h-64 w-5/12 rounded-xl bg-purple-200 dark:bg-zinc-700"
-                key={websocket.user.id}
-              >
+              <div className="m-4 h-64 w-5/12 rounded-xl bg-purple-200 dark:bg-zinc-700" key={websocket.user.id}>
                 <VideoElement
                   peerUserID={websocket.user.id}
                   stream={peerStreams.get(websocket.user.id) || stream.current}
                   currentUserID={currentUser.id}
-                  videoTrackState={
-                    videoTrackStates.get(websocket.user.id) || cameraState
-                  }
+                  videoTrackState={videoTrackStates.get(websocket.user.id) || cameraState}
                   isLocal={currentUser.id === websocket.user.id}
                   deafen={!audioState}
                 />
@@ -540,9 +498,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                       alt={"user-logo"}
                       className="h-24 w-24 rounded-full md:h-36 md:w-36"
                     />
-                    <div className="mx-auto pt-4 text-black">
-                      {websocket.user.name}
-                    </div>
+                    <div className="mx-auto pt-4 text-black">{websocket.user.name}</div>
                   </button>
                 </div>
               </div>
@@ -619,11 +575,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                   </div>
                 ) : (
                   <div className="px-2">
-                    <Button
-                      auto
-                      onClick={props.microphoneToggle}
-                      className="px-2"
-                    >
+                    <Button auto onClick={props.microphoneToggle} className="px-2">
                       Turn Mic On
                     </Button>
                   </div>

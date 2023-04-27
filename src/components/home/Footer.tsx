@@ -24,26 +24,14 @@ const Footer = () => {
             className="hvr-grow-rotate-left rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">
-              <GitHub
-                height={16}
-                width={16}
-                fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`}
-                stroke={undefined}
-              />
+              <GitHub height={16} width={16} fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} stroke={undefined} />
             </span>
           </a>
         </li>
         <li>
-          <a
-            href="mailto:michael@freno.me"
-            className="hvr-grow rounded-full border-zinc-800 dark:border-zinc-300"
-          >
+          <a href="mailto:michael@freno.me" className="hvr-grow rounded-full border-zinc-800 dark:border-zinc-300">
             <span className="m-auto">
-              <Envelope
-                height={16}
-                width={16}
-                fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`}
-              />
+              <Envelope height={16} width={16} fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} />
             </span>
           </a>
         </li>
@@ -55,17 +43,12 @@ const Footer = () => {
             className="hvr-grow-rotate rounded-full border-zinc-800 dark:border-zinc-300"
           >
             <span className="m-auto">
-              <LinkedIn
-                height={16}
-                width={16}
-                fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`}
-                stroke={undefined}
-              />
+              <LinkedIn height={16} width={16} fill={`${isDarkTheme ? "#d4d4d8" : "#27272a"}`} stroke={undefined} />
             </span>
           </a>
         </li>
       </ul>
-      <div className="mr-6 -mt-6 flex flex-col items-end pb-12 md:mr-24 md:pb-4">
+      <div className="-mt-6 mr-6 flex flex-col items-end pb-12 md:mr-24 md:pb-4">
         <span className="flex">©{copyright_tag}</span>
         <span className="flex">Michael Freno</span>
       </div>
