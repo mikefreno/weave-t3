@@ -8,6 +8,7 @@ import React, { useRef } from "react";
 const LoginRedirect = () => {
   const { data: session, status } = useSession();
   const switchRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   if (status === "authenticated") {
     router.push("/app");
@@ -19,10 +20,8 @@ const LoginRedirect = () => {
         <meta name="description" content="Login" />
       </Head>
       <Navbar switchRef={switchRef} />
-      <div className="pt-24 text-center text-3xl">
-        You must be logged in to use that page
-      </div>
-      <LoginModal onClose={undefined} loginRef={undefined} />
+      <div className="pt-24 text-center text-3xl">You must be logged in to use that page</div>
+      <LoginModal onClose={undefined} loginRef={undefined} tooltipRef={tooltipRef} />
     </div>
   );
 };
