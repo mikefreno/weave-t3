@@ -45,6 +45,7 @@ const Navbar = (props: {
   const menuRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const loginRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
   const infoModalRef = useRef<HTMLDivElement>(null);
@@ -79,7 +80,7 @@ const Navbar = (props: {
     setInfoDropdownShowing(false);
   });
 
-  useOnClickOutside([loginRef, loginButtonRef, props.switchRef as RefObject<HTMLDivElement>], () => {
+  useOnClickOutside([loginRef, tooltipRef, loginButtonRef, props.switchRef as RefObject<HTMLDivElement>], () => {
     setShowingLoginModal(false);
   });
 
@@ -292,7 +293,7 @@ const Navbar = (props: {
           ) : null}
         </div>
       </nav>
-      {showingLoginModal ? <LoginModal onClose={loginToggle} loginRef={loginRef} /> : null}
+      {showingLoginModal ? <LoginModal onClose={loginToggle} loginRef={loginRef} tooltipRef={tooltipRef} /> : null}
     </div>
   );
 };

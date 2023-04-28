@@ -16,6 +16,7 @@ import Link from "next/link";
 const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
   loginRef: React.LegacyRef<HTMLDivElement> | undefined;
+  tooltipRef: React.RefObject<HTMLDivElement>;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const router = useRouter().route;
@@ -109,7 +110,9 @@ const LoginModal = (props: {
               <Tooltip
                 css={{ width: "180px", textAlign: "center" }}
                 content={
-                  "Weave uses a password-less login system, to login/register you will receive a link in your email"
+                  <div ref={props.tooltipRef}>
+                    Weave uses a password-less login system, to login/register you will receive a link in your email
+                  </div>
                 }
               >
                 <InfoIcon height={16} width={16} fill={"#9333ea"} />
