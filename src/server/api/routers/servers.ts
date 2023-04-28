@@ -266,19 +266,30 @@ export const serverRouter = createTRPCRouter({
       });
     }
   }),
-  getFullServerData: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
-    const serverMemberData = await ctx.prisma.server.findFirst({
-      where: {
-        id: input,
-      },
-      include: {
-        owner: true,
-        admin: { include: { admin: true } },
-        members: { include: { member: true } },
-      },
-    });
-    return serverMemberData;
-  }),
+  getPrivilegeBasedServerData: protectedProcedure
+    .input(z.object({ serverID: z.number().optional(), privilegeLevel: z.string().optional() }))
+    .query(async ({ input, ctx }) => {
+      if (input.privilegeLevel === "admin" || input.privilegeLevel === "owner") {
+        const fullServerData = await ctx.prisma.server.findFirst({
+          where: {
+            id: input.serverID,
+          },
+          include: {
+            owner: true,
+            admin: { include: { admin: true } },
+            members: { include: { member: true } },
+          },
+        });
+        return fullServerData;
+      } else {
+        const restrictedServerData = await ctx.prisma.server.findFirst({
+          where: {
+            id: input.serverID,
+          },
+        });
+        return restrictedServerData;
+      }
+    }),
   getUsersInChannel: protectedProcedure.input(z.number()).query(async ({ input, ctx }): Promise<User[]> => {
     const wsConnections = await ctx.prisma.wSConnection.findMany({
       where: {
@@ -372,11 +383,49 @@ export const serverRouter = createTRPCRouter({
       if (memberData) {
         await ctx.prisma.server_Admin.create({
           data: {
-            adminId: memberData.memberId,
-            ServerId: input.serverID,
-            assignedBy: input.promoterID,
+            admin: {
+              connect: { id: input.promoteeID },
+            },
+            Server: {
+              connect: { id: input.serverID },
+            },
             joinedAt: memberData.joinedAt,
             invitedBy: memberData.invitedBy,
+            assignedBy: input.promoterID,
+          },
+        });
+        await ctx.prisma.server_Member.delete({
+          where: {
+            id: memberData.id,
+          },
+        });
+      }
+    }),
+  demoteAdminToMember: protectedProcedure
+    .input(z.object({ demoteeID: z.string(), demoterID: z.string(), serverID: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const adminData = await ctx.prisma.server_Admin.findFirst({
+        where: {
+          adminId: input.demoteeID,
+          ServerId: input.serverID,
+        },
+      });
+      if (adminData) {
+        await ctx.prisma.server_Member.create({
+          data: {
+            member: {
+              connect: { id: input.demoteeID },
+            },
+            Server: {
+              connect: { id: input.serverID },
+            },
+            joinedAt: adminData.joinedAt,
+            invitedBy: adminData.invitedBy,
+          },
+        });
+        await ctx.prisma.server_Admin.delete({
+          where: {
+            id: adminData.id,
           },
         });
       }

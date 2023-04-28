@@ -343,7 +343,7 @@ const App = () => {
               microphoneToggle={microphoneToggle}
               audioState={audioState}
               audioToggle={audioToggle}
-              serverSettingsToggle={serverSettingsToggle}
+              setServerSettingsPane={setServerSettingsPane}
             />
           </div>
         </div>
@@ -443,6 +443,7 @@ const App = () => {
                 serverID={selectedServer?.id}
                 deletionServerButtonRef={deletionServerButtonRef}
                 serverDeletionToggle={serverDeletionToggle}
+                currentUser={currentUser}
               />
             ) : (
               <ServerMainScreen

@@ -16,7 +16,7 @@ import useOnClickOutside from "@/src/components/ClickOutsideHook";
 import CommentsIcon from "@/src/icons/CommentsIcon";
 import { Input, Tooltip } from "@nextui-org/react";
 import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
-import React, { MouseEventHandler, RefObject, useContext, useRef, useState } from "react";
+import React, { Dispatch, MouseEventHandler, RefObject, SetStateAction, useContext, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import { api } from "@/src/utils/api";
 import SideNavSmallScreen from "./SideNavSmallScreen";
@@ -79,7 +79,7 @@ interface InnerNavProps {
   microphoneToggle: any;
   audioState: boolean;
   audioToggle: any;
-  serverSettingsToggle: () => void;
+  setServerSettingsPane: Dispatch<SetStateAction<boolean>>;
 }
 
 const InnerNav = (props: InnerNavProps) => {
@@ -377,18 +377,17 @@ const InnerNav = (props: InnerNavProps) => {
             className="justify-left flex pl-4 pt-4 text-xl font-bold"
             onClick={() => {
               channelSetter(null);
-              props.serverSettingsToggle();
+              props.setServerSettingsPane(false);
             }}
           >
             {selectedInnerTab}
           </button>
           <div className="p-4">
-            {/* if user is owner or admin  */}
             <button
               className="logoSpinner"
               onClick={() => {
                 channelSetter(null);
-                props.serverSettingsToggle();
+                props.setServerSettingsPane(true);
               }}
             >
               <SettingsIcon height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
