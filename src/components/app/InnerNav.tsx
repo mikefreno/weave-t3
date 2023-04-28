@@ -384,7 +384,13 @@ const InnerNav = (props: InnerNavProps) => {
           </button>
           <div className="p-4">
             {/* if user is owner or admin  */}
-            <button className="logoSpinner" onClick={props.serverSettingsToggle}>
+            <button
+              className="logoSpinner"
+              onClick={() => {
+                channelSetter(null);
+                props.serverSettingsToggle();
+              }}
+            >
               <SettingsIcon height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
             </button>
             {/* end */}
