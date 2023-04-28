@@ -14,21 +14,19 @@ interface MongoServer {
 
 export const databaseMgmtRouter = createTRPCRouter({
   syncAllMongoUsers: protectedProcedure.mutation(async ({ ctx }) => {
+    const userID = ctx.session.user.id;
     if (
-      ctx.session.user.id === "cle6jo913000tofj4e2zijrnk" ||
-      ctx.session.user.id === "cle4jdgkz0007of5cyqlqtfey"
+      userID === "cle4jdgkz0007of5cyqlqtfey" ||
+      userID === "cle6jo913000tofj4e2zijrnk" ||
+      userID === "clgzqfm7l0000of4z4fragl8f"
     ) {
       try {
         const all_users = await ctx.prisma.user.findMany();
         const mongoUsers: MongoUser[] = await ctx.prismaMongo.user.findMany();
-        const mongoUsersMap = new Map(
-          mongoUsers.map((user) => [user.id, user])
-        );
+        const mongoUsersMap = new Map(mongoUsers.map((user) => [user.id, user]));
 
         // Filter users not yet in MongoDB and add new users
-        const usersNotInMongo = all_users.filter(
-          (user) => !mongoUsersMap.has(user.id)
-        );
+        const usersNotInMongo = all_users.filter((user) => !mongoUsersMap.has(user.id));
         await Promise.all(
           usersNotInMongo.map(
             async (user) =>
@@ -46,11 +44,7 @@ export const databaseMgmtRouter = createTRPCRouter({
           all_users.map(async (user) => {
             const mongoUser = mongoUsersMap.get(user.id);
 
-            if (
-              mongoUser &&
-              (mongoUser.name !== user.name ||
-                mongoUser.pseudonym !== user.pseudonym)
-            ) {
+            if (mongoUser && (mongoUser.name !== user.name || mongoUser.pseudonym !== user.pseudonym)) {
               await ctx.prismaMongo.user.update({
                 where: { id: user.id },
                 data: {
@@ -70,20 +64,17 @@ export const databaseMgmtRouter = createTRPCRouter({
     }
   }),
   syncAllMongoServers: protectedProcedure.mutation(async ({ ctx }) => {
+    const userID = ctx.session.user.id;
     if (
-      ctx.session.user.id === "cle6jo913000tofj4e2zijrnk" ||
-      ctx.session.user.id === "cle4jdgkz0007of5cyqlqtfey"
+      userID === "cle4jdgkz0007of5cyqlqtfey" ||
+      userID === "cle6jo913000tofj4e2zijrnk" ||
+      userID === "clgzqfm7l0000of4z4fragl8f"
     ) {
       try {
         const all_servers = await ctx.prisma.server.findMany();
-        const mongoServers: MongoServer[] =
-          await ctx.prismaMongo.server.findMany();
-        const mongoServerMap = new Map(
-          mongoServers.map((server) => [server.id, server])
-        );
-        const serversNotInMongo = all_servers.filter(
-          (server) => !mongoServerMap.has(server.id)
-        );
+        const mongoServers: MongoServer[] = await ctx.prismaMongo.server.findMany();
+        const mongoServerMap = new Map(mongoServers.map((server) => [server.id, server]));
+        const serversNotInMongo = all_servers.filter((server) => !mongoServerMap.has(server.id));
         await Promise.all(
           serversNotInMongo.map(
             async (server) =>

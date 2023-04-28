@@ -56,26 +56,21 @@ export const serverRouter = createTRPCRouter({
     const allServers: Server[] = [];
     if (user !== null) {
       const adminServers = user.adminships.map((adminship) => adminship.Server);
-      const memberServers = user.memberships.map(
-        (membership) => membership.Server
-      );
-      const servers = [
-        ...new Set([...adminServers, ...memberServers, ...user.servers]),
-      ];
+      const memberServers = user.memberships.map((membership) => membership.Server);
+      const servers = [...new Set([...adminServers, ...memberServers, ...user.servers])];
       allServers.push(...servers);
-      return allServers;
+      const filteredServers = allServers.filter((server) => server.unlisted === false);
+      return filteredServers;
     }
   }),
-  getServerByID: publicProcedure
-    .input(z.number())
-    .mutation(async ({ input, ctx }) => {
-      const server = await ctx.prisma.server.findFirst({
-        where: {
-          id: input,
-        },
-      });
-      return server;
-    }),
+  getServerByID: publicProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const server = await ctx.prisma.server.findFirst({
+      where: {
+        id: input,
+      },
+    });
+    return server;
+  }),
   createJWTInvite: protectedProcedure
     .input(z.object({ serverID: z.number(), email: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -104,8 +99,8 @@ export const serverRouter = createTRPCRouter({
 
       const sendinblueData = {
         sender: {
-          name: "Weave",
-          email: "michael@freno.me",
+          name: "Weave Website Contact",
+          email: "no_reply@weavechat.net",
         },
         to: [
           {
@@ -145,12 +140,8 @@ export const serverRouter = createTRPCRouter({
       });
       if (server !== null) {
         const adminEmails = server.admin.map((admin) => admin.admin.email);
-        const memberEmails = server.members.map(
-          (member) => member.member.email
-        );
-        const emails = [
-          ...new Set([...adminEmails, ...memberEmails, server.owner.email]),
-        ];
+        const memberEmails = server.members.map((member) => member.member.email);
+        const emails = [...new Set([...adminEmails, ...memberEmails, server.owner.email])];
         if (emails.includes(input.email)) {
           return true;
         } else return false;
@@ -178,16 +169,14 @@ export const serverRouter = createTRPCRouter({
         return true;
       }
     }),
-  getAllPublicServers: publicProcedure
-    .input(z.string())
-    .mutation(({ input, ctx }) => {
-      return ctx.prisma.server.findMany({
-        where: {
-          type: "public",
-          category: input,
-        },
-      });
-    }),
+  getAllPublicServers: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
+    return ctx.prisma.server.findMany({
+      where: {
+        type: "public",
+        category: input,
+      },
+    });
+  }),
   postComment: protectedProcedure
     .meta({ openapi: { method: "POST", path: "/api/send-message" } })
     .input(
@@ -206,104 +195,169 @@ export const serverRouter = createTRPCRouter({
         },
       });
     }),
-  getChannelComments: protectedProcedure
-    .input(z.number())
-    .query(async ({ input, ctx }) => {
-      if (input === 0) {
-        return "";
-      } else {
-        return ctx.prisma.comment.findMany({
-          where: { channelID: input },
-          include: {
-            user: true,
-          },
-        });
-      }
-    }),
-  deleteUserFromServer: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ input, ctx }) => {
-      const userID = ctx.session.user.id;
-
-      const serverMember = await ctx.prisma.server_Member.findFirst({
-        where: {
-          memberId: userID,
-          ServerId: input,
-        },
-      });
-      if (serverMember) {
-        await ctx.prisma.server_Member.delete({
-          where: { id: serverMember.id },
-        });
-      }
-      const serverAdmin = await ctx.prisma.server_Admin.findFirst({
-        where: {
-          adminId: userID,
-          ServerId: input,
-        },
-      });
-      if (serverAdmin) {
-        await ctx.prisma.server_Member.delete({
-          where: { id: serverAdmin.id },
-        });
-      }
-    }),
-  joinPublicServer: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ input, ctx }) => {
-      const userID = ctx.session.user.id;
-      const member = await ctx.prisma.server_Member.findFirst({
-        where: { memberId: userID, ServerId: input },
-      });
-      const admin = await ctx.prisma.server_Admin.findFirst({
-        where: { adminId: userID, ServerId: input },
-      });
-      const server = await ctx.prisma.server.findFirst({
-        where: { id: input },
-      });
-      let owner: boolean;
-      if (userID == server?.ownerId) {
-        owner = true;
-      } else {
-        owner = false;
-      }
-      if (member || admin || owner) {
-        return false;
-      } else {
-        await ctx.prisma.server_Member.create({
-          data: {
-            member: {
-              connect: { id: userID },
-            },
-            Server: {
-              connect: { id: input },
-            },
-            invitedBy: "publicJoin",
-          },
-        });
-      }
-    }),
-  getUserCounts: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input }) => {
-      const server = await ctx.prisma.server.findFirst({
-        where: { id: input },
-      });
-    }),
-  getUsersInChannel: protectedProcedure
-    .input(z.number())
-    .query(async ({ input, ctx }): Promise<User[]> => {
-      const wsConnections = await ctx.prisma.wSConnection.findMany({
-        where: {
-          channelID: input,
-        },
+  getChannelComments: protectedProcedure.input(z.number()).query(async ({ input, ctx }) => {
+    if (input === 0) {
+      return "";
+    } else {
+      return ctx.prisma.comment.findMany({
+        where: { channelID: input },
         include: {
           user: true,
         },
       });
-      const Users = wsConnections.map((wsConnection) => {
-        return wsConnection.user ?? null;
+    }
+  }),
+  deleteUserFromServer: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const userID = ctx.session.user.id;
+
+    const serverMember = await ctx.prisma.server_Member.findFirst({
+      where: {
+        memberId: userID,
+        ServerId: input,
+      },
+    });
+    if (serverMember) {
+      await ctx.prisma.server_Member.delete({
+        where: { id: serverMember.id },
       });
-      return Users.filter(Boolean) as User[];
-    }),
+    }
+    const serverAdmin = await ctx.prisma.server_Admin.findFirst({
+      where: {
+        adminId: userID,
+        ServerId: input,
+      },
+    });
+    if (serverAdmin) {
+      await ctx.prisma.server_Member.delete({
+        where: { id: serverAdmin.id },
+      });
+    }
+  }),
+  joinPublicServer: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const userID = ctx.session.user.id;
+    const member = await ctx.prisma.server_Member.findFirst({
+      where: { memberId: userID, ServerId: input },
+    });
+    const admin = await ctx.prisma.server_Admin.findFirst({
+      where: { adminId: userID, ServerId: input },
+    });
+    const server = await ctx.prisma.server.findFirst({
+      where: { id: input },
+    });
+    let owner: boolean;
+    if (userID == server?.ownerId) {
+      owner = true;
+    } else {
+      owner = false;
+    }
+    if (member || admin || owner) {
+      return false;
+    } else {
+      await ctx.prisma.server_Member.create({
+        data: {
+          member: {
+            connect: { id: userID },
+          },
+          Server: {
+            connect: { id: input },
+          },
+          invitedBy: "publicJoin",
+        },
+      });
+    }
+  }),
+  getFullServerData: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const serverMemberData = await ctx.prisma.server.findFirst({
+      where: {
+        id: input,
+      },
+      include: {
+        owner: true,
+        admin: true,
+        members: true,
+      },
+    });
+    return serverMemberData;
+  }),
+  getUsersInChannel: protectedProcedure.input(z.number()).query(async ({ input, ctx }): Promise<User[]> => {
+    const wsConnections = await ctx.prisma.wSConnection.findMany({
+      where: {
+        channelID: input,
+      },
+      include: {
+        user: true,
+      },
+    });
+    const Users = wsConnections.map((wsConnection) => {
+      return wsConnection.user ?? null;
+    });
+    return Users.filter(Boolean) as User[];
+  }),
+  getUserPrivilegeLevel: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const userID = ctx.session.user.id;
+    const serverData = await ctx.prisma.server.findFirst({
+      where: {
+        id: input,
+      },
+      include: { admin: true },
+    });
+    if (serverData) {
+      if (userID === serverData.ownerId) {
+        return "owner";
+      } else {
+        const adminCheck = serverData.admin.find((admin) => admin.adminId === userID);
+        return adminCheck ? "admin" : "member";
+      }
+    }
+  }),
+  delistServer: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const userID = ctx.session.user.id;
+    const serverData = await ctx.prisma.server.findFirst({
+      where: { id: input },
+    });
+    if (serverData && userID === serverData.ownerId) {
+      await ctx.prisma.server.update({
+        where: { id: input },
+        data: {
+          unlisted: true,
+        },
+      });
+      return "Server unlisted and queued for deletion, contact support immediately if in error: mike@weavechat.net";
+    } else return "Rejected";
+  }),
+  deleteUnlistedServer: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
+    const userID = ctx.session.user.id;
+    if (
+      userID === "cle4jdgkz0007of5cyqlqtfey" ||
+      userID === "cle6jo913000tofj4e2zijrnk" ||
+      userID === "clgzqfm7l0000of4z4fragl8f"
+    ) {
+      const serverData = await ctx.prisma.server.findFirst({
+        where: { id: input },
+      });
+      if (serverData && serverData.unlisted) {
+        await ctx.prisma.server.delete({
+          where: { id: input },
+        });
+      }
+    }
+  }),
+  getUnlistedServers: protectedProcedure.query(async ({ ctx }) => {
+    const userID = ctx.session.user.id;
+    if (
+      userID === "cle4jdgkz0007of5cyqlqtfey" ||
+      userID === "cle6jo913000tofj4e2zijrnk" ||
+      userID === "clgzqfm7l0000of4z4fragl8f"
+    ) {
+      const unlistedServers = await ctx.prisma.server.findMany({
+        where: {
+          unlisted: true,
+        },
+        include: {
+          owner: true,
+        },
+      });
+      return unlistedServers;
+    }
+  }),
 });

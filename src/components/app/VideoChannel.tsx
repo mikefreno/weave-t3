@@ -38,6 +38,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const [checkCamButtonLoading, setCheckCamButtonLoading] = useState<boolean>(false);
   const [webSocketsInCall, setWebSocketsInCall] = useState<(WSConnection & { user: User })[]>([]);
   const [webSocketsInChannel, setWebSocketsInChannel] = useState<(WSConnection & { user: User })[]>([]);
+
   const [videoTrackStatus, setVideoTrackStatus] = useState<Map<string, boolean>>(new Map());
   const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(new Map());
   const [videoTrackStates, setVideoTrackStates] = useState<Map<string, boolean>>(new Map());

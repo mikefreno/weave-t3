@@ -71,6 +71,7 @@ model Server {
   ownerId    String
   category   String           @default("other")
   type       String           @default("private")
+  unlisted   Boolean          @default(false)
   owner      User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   admin      Server_Admin[]
   members    Server_Member[]

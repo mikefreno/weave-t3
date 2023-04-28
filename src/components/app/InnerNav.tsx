@@ -36,6 +36,7 @@ type ServerIncludingChannel = {
   logo_url: string | null;
   type: string;
   banner_url: string | null;
+  unlisted: boolean;
   ownerId: string;
   category: string;
   channels: Server_Channel[];
@@ -78,10 +79,15 @@ interface InnerNavProps {
   microphoneToggle: any;
   audioState: boolean;
   audioToggle: any;
+  privilegeLevel: "admin" | "member" | "owner" | undefined;
+  deletionServerButtonRef: RefObject<HTMLButtonElement>;
+  serverDeletionToggle: () => void;
+  serverSettingsToggle: () => void;
 }
 
 const InnerNav = (props: InnerNavProps) => {
   const {
+    privilegeLevel,
     currentTabSetter,
     currentTab,
     selectedInnerTab,
@@ -101,16 +107,19 @@ const InnerNav = (props: InnerNavProps) => {
     inviteModalToggle,
     inviteModalButtonRef,
     serverSetter,
+    deletionServerButtonRef,
+    serverDeletionToggle,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   //state
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("Recent");
   const [userSearchData, setUserSearchData] = useState<MongoUser[] | null>(null);
-  const [showSearch, setShowSearch] = useState<boolean>();
+  const [showSearch, setShowSearch] = useState<boolean>(false);
   //ref
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchResultsRef = useRef<HTMLDivElement>(null);
+
   //trpc (api)
   const deleteUserFromServer = api.server.deleteUserFromServer.useMutation();
   const getUserSearchData = api.searchRouter.getMongoUsers.useMutation();
@@ -374,13 +383,14 @@ const InnerNav = (props: InnerNavProps) => {
             className="justify-left flex pl-4 pt-4 text-xl font-bold"
             onClick={() => {
               channelSetter(null);
+              props.serverSettingsToggle();
             }}
           >
             {selectedInnerTab}
           </button>
           <div className="p-4">
             {/* if user is owner or admin  */}
-            <button className="logoSpinner ">
+            <button className="logoSpinner" onClick={props.serverSettingsToggle}>
               <SettingsIcon height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
             </button>
             {/* end */}
@@ -513,14 +523,6 @@ const InnerNav = (props: InnerNavProps) => {
               <span className="my-auto">
                 <AddIcon height={16} width={16} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={2} />
               </span>
-            </button>
-            <button
-              className="flex underline-offset-2 hover:underline"
-              onClick={leaveServerAlert}
-              ref={inviteModalButtonRef}
-            >
-              <div>Leave Server</div>
-              <span className="my-auto"></span>
             </button>
           </div>
         </>
