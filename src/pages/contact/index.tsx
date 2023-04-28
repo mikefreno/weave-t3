@@ -31,7 +31,7 @@ export default function PrivacyPolicy() {
         message: messageInputRef.current.value,
       });
       if (res === 201) {
-        setResponseText("Message sent successfully, we will get back a soon as possible!");
+        setResponseText("Message sent successfully, we will get back to you as soon as possible!");
       } else {
         console.log(res + "error");
       }
