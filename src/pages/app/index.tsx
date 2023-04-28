@@ -343,9 +343,6 @@ const App = () => {
               microphoneToggle={microphoneToggle}
               audioState={audioState}
               audioToggle={audioToggle}
-              privilegeLevel={privilegeLevel}
-              deletionServerButtonRef={deletionServerButtonRef}
-              serverDeletionToggle={serverDeletionToggle}
               serverSettingsToggle={serverSettingsToggle}
             />
           </div>
@@ -441,7 +438,12 @@ const App = () => {
                 />
               ) : null
             ) : serverSettingsPane ? (
-              <ServerSettings privilegeLevel={privilegeLevel} server={selectedServer} />
+              <ServerSettings
+                privilegeLevel={privilegeLevel}
+                server={selectedServer}
+                deletionServerButtonRef={deletionServerButtonRef}
+                serverDeletionToggle={serverDeletionToggle}
+              />
             ) : (
               <ServerMainScreen
                 usersServers={usersServers.data}

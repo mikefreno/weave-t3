@@ -79,15 +79,11 @@ interface InnerNavProps {
   microphoneToggle: any;
   audioState: boolean;
   audioToggle: any;
-  privilegeLevel: "admin" | "member" | "owner" | undefined;
-  deletionServerButtonRef: RefObject<HTMLButtonElement>;
-  serverDeletionToggle: () => void;
   serverSettingsToggle: () => void;
 }
 
 const InnerNav = (props: InnerNavProps) => {
   const {
-    privilegeLevel,
     currentTabSetter,
     currentTab,
     selectedInnerTab,
@@ -107,8 +103,6 @@ const InnerNav = (props: InnerNavProps) => {
     inviteModalToggle,
     inviteModalButtonRef,
     serverSetter,
-    deletionServerButtonRef,
-    serverDeletionToggle,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   //state
