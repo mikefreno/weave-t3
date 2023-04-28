@@ -98,7 +98,7 @@ export default function PrivacyPolicy() {
                 If you have any questions about what is contained here please contact by:
               </div>
               <div className="pl-6">
-                <li className="list-disc">Emailing michael@freno.me</li>
+                <li className="list-disc">Emailing mike@weavechat.net</li>
                 <li className="list-disc">
                   Or by going{" "}
                   <Link href="/contact" className="underline-offset-4 hover:underline">

@@ -28,9 +28,7 @@ export const miscRouter = createTRPCRouter({
       return { uploadURL: signedUrl, key: Key };
     }),
   sendContactRequest: publicProcedure
-    .input(
-      z.object({ name: z.string(), email: z.string(), message: z.string() })
-    )
+    .input(z.object({ name: z.string(), email: z.string(), message: z.string() }))
     .mutation(async ({ input }) => {
       const apiKey = process.env.SENDINBLUE_KEY as string;
       const apiUrl = "https://api.sendinblue.com/v3/smtp/email";
@@ -38,11 +36,11 @@ export const miscRouter = createTRPCRouter({
       const sendinblueData = {
         sender: {
           name: "Weave",
-          email: "michael@freno.me",
+          email: "mike@weavechat.net",
         },
         to: [
           {
-            email: "michael@freno.me",
+            email: "mike@weavechat.net",
           },
         ],
         htmlContent: `<html><head></head><body><div>Request Name: ${input.name}</div><div>Request Email: ${input.email}</div><div>Request Message: ${input.message}</div></body></html>`,

@@ -26,6 +26,8 @@ import UserProfileModal from "@/src/components/app/UserProfileModal";
 import { type User as MongoUser } from "@prisma/client/mongo";
 import VideoChannel from "@/src/components/app/VideoChannel";
 import VoiceChannel from "@/src/components/app/VoiceChannel";
+import ServerSettings from "@/src/components/app/ServerSettings";
+import DeleteServerConfirmation from "@/src/components/app/DeleteServerConfirmation";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -55,9 +57,13 @@ const App = () => {
     }
   >();
   const [selectedServer, setSelectedServer] = useState<Server | null>(null);
+  const [privilegeLevel, setPrivilegeLevel] = useState<"admin" | "member" | "owner">();
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const socketRef = useRef<WebSocket | null>(null);
+  const [deletionConfirmationShowing, setDeletionConfirmationShowing] = useState<boolean>(false);
+  const [ownerConfirmedDeletion, setOwnerConfirmedDeletion] = useState<boolean>(false);
+  const [serverSettingsPane, setServerSettingsPane] = useState<boolean>(false);
   //refs
+  const socketRef = useRef<WebSocket | null>(null);
   const switchRef = useRef<HTMLDivElement>(null);
   const serverModalRef = useRef<HTMLDivElement>(null);
   const serverButtonRef = useRef<HTMLButtonElement>(null);
@@ -70,10 +76,13 @@ const App = () => {
   const inviteModalRef = useRef<HTMLDivElement>(null);
   const createChannelButtonRef = useRef<HTMLButtonElement>(null);
   const createChannelRef = useRef<HTMLDivElement>(null);
+  const deletionServerButtonRef = useRef<HTMLButtonElement>(null);
+  const deleteConfirmationModalRef = useRef<HTMLDivElement>(null);
 
   //trpc (api) hooks
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
   const currentUserReturn = api.users.getCurrentUser.useQuery();
+  const currentUserServerPrivilegeMutation = api.server.getUserPrivilegeLevel.useMutation();
 
   //click outside hooks
   useOnClickOutside([UserProfileModalRef], () => {
@@ -94,6 +103,9 @@ const App = () => {
     setServerModalShowing(false);
   });
   useOnClickOutside([botModalRef, botButtonRef, switchRef], () => setBotModalShowing(false));
+  useOnClickOutside([deletionServerButtonRef, deleteConfirmationModalRef], () => {
+    setDeletionConfirmationShowing(false);
+  });
 
   //socket management
   useEffect(() => {
@@ -118,6 +130,7 @@ const App = () => {
       };
     }
   }, [socket]);
+
   const socketUserUpdate = () => {
     socket?.send(
       JSON.stringify({
@@ -166,9 +179,6 @@ const App = () => {
 
   useEffect(() => {
     document.getElementById("html")?.classList.add("scrollDisabled");
-    // document
-    //   .getElementById("body")
-    //   ?.setAttribute("class", "bg-zinc-300 dark:bg-zinc-700");
   }, []);
 
   useEffect(() => {
@@ -184,6 +194,10 @@ const App = () => {
       document.getElementById("html")?.classList.remove("scrollDisabled");
     };
   }, []);
+
+  useEffect(() => {
+    privilegeSetter();
+  }, [selectedServer]);
 
   //refreshers
   const refreshUserServers = async () => {
@@ -225,6 +239,12 @@ const App = () => {
   const microphoneToggle = async () => {
     setMicrophoneState(!microphoneState);
   };
+  const serverDeletionToggle = async () => {
+    setDeletionConfirmationShowing(!deletionConfirmationShowing);
+  };
+  const serverSettingsToggle = () => {
+    setServerSettingsPane(!serverSettingsPane);
+  };
 
   //setters
   const serverSetter = async (server: Server) => {
@@ -236,7 +256,12 @@ const App = () => {
   const innerTabSetter = (input: string) => {
     setSelectedInnerTab(input);
   };
-
+  const privilegeSetter = async () => {
+    if (selectedServer) {
+      const thisPrivilegeLevel = await currentUserServerPrivilegeMutation.mutateAsync(selectedServer.id);
+      setPrivilegeLevel(thisPrivilegeLevel);
+    }
+  };
   const userSelect = (user: MongoUser) => {
     setSearchedUser(user);
   };
@@ -246,6 +271,8 @@ const App = () => {
   const loadingOverlaySetter = (boolean: boolean) => {
     setLoadingOverlayShowing(boolean);
   };
+  //cron triggers
+  const startDeletionCountdown = async () => {};
   //auth check
   if (currentUser === undefined || currentUser === null) {
     setTimeout(() => {
@@ -316,6 +343,10 @@ const App = () => {
               microphoneToggle={microphoneToggle}
               audioState={audioState}
               audioToggle={audioToggle}
+              privilegeLevel={privilegeLevel}
+              deletionServerButtonRef={deletionServerButtonRef}
+              serverDeletionToggle={serverDeletionToggle}
+              serverSettingsToggle={serverSettingsToggle}
             />
           </div>
         </div>
@@ -396,7 +427,7 @@ const App = () => {
                   fullscreen={fullscreen}
                   socketChannelUpdate={socketChannelUpdate}
                 />
-              ) : (
+              ) : selectedChannel.type === "voice" ? (
                 <VoiceChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
@@ -408,7 +439,9 @@ const App = () => {
                   fullscreen={fullscreen}
                   socketChannelUpdate={socketChannelUpdate}
                 />
-              )
+              ) : null
+            ) : serverSettingsPane ? (
+              <ServerSettings privilegeLevel={privilegeLevel} server={selectedServer} />
             ) : (
               <ServerMainScreen
                 usersServers={usersServers.data}
@@ -454,6 +487,17 @@ const App = () => {
             user={searchedUser}
             UserProfileModalRef={UserProfileModalRef}
           />
+        ) : null}
+        {deletionConfirmationShowing ? (
+          <div>
+            <DeleteServerConfirmation
+              setOwnerConfirmedDeletion={setOwnerConfirmedDeletion}
+              deleteConfirmationModalRef={deleteConfirmationModalRef}
+              serverDeletionToggle={serverDeletionToggle}
+              serverName={selectedServer?.name}
+              serverId={selectedServer?.id}
+            />
+          </div>
         ) : null}
       </div>
     </div>
