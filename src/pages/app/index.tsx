@@ -424,7 +424,7 @@ const App = () => {
                   fullscreen={fullscreen}
                   socketChannelUpdate={socketChannelUpdate}
                 />
-              ) : selectedChannel.type === "voice" ? (
+              ) : selectedChannel.type === "audio" ? (
                 <VoiceChannel
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
@@ -440,7 +440,7 @@ const App = () => {
             ) : serverSettingsPane ? (
               <ServerSettings
                 privilegeLevel={privilegeLevel}
-                server={selectedServer}
+                serverID={selectedServer?.id}
                 deletionServerButtonRef={deletionServerButtonRef}
                 serverDeletionToggle={serverDeletionToggle}
               />

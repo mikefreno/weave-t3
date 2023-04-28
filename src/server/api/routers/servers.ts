@@ -273,8 +273,8 @@ export const serverRouter = createTRPCRouter({
       },
       include: {
         owner: true,
-        admin: true,
-        members: true,
+        admin: { include: { admin: true } },
+        members: { include: { member: true } },
       },
     });
     return serverMemberData;
@@ -360,4 +360,25 @@ export const serverRouter = createTRPCRouter({
       return unlistedServers;
     }
   }),
+  promoteMemberToAdmin: protectedProcedure
+    .input(z.object({ promoteeID: z.string(), promoterID: z.string(), serverID: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const memberData = await ctx.prisma.server_Member.findFirst({
+        where: {
+          memberId: input.promoteeID,
+          ServerId: input.serverID,
+        },
+      });
+      if (memberData) {
+        await ctx.prisma.server_Admin.create({
+          data: {
+            adminId: memberData.memberId,
+            ServerId: input.serverID,
+            assignedBy: input.promoterID,
+            joinedAt: memberData.joinedAt,
+            invitedBy: memberData.invitedBy,
+          },
+        });
+      }
+    }),
 });
