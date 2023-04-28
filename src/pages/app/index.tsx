@@ -272,7 +272,7 @@ const App = () => {
     setLoadingOverlayShowing(boolean);
   };
   //cron triggers
-  const startDeletionCountdown = async () => {};
+  // const startDeletionCountdown = async () => {};
   //auth check
   if (currentUser === undefined || currentUser === null) {
     setTimeout(() => {
