@@ -196,7 +196,7 @@ export const serverRouter = createTRPCRouter({
       });
       if (serverData) {
         const reactionKeys = serverData.emojiReactions?.split(",");
-        let reactionInit: { [key: string]: number } = {};
+        const reactionInit: { [key: string]: number } = {};
         reactionKeys?.forEach((reaction) => {
           reactionInit[reaction] = 0;
         });
@@ -476,7 +476,7 @@ export const serverRouter = createTRPCRouter({
     all_servers.forEach((server) => {
       if (server.emojiReactions) {
         serversReactionKeys = server.emojiReactions.split(",");
-        let serversReactionInit: { [key: string]: number } = {};
+        const serversReactionInit: { [key: string]: number } = {};
         serversReactionKeys.forEach((reaction) => {
           serversReactionInit[reaction] = 0;
         });

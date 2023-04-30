@@ -385,8 +385,8 @@ export default function ServerSettings(props: ServerSettingsProps) {
           </div>
         </div>
         <div className="text py-4 text-center">
-          Select <span className="underline underline-offset-4">up to 5</span> emoji's (in addition to thumbs up and
-          down) that users can react to messages with!
+          Select <span className="underline underline-offset-4">up to 5</span> emoji&apos;s (in addition to thumbs up
+          and down) that users can react to messages with!
         </div>
         <div className="">
           <button

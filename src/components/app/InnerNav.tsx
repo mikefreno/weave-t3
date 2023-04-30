@@ -36,6 +36,7 @@ type ServerIncludingChannel = {
   logo_url: string | null;
   type: string;
   banner_url: string | null;
+  emojiReactions: string;
   unlisted: boolean;
   ownerId: string;
   category: string;
