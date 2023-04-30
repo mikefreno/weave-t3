@@ -10,51 +10,27 @@ body {
 
 .bgColorGradient {
   background: rgb(91, 33, 182);
-  background: radial-gradient(
-    circle,
-    rgba(91, 33, 182, 1) 0%,
-    rgba(38, 38, 38, 1) 40%
-  );
+  background: radial-gradient(circle, rgba(91, 33, 182, 1) 0%, rgba(38, 38, 38, 1) 40%);
 }
 .topGradient {
   background: rgb(51, 18, 100);
-  background: linear-gradient(
-    177deg,
-    rgba(51, 18, 100, 1) 5%,
-    rgba(212, 212, 216, 0) 20%
-  );
+  background: linear-gradient(177deg, rgba(51, 18, 100, 1) 5%, rgba(212, 212, 216, 0) 20%);
 }
 .topGradientLight {
   background: rgb(51, 18, 100);
-  background: linear-gradient(
-    177deg,
-    rgba(124, 58, 237, 1) 5%,
-    rgba(212, 212, 216, 0) 20%
-  );
+  background: linear-gradient(177deg, rgba(124, 58, 237, 1) 5%, rgba(212, 212, 216, 0) 20%);
 }
 .bottomGradient {
   background: rgb(51, 18, 100);
-  background: linear-gradient(
-    357deg,
-    rgba(51, 18, 100, 1) 5%,
-    rgba(212, 212, 216, 0) 10%
-  );
+  background: linear-gradient(357deg, rgba(51, 18, 100, 1) 5%, rgba(212, 212, 216, 0) 10%);
 }
 .bottomGradientLight {
   background: rgb(51, 18, 100);
-  background: linear-gradient(
-    357deg,
-    rgba(124, 58, 237, 1) 5%,
-    rgba(212, 212, 216, 0) 10%
-  );
+  background: linear-gradient(357deg, rgba(124, 58, 237, 1) 5%, rgba(212, 212, 216, 0) 10%);
 }
 .bgColorGradientLight {
   background: rgb(91, 33, 182);
-  background: radial-gradient(
-    circle,
-    rgba(91, 33, 182, 1) 0%,
-    rgba(212, 212, 216, 1) 40%
-  );
+  background: radial-gradient(circle, rgba(91, 33, 182, 1) 0%, rgba(212, 212, 216, 1) 40%);
 }
 #LineA,
 #LineB {

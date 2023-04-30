@@ -63,19 +63,20 @@ model User {
 }
 
 model Server {
-  id         Int              @id @default(autoincrement())
-  name       String
-  blurb      String?
-  logo_url   String?
-  banner_url String?
-  ownerId    String
-  category   String           @default("other")
-  type       String           @default("private")
-  unlisted   Boolean          @default(false)
-  owner      User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  admin      Server_Admin[]
-  members    Server_Member[]
-  channels   Server_Channel[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  blurb          String?
+  logo_url       String?
+  banner_url     String?
+  ownerId        String
+  category       String           @default("other")
+  type           String           @default("private")
+  unlisted       Boolean          @default(false)
+  emojiReactions String           @default("thumbsUp,thumbDown")
+  owner          User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  admin          Server_Admin[]
+  members        Server_Member[]
+  channels       Server_Channel[]
 
   @@index([ownerId])
 }
@@ -128,9 +129,21 @@ model Comment {
   message   String
   channel   Server_Channel @relation(fields: [channelID], references: [id], onDelete: Cascade)
   channelID Int
+  reactions Reaction[]
 
   @@index([userId])
   @@index([channelID])
+}
+
+model Reaction {
+  id            Int     @id @default(autoincrement())
+  comment       Comment @relation(fields: [commentID], references: [id], onDelete: Cascade)
+  commentID     Int
+  type          String
+  count         Int
+  reactingUsers String
+
+  @@index([commentID])
 }
 
 model Conversation {

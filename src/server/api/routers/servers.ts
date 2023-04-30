@@ -3,6 +3,10 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import jwt from "jsonwebtoken";
 import { User, type Server } from "@prisma/client";
 
+type Reactions = {
+  [key: string]: number;
+};
+
 export const serverRouter = createTRPCRouter({
   createServer: protectedProcedure
     .input(
@@ -178,33 +182,46 @@ export const serverRouter = createTRPCRouter({
     });
   }),
   postComment: protectedProcedure
-    .meta({ openapi: { method: "POST", path: "/api/send-message" } })
     .input(
       z.object({
         channelID: z.number(),
         commentContent: z.string(),
+        serverID: z.number(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const userID = ctx.session.user.id;
-      return await ctx.prisma.comment.create({
-        data: {
-          userId: userID,
-          message: input.commentContent,
-          channelID: input.channelID,
-        },
+      const serverData = await ctx.prisma.server.findFirst({
+        where: { id: input.serverID },
       });
+      if (serverData) {
+        const reactionKeys = serverData.emojiReactions?.split(",");
+        let reactionInit: { [key: string]: number } = {};
+        reactionKeys?.forEach((reaction) => {
+          reactionInit[reaction] = 0;
+        });
+        return await ctx.prisma.comment.create({
+          data: {
+            userId: userID,
+            message: input.commentContent,
+            channelID: input.channelID,
+            reactions: reactionInit,
+          },
+        });
+      }
     }),
   getChannelComments: protectedProcedure.input(z.number()).query(async ({ input, ctx }) => {
     if (input === 0) {
       return "";
     } else {
-      return ctx.prisma.comment.findMany({
+      const channelComments = await ctx.prisma.comment.findMany({
         where: { channelID: input },
         include: {
+          reactions: true,
           user: true,
         },
       });
+      return channelComments;
     }
   }),
   deleteUserFromServer: protectedProcedure.input(z.number()).mutation(async ({ input, ctx }) => {
@@ -428,6 +445,88 @@ export const serverRouter = createTRPCRouter({
             id: adminData.id,
           },
         });
+      }
+    }),
+  setServerEmojis: protectedProcedure
+    .input(z.object({ serverID: z.number(), emojiString: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        await ctx.prisma.server.update({
+          where: {
+            id: input.serverID,
+          },
+          data: {
+            emojiReactions: input.emojiString,
+          },
+        });
+        return "success";
+      } catch (e) {
+        console.log(e);
+        return "error";
+      }
+    }),
+  globalInitReaction: protectedProcedure.query(async ({ ctx }) => {
+    const all_servers = await ctx.prisma.server.findMany({
+      include: {
+        channels: { include: { comments: true } },
+      },
+    });
+    let serversReactionKeys: string[] = [];
+
+    all_servers.forEach((server) => {
+      if (server.emojiReactions) {
+        serversReactionKeys = server.emojiReactions.split(",");
+        let serversReactionInit: { [key: string]: number } = {};
+        serversReactionKeys.forEach((reaction) => {
+          serversReactionInit[reaction] = 0;
+        });
+        server.channels.forEach((channel) =>
+          channel.comments.forEach(
+            async (comment) =>
+              await ctx.prisma.comment.update({ where: { id: comment.id }, data: { reactions: serversReactionInit } })
+          )
+        );
+      }
+    });
+  }),
+  commentReactionGiven: protectedProcedure
+    .input(z.object({ commentID: z.number(), reaction: z.string(), reactingUserID: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const reaction = await ctx.prisma.reaction.findFirst({
+          where: { commentID: input.commentID, type: input.reaction },
+        });
+        if (reaction) {
+          const usersWhoGaveReaction = reaction.reactingUsers.split(",");
+          console.log("usersWhoGaveReaction: " + usersWhoGaveReaction);
+          if (usersWhoGaveReaction && usersWhoGaveReaction.includes(input.reactingUserID)) {
+            const otherUsers = usersWhoGaveReaction.filter((userID) => userID !== input.reactingUserID);
+            const usersString = otherUsers.join(",");
+            await ctx.prisma.reaction.update({
+              where: { id: reaction.id },
+              data: { count: reaction.count - 1, reactingUsers: usersString },
+            });
+          } else {
+            const usersString = reaction.reactingUsers + input.reactingUserID + ",";
+            await ctx.prisma.reaction.update({
+              where: { id: reaction.id },
+              data: { count: reaction.count + 1, reactingUsers: usersString },
+            });
+          }
+        } else {
+          await ctx.prisma.reaction.create({
+            data: {
+              commentID: input.commentID,
+              type: input.reaction,
+              count: 1,
+              reactingUsers: input.reactingUserID + ",",
+            },
+          });
+        }
+        return "success";
+      } catch (e) {
+        console.log(e);
+        return "error";
       }
     }),
 });

@@ -242,12 +242,10 @@ const App = () => {
   const serverDeletionToggle = async () => {
     setDeletionConfirmationShowing(!deletionConfirmationShowing);
   };
-  const serverSettingsToggle = () => {
-    setServerSettingsPane(!serverSettingsPane);
-  };
 
   //setters
   const serverSetter = async (server: Server) => {
+    setServerSettingsPane(false);
     setSelectedServer(server);
   };
   const channelSetter = (input: Server_Channel | null) => {
@@ -411,6 +409,7 @@ const App = () => {
                   currentUser={currentUser}
                   socket={socket}
                   fullscreen={fullscreen}
+                  serverReactions={selectedServer?.emojiReactions}
                 />
               ) : selectedChannel.type === "video" ? (
                 <VideoChannel

@@ -175,6 +175,10 @@ const RoadMap = () => {
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>
                 <div className="pl-2">Voice Channels</div>
               </li>
+              <li className="flex">
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>
+                <div className="pl-2">Video Channels</div>
+              </li>
             </ul>
           </div>
           <div id="UI" className="absolute -mt-20"></div>
@@ -235,11 +239,11 @@ const RoadMap = () => {
                 <div className="pl-2">Account Deletion</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Friends</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Direct Messaging</div>
               </li>
             </ul>
@@ -258,6 +262,10 @@ const RoadMap = () => {
                 <div className="pl-2">Message Attachments</div>
               </li>
               <li className="flex">
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
+                <div className="pl-2">Message Reactions</div>
+              </li>
+              <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Code Blocks in Messages</div>
               </li>
@@ -272,16 +280,12 @@ const RoadMap = () => {
                 <div className="pl-2">Server Aesthetics defined by owner / admin</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
                 <div className="pl-2">Server Admin</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
                 <div className="pl-2">Server Templates</div>
-              </li>
-              <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
-                <div className="pl-2">Voice Channels</div>
               </li>
               <li className="flex">
                 <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
@@ -320,7 +324,7 @@ const RoadMap = () => {
             </p>
             <ul className="">
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
                 <div className="pl-2">User Search</div>
               </li>
               <li className="flex">
@@ -328,7 +332,7 @@ const RoadMap = () => {
                 <div className="pl-2">Server Search</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-transparent pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
                 <div className="pl-2">Desktop App</div>
               </li>
               <li className="flex">
@@ -340,7 +344,7 @@ const RoadMap = () => {
                 <div className="pl-2">Usage Statistics</div>
               </li>
               <li className="flex">
-                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-orange-500 pt-1"></div>{" "}
+                <div className="absolute my-auto -ml-2 mt-2 h-3 w-3 rounded-full border border-zinc-400 bg-green-500 pt-1"></div>{" "}
                 <div className="pl-2">Privacy Policy Documentation</div>
               </li>
             </ul>
