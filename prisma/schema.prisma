@@ -60,23 +60,27 @@ model User {
   initiatedConversations Conversation_junction[] @relation("InitiatedConversations")
   receivedConversations  Conversation_junction[] @relation("ReceivedConversations")
   DirectMessage          DirectMessage[]
+  Suspended_Member       Suspended_Member[]
+  Banned_Member          Banned_Member[]
 }
 
 model Server {
-  id             Int              @id @default(autoincrement())
-  name           String
-  blurb          String?
-  logo_url       String?
-  banner_url     String?
-  ownerId        String
-  category       String           @default("other")
-  type           String           @default("private")
-  unlisted       Boolean          @default(false)
-  emojiReactions String           @default("thumbsUp,thumbDown")
-  owner          User             @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  admin          Server_Admin[]
-  members        Server_Member[]
-  channels       Server_Channel[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  blurb            String?
+  logo_url         String?
+  banner_url       String?
+  ownerId          String
+  category         String             @default("other")
+  type             String             @default("private")
+  unlisted         Boolean            @default(false)
+  emojiReactions   String             @default("thumbsUp,thumbDown")
+  owner            User               @relation(fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  admin            Server_Admin[]
+  members          Server_Member[]
+  channels         Server_Channel[]
+  suspendedMembers Suspended_Member[]
+  bannedMembers    Banned_Member[]
 
   @@index([ownerId])
 }
@@ -105,6 +109,37 @@ model Server_Member {
   ServerId  Int
   joinedAt  DateTime @default(now())
   invitedBy String
+
+  @@index([memberId])
+  @@index([ServerId])
+}
+
+model Suspended_Member {
+  id                   Int      @id @default(autoincrement())
+  member               User     @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  memberId             String
+  Server               Server   @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ServerId             Int
+  joinedAt             DateTime @default(now())
+  invitedBy            String
+  suspendedAt          DateTime @default(now())
+  suspendedById        String
+  suspensionExpiration DateTime
+
+  @@index([memberId])
+  @@index([ServerId])
+}
+
+model Banned_Member {
+  id         Int      @id @default(autoincrement())
+  member     User     @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  memberId   String
+  Server     Server   @relation(fields: [ServerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ServerId   Int
+  joinedAt   DateTime @default(now())
+  invitedBy  String
+  bannedAt   DateTime @default(now())
+  bannedById String
 
   @@index([memberId])
   @@index([ServerId])

@@ -295,6 +295,8 @@ export const serverRouter = createTRPCRouter({
             owner: true,
             admin: { include: { admin: true } },
             members: { include: { member: true } },
+            bannedMembers: { include: { member: true } },
+            suspendedMembers: { include: { member: true } },
           },
         });
         return fullServerData;
@@ -527,6 +529,94 @@ export const serverRouter = createTRPCRouter({
       } catch (e) {
         console.log(e);
         return "error";
+      }
+    }),
+  banUser: protectedProcedure
+    .input(z.object({ userIDtoBan: z.string(), serverID: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const found = await ctx.prisma.banned_Member.findFirst({
+        where: {
+          memberId: input.userIDtoBan,
+          ServerId: input.serverID,
+        },
+      });
+      if (found) {
+        return "exists error";
+      } else {
+        const userToBan = await ctx.prisma.server_Member.findFirst({
+          where: {
+            memberId: input.userIDtoBan,
+            ServerId: input.serverID,
+          },
+        });
+        try {
+          if (userToBan) {
+            const found = ctx.prisma.banned_Member.findFirst({
+              where: {
+                memberId: input.userIDtoBan,
+              },
+            });
+            await ctx.prisma.banned_Member.create({
+              data: {
+                memberId: input.userIDtoBan,
+                ServerId: input.serverID,
+                bannedById: ctx.session.user.id,
+                invitedBy: userToBan.invitedBy,
+                joinedAt: userToBan.joinedAt,
+              },
+            });
+            await ctx.prisma.server_Member.delete({
+              where: {
+                id: userToBan.id,
+              },
+            });
+            return "success";
+          }
+        } catch (e) {
+          console.error(e);
+          return "error";
+        }
+      }
+    }),
+  unBanUser: protectedProcedure
+    .input(z.object({ userIDtoUnBan: z.string(), serverID: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const found = await ctx.prisma.server_Member.findFirst({
+        where: {
+          memberId: input.userIDtoUnBan,
+          ServerId: input.serverID,
+        },
+      });
+      if (found) {
+        return "exists error";
+      } else {
+        const userToUnBan = await ctx.prisma.banned_Member.findFirst({
+          where: {
+            memberId: input.userIDtoUnBan,
+            ServerId: input.serverID,
+          },
+        });
+        try {
+          if (userToUnBan) {
+            await ctx.prisma.server_Member.create({
+              data: {
+                memberId: input.userIDtoUnBan,
+                ServerId: input.serverID,
+                invitedBy: userToUnBan.invitedBy,
+                joinedAt: userToUnBan.joinedAt,
+              },
+            });
+            await ctx.prisma.banned_Member.delete({
+              where: {
+                id: userToUnBan.id,
+              },
+            });
+            return "success";
+          }
+        } catch (e) {
+          console.error(e);
+          return "error";
+        }
       }
     }),
 });
