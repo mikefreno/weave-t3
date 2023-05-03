@@ -1,15 +1,47 @@
 import SearchIcon from "@/src/icons/SearchIcon";
 import { Input } from "@nextui-org/react";
-import React, { RefObject, useContext, useState } from "react";
+import React, { RefObject, useContext, useRef, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
+import { api } from "@/src/utils/api";
+import { type Server as MongoServer, type User as MongoUser } from "@prisma/client/mongo";
+import Search from "./Search";
+import useOnClickOutside from "@/src/components/ClickOutsideHook";
 
-const DirectMessageModal = (props: { directMessageModalRef: RefObject<HTMLDivElement> }) => {
+const DirectMessageModal = (props: {
+  directMessageModalRef: RefObject<HTMLDivElement>;
+  userSelect: (input: MongoUser) => void;
+}) => {
   const { isDarkTheme } = useContext(ThemeContext);
+  //state
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortType, setSortType] = useState("Recent");
+  const [userSearchData, setUserSearchData] = useState<MongoUser[] | null>(null);
+  const [showSearch, setShowSearch] = useState<boolean>(false);
+  //ref
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+
+  const getUserSearchData = api.search.getMongoUsers.useMutation();
+
+  //click outside hook
+  useOnClickOutside([searchInputRef, searchResultsRef], () => {
+    setShowSearch(false);
+  });
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
     // Perform your search logic here
+  };
+
+  const loadUserSearchData = async () => {
+    if (!userSearchData) {
+      const res: MongoUser[] | null = await getUserSearchData.mutateAsync();
+      if (res) {
+        setUserSearchData(res);
+      } else {
+        console.log("error retrieving user search data");
+      }
+    }
   };
 
   return (
@@ -29,9 +61,20 @@ const DirectMessageModal = (props: { directMessageModalRef: RefObject<HTMLDivEle
                 className="w-24 text-xs"
                 placeholder="Find ya mate"
                 value={searchTerm}
+                onFocus={() => {
+                  loadUserSearchData();
+                  setShowSearch(true);
+                }}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 contentLeft={<SearchIcon height={12} width={12} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} />}
               />
+              {showSearch && userSearchData && searchTerm.length > 2 ? (
+                <div className="flex justify-center">
+                  <div className="fixed w-48 " ref={searchResultsRef}>
+                    <Search userInput={searchTerm} select={props.userSelect} userData={userSearchData} />
+                  </div>
+                </div>
+              ) : null}
             </form>
           </div>
         </div>

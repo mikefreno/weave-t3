@@ -6,12 +6,12 @@ import { Button, Input, Loading, Tooltip } from "@nextui-org/react";
 import BackArrow from "@/src/icons/BackArrow";
 import ThemeContext from "@/src/components/ThemeContextProvider";
 import Link from "next/link";
-import LoadingElement from "@/src/components/loading";
 import { useSession } from "next-auth/react";
 import router from "next/router";
 import Resizer from "react-image-file-resizer";
 import Head from "next/head";
 import { toSvg } from "jdenticon";
+import AdjustableLoadingElement from "@/src/components/AdjustableLoadingElement";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -174,7 +174,11 @@ const UserSetup = () => {
   };
 
   if (status === "loading") {
-    return <LoadingElement isDarkTheme={isDarkTheme} />;
+    return (
+      <div className="h-screen w-screen bg-zinc-50 dark:bg-zinc-800">
+        <AdjustableLoadingElement />
+      </div>
+    );
   }
   if (status === "unauthenticated") {
     return router.push("/");

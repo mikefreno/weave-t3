@@ -5,6 +5,8 @@ import { miscRouter } from "./routers/misc";
 import { websocketRouter } from "./routers/websocket";
 import { databaseMgmtRouter } from "./routers/databaseMgmt";
 import { searchRouter } from "./routers/search";
+import { conversationRouter } from "./routers/conversation";
+import { friendsRouter } from "./routers/friends";
 
 /**
  * This is the primary router for your server.
@@ -12,12 +14,14 @@ import { searchRouter } from "./routers/search";
  * All routers added in /api/routers should be manually added here
  */
 export const appRouter = createTRPCRouter({
-  users: userRouter,
-  server: serverRouter,
+  conversation: conversationRouter,
+  databaseMgmt: databaseMgmtRouter,
+  friends: friendsRouter,
   misc: miscRouter,
+  search: searchRouter,
+  server: serverRouter,
+  users: userRouter,
   websocket: websocketRouter,
-  databaseMgmtRouter: databaseMgmtRouter,
-  searchRouter: searchRouter,
 });
 
 // export type definition of API

@@ -27,6 +27,8 @@ import ThumbsUpEmoji from "@/src/icons/emojis/ThumbsUp.svg";
 import TongueEmoji from "@/src/icons/emojis/Tongue.svg";
 import UpsideDownEmoji from "@/src/icons/emojis/UpsideDown.svg";
 import WorriedEmoji from "@/src/icons/emojis/Worried.svg";
+import AdjustableLoadingElement from "../AdjustableLoadingElement";
+import { comment } from "postcss";
 
 interface ChannelMainProps {
   selectedChannel: Server_Channel;
@@ -39,20 +41,18 @@ interface ChannelMainProps {
   fullscreen: boolean;
   serverReactions: string | null | undefined;
 }
-type Reactions = {
-  [key: string]: number;
-};
 const UsersCommentClass =
   "shadow-lg text-zinc-100 relative shadow-zinc-400 dark:shadow-zinc-700 bg-purple-700 rounded-2xl py-5 px-6 max-w-[75%]";
 const OtherCommentsClass =
   "bg-zinc-100 shadow-lg relative dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 pr-6 pl-8 max-w-[75%]";
 
-const ChannelMain = (props: ChannelMainProps) => {
+export default function ChatChannel(props: ChannelMainProps) {
   const { selectedChannel, currentUser, socket, fullscreen, serverReactions } = props;
+  const { isDarkTheme } = useContext(ThemeContext);
   //state
+  const [height, setHeight] = useState<number>();
   const [messageSendLoading, setMessageSendLoading] = useState(false);
   const [iconClass, setIconClass] = useState("");
-  const { isDarkTheme } = useContext(ThemeContext);
   const [attachmentModalShowing, setAttachmentModalShowing] = useState(false);
   const [messages, setMessages] = useState<
     (Comment & {
@@ -60,8 +60,8 @@ const ChannelMain = (props: ChannelMainProps) => {
       reactions: Reaction[];
     })[]
   >([]);
-  const [thisChannel, setThisChannel] = useState<Server_Channel | null>(null);
   const [serverEmojiArray, setServerEmojiArray] = useState<string[]>([]);
+  const [messageClickedMap, setMessageClickedMap] = useState<Map<number, boolean>>(new Map());
   //ref
   const messageInputRef = useRef<HTMLInputElement>(null);
   const attachmentButtonRef = useRef<HTMLButtonElement>(null);
@@ -69,7 +69,6 @@ const ChannelMain = (props: ChannelMainProps) => {
   const inputDivRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [messageClickedMap, setMessageClickedMap] = useState<Map<number, boolean>>(new Map());
   const firstScrollDone = useRef<boolean>(false);
 
   //trpc (api)
@@ -81,12 +80,27 @@ const ChannelMain = (props: ChannelMainProps) => {
   });
 
   useEffect(() => {
+    const handleResize = () => {
+      if (bannerRef.current && inputDivRef.current) {
+        const bodyHeight = window.innerHeight - (bannerRef.current.clientHeight + inputDivRef.current.clientHeight);
+        setHeight(bodyHeight);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [bannerRef.current, inputDivRef.current]);
+
+  useEffect(() => {
     if (getMessagesQuery.data) {
       const messages = getMessagesQuery.data;
       if (messages) {
         setMessages(messages);
       }
     }
+    firstScrollDone.current = false;
   }, [selectedChannel, getMessagesQuery]);
 
   useEffect(() => {
@@ -97,8 +111,8 @@ const ChannelMain = (props: ChannelMainProps) => {
   }, [serverReactions]);
 
   useEffect(() => {
-    if (firstScrollDone.current == false) {
-      bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
+    if (firstScrollDone.current == false && bottomRef.current) {
+      bottomRef.current.scrollIntoView();
       firstScrollDone.current = true;
     }
     messages.forEach((message) => {
@@ -181,7 +195,7 @@ const ChannelMain = (props: ChannelMainProps) => {
       const data = {
         message: input,
         senderID: currentUser.id,
-        channelID: thisChannel?.id,
+        channelID: selectedChannel.id,
         action: "message",
       };
       socket?.send(JSON.stringify(data));
@@ -201,11 +215,21 @@ const ChannelMain = (props: ChannelMainProps) => {
   };
 
   const giveReaction = async (reactionGiven: string, commentID: number) => {
-    await commentReactionGivenMutation.mutateAsync({
-      reaction: reactionGiven,
-      commentID: commentID,
-      reactingUserID: currentUser.id,
-    });
+    // await commentReactionGivenMutation.mutateAsync({
+    //   reaction: reactionGiven,
+    //   commentID: commentID,
+    //   reactingUserID: currentUser.id,
+    // });
+    const data = {
+      message: "",
+      senderID: currentUser.id,
+      channelID: selectedChannel.id,
+      action: "message",
+      reaction: true,
+      reactionType: reactionGiven,
+      messageID: commentID,
+    };
+    socket?.send(JSON.stringify(data));
     getMessagesQuery.refetch();
   };
 
@@ -231,13 +255,13 @@ const ChannelMain = (props: ChannelMainProps) => {
         <div
           className={`${
             fullscreen ? "w-screen" : "w-full"
-          } scrollXDisabled h-screen  rounded bg-zinc-50 transition-colors duration-300 ease-in-out dark:bg-zinc-900`}
+          } scrollXDisabled h-screen rounded bg-zinc-50 transition-colors duration-300 ease-in-out dark:bg-zinc-900`}
         >
           <div ref={bannerRef}>
             <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} fullscreen={fullscreen} />
           </div>
-          <div className="scrollXDisabled overflow-y-scroll pb-24 pt-8">
-            <ul className={`${fullscreen ? "w-screen" : "w-full"} px-4 pt-6`}>
+          <div className="flex h-screen flex-col justify-end">
+            <ul className={`${fullscreen ? "w-screen" : "w-full"} overflow-y-scroll px-4 pb-24 pt-14`}>
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -316,11 +340,11 @@ const ChannelMain = (props: ChannelMainProps) => {
                   </div>
                 </div>
               ))}
+              <div ref={bottomRef} />
             </ul>
-            <div ref={bottomRef}></div>
           </div>
-          <div className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}>
-            <div ref={inputDivRef} className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
+          <div ref={inputDivRef} className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}>
+            <div className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>
                   <Input
@@ -372,6 +396,4 @@ const ChannelMain = (props: ChannelMainProps) => {
       </div>
     </>
   );
-};
-
-export default ChannelMain;
+}

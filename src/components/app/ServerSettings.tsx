@@ -158,7 +158,7 @@ export default function ServerSettings(props: ServerSettingsProps) {
   const userManagementMobileScreenFormat = () => {
     return (
       <div>
-        <div className="rule-around py-2 text-center text-xl">Admin</div>
+        <div className="rule-around py-2  text-center text-xl">Admin</div>
         {privilegeLevelData?.admin?.length === 0 ? (
           <div className="py-2 text-center italic">
             No admin, you can promote a member to help with server administration
@@ -643,7 +643,7 @@ export default function ServerSettings(props: ServerSettingsProps) {
   };
 
   return (
-    <div className="max-h-screen w-full select-text overflow-y-scroll p-2 md:px-8 md:py-6">
+    <div className="md:px-83 max-h-screen w-full select-text overflow-y-scroll px-2 pb-4 pt-12">
       <div className="text-center text-2xl tracking-widest">{privilegeLevelData?.name}</div>
       <div className="py-4 text-center text-xl tracking-wider">Settings</div>
       <div className="flex flex-col items-center py-2">

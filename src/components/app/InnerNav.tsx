@@ -28,6 +28,7 @@ import SpeakerOn from "@/src/icons/SpeakerOn";
 import SpeakerOff from "@/src/icons/SpeakerOff";
 import MicIcon from "@/src/icons/MicIcon";
 import MicSlashIcon from "@/src/icons/MicSlashIcon";
+import DirectMessageConversationList from "./DirectMessageConversationList";
 
 type ServerIncludingChannel = {
   id: number;
@@ -81,6 +82,8 @@ interface InnerNavProps {
   audioState: boolean;
   audioToggle: any;
   setServerSettingsPane: Dispatch<SetStateAction<boolean>>;
+  setConversationPage: (conversationID: number | null) => void;
+  requestedConversationID: number | null;
 }
 
 const InnerNav = (props: InnerNavProps) => {
@@ -104,6 +107,7 @@ const InnerNav = (props: InnerNavProps) => {
     inviteModalToggle,
     inviteModalButtonRef,
     serverSetter,
+    requestedConversationID,
   } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   //state
@@ -117,7 +121,7 @@ const InnerNav = (props: InnerNavProps) => {
 
   //trpc (api)
   const deleteUserFromServer = api.server.deleteUserFromServer.useMutation();
-  const getUserSearchData = api.searchRouter.getMongoUsers.useMutation();
+  const getUserSearchData = api.search.getMongoUsers.useMutation();
 
   //click outside hook
   useOnClickOutside([searchInputRef, searchResultsRef], () => {
@@ -178,12 +182,14 @@ const InnerNav = (props: InnerNavProps) => {
           </div>
           <div className="">
             <button
-              className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
+              className={`mx-auto mt-3 flex w-11/12 rounded-md px-4 py-2 text-lg ${
                 selectedInnerTab == "friends"
-                  ? "bg-purple-200 dark:bg-purple-500"
+                  ? "bg-purple-200 dark:bg-purple-600"
                   : "hover:bg-purple-300 dark:hover:bg-zinc-700"
               }`}
-              onClick={() => innerTabSetter("friends")}
+              onClick={() => {
+                innerTabSetter("friends");
+              }}
             >
               <span className="my-auto">
                 <HandWave height={24} width={24} color={isDarkTheme ? "#e4e4e7" : "#27272a"} />
@@ -191,9 +197,9 @@ const InnerNav = (props: InnerNavProps) => {
               <span className="mx-auto">Friends</span>
             </button>
             <button
-              className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
+              className={`mx-auto mt-3 flex w-11/12 rounded-md px-4 py-2 text-lg ${
                 selectedInnerTab == "requests"
-                  ? "bg-purple-200 dark:bg-purple-500"
+                  ? "bg-purple-200 dark:bg-purple-600"
                   : "hover:bg-purple-300 dark:hover:bg-zinc-700"
               }`}
               onClick={() => innerTabSetter("requests")}
@@ -204,7 +210,7 @@ const InnerNav = (props: InnerNavProps) => {
               <span className="mx-auto">Requests</span>
             </button>
             <hr className="my-4 h-[2px]" />
-            <div className="my-4 flex justify-evenly">
+            {/* <div className="my-4 flex justify-evenly">
               <Tooltip
                 content={"Sort by most frequent"}
                 trigger="hover"
@@ -247,7 +253,7 @@ const InnerNav = (props: InnerNavProps) => {
                   />
                 </button>
               </Tooltip>
-            </div>
+            </div> */}
             <div className="flex justify-center">
               <span>Direct Messages</span>
               <button
@@ -258,7 +264,13 @@ const InnerNav = (props: InnerNavProps) => {
                 <AddIcon height={18} width={18} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1.5} />
               </button>
             </div>
-            <div id="Direct-Message-List"></div>
+            <div id="Direct-Message-List">
+              <DirectMessageConversationList
+                currentUser={currentUser}
+                setConversationPage={props.setConversationPage}
+                requestedConversationID={requestedConversationID}
+              />
+            </div>
           </div>
         </>
       );
@@ -280,7 +292,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Made By Weave"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Made By Weave")}
@@ -294,7 +306,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Science & Technology"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Science & Technology")}
@@ -307,7 +319,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Education"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Education")}
@@ -320,7 +332,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Gaming"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Gaming")}
@@ -333,7 +345,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Entertainment"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Entertainment")}
@@ -346,7 +358,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Music"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Music")}
@@ -359,7 +371,7 @@ const InnerNav = (props: InnerNavProps) => {
           <button
             className={`mx-auto mt-1 flex w-11/12 rounded-md px-4 py-2 text-lg ${
               selectedInnerTab == "Finance & Economics"
-                ? "bg-purple-200 dark:bg-purple-500"
+                ? "bg-purple-200 dark:bg-purple-600"
                 : "hover:bg-purple-300 dark:hover:bg-zinc-700"
             }`}
             onClick={() => innerTabSetter("Finance & Economics")}

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { toPng } from "jdenticon";
@@ -20,7 +19,14 @@ export const userRouter = createTRPCRouter({
     }
   }),
 
-  getById: protectedProcedure.input(z.string()).query(({ ctx, input }) => {
+  getUserById: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    return ctx.prisma.user.findFirst({
+      where: {
+        id: input,
+      },
+    });
+  }),
+  getUserByIdQuery: protectedProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return ctx.prisma.user.findFirst({
       where: {
         id: input,
@@ -28,66 +34,70 @@ export const userRouter = createTRPCRouter({
     });
   }),
 
-  setUserName: protectedProcedure
-    .input(z.string())
-    .mutation(({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-      return ctx.prisma.user.update({
-        where: { id: userId },
-        data: { name: input },
-      });
-    }),
+  setUserName: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
+    const userId = ctx.session.user.id;
+    return ctx.prisma.user.update({
+      where: { id: userId },
+      data: { name: input },
+    });
+  }),
 
-  setUserPseudonym: protectedProcedure
-    .input(z.string())
-    .mutation(({ ctx, input }) => {
-      console.log(input);
-      const userId = ctx.session.user.id;
-      return ctx.prisma.user.update({
-        where: { id: userId },
-        data: { pseudonym: input },
-      });
-    }),
+  setUserPseudonym: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
+    console.log(input);
+    const userId = ctx.session.user.id;
+    return ctx.prisma.user.update({
+      where: { id: userId },
+      data: { pseudonym: input },
+    });
+  }),
 
-  setUserImage: protectedProcedure
-    .input(z.string())
-    .mutation(({ ctx, input }) => {
-      const user = ctx.session.user;
-      if (user.image == `https://weaveimages.s3.amazonaws.com/${input}`) {
-        return;
-      } else {
-        return ctx.prisma.user.update({
-          where: { id: user.id },
-          data: { image: `https://weaveimages.s3.amazonaws.com/${input}` },
-        });
-      }
-    }),
-
-  setUserPseudonymImage: protectedProcedure
-    .input(z.string())
-    .mutation(({ ctx, input }) => {
-      const userId = ctx.session.user.id;
+  setUserImage: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
+    const user = ctx.session.user;
+    if (user.image == `https://weaveimages.s3.amazonaws.com/${input}`) {
+      return;
+    } else {
       return ctx.prisma.user.update({
-        where: { id: userId },
-        data: {
-          pseudonym_image: `https://weaveimages.s3.amazonaws.com/${input}`,
-        },
+        where: { id: user.id },
+        data: { image: `https://weaveimages.s3.amazonaws.com/${input}` },
       });
-    }),
+    }
+  }),
+
+  setUserPseudonymImage: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
+    const userId = ctx.session.user.id;
+    return ctx.prisma.user.update({
+      where: { id: userId },
+      data: {
+        pseudonym_image: `https://weaveimages.s3.amazonaws.com/${input}`,
+      },
+    });
+  }),
 
   setIdenticonAsImage: protectedProcedure
-    .input(
-      z.object({ type: z.string(), uploadURL: z.string(), s3key: z.string() })
-    )
+    .input(z.object({ type: z.string(), uploadURL: z.string(), s3key: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const userEmail = ctx.session.user.email;
 
       const png = toPng(userEmail, 200);
 
-      await axios.put(input.uploadURL, png).catch((err) => {
-        console.log(err);
-      });
+      await fetch(input.uploadURL, {
+        method: "PUT",
+        body: png,
+        headers: {
+          "Content-Type": "image/png",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.text();
+        })
+        .catch((error) => {
+          console.error("There was a problem with the fetch operation:", error);
+        });
+
       if (input.type === "image") {
         return ctx.prisma.user.update({
           where: { id: userId },
@@ -153,5 +163,26 @@ export const userRouter = createTRPCRouter({
       console.log("ACCOUNT EFFECT: ", res2);
     }
     console.log("USER EFFECT: ", res);
+  }),
+  getCurrentUserDMPageInfo: protectedProcedure.query(async ({ ctx }) => {
+    const userData = await ctx.prisma.user.findFirst({
+      where: {
+        id: ctx.session.user.id,
+      },
+      include: {
+        friendship_junction: {
+          include: { friendship: { include: { friendship_junction: { include: { user: true } } } } },
+        },
+        friendRequest_junction: {
+          include: { friendRequest: { include: { friendRequest_junction: { include: { user: true } } } } },
+        },
+        conversation_junction: {
+          include: {
+            conversation: { include: { directMessage: true, conversation_junction: { include: { user: true } } } },
+          },
+        },
+      },
+    });
+    return userData;
   }),
 });

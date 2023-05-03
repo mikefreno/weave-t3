@@ -3,10 +3,6 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import jwt from "jsonwebtoken";
 import { User, type Server } from "@prisma/client";
 
-type Reactions = {
-  [key: string]: number;
-};
-
 export const serverRouter = createTRPCRouter({
   createServer: protectedProcedure
     .input(

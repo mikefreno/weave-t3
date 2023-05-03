@@ -4,11 +4,11 @@ import Head from "next/head";
 import { useState } from "react";
 
 export default function MongoSync() {
-  const syncUsers = api.databaseMgmtRouter.syncAllMongoUsers.useMutation();
+  const syncUsers = api.databaseMgmt.syncAllMongoUsers.useMutation();
   const [userLoading, setUserLoading] = useState<boolean>(false);
   const [syncUsersResponse, setSyncUsersResponse] = useState<string>("");
 
-  const syncServers = api.databaseMgmtRouter.syncAllMongoServers.useMutation();
+  const syncServers = api.databaseMgmt.syncAllMongoServers.useMutation();
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [syncServersResponse, setSyncServersResponse] = useState<string>("");
 

@@ -13,12 +13,25 @@ import DMPages from "@/src/components/app/DMPages";
 import AccountPage from "@/src/components/app/AccountPage";
 import { useSession } from "next-auth/react";
 import { api } from "@/src/utils/api";
-import LoadingElement from "@/src/components/loading";
 import router from "next/router";
 import ServerMainScreen from "@/src/components/app/ServerMainScreen";
 import ChatChannel from "@/src/components/app/ChatChannel";
-import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
-import LoadingOverlay from "@/src/components/app/LoadingOverlay";
+import {
+  Conversation,
+  Conversation_junction,
+  DirectMessage,
+  Friend_Request,
+  Friend_Request_junction,
+  Friendship,
+  Friendship_junction,
+  Reaction,
+  Server,
+  Server_Admin,
+  Server_Channel,
+  Server_Member,
+  User,
+} from "@prisma/client";
+import AdjustableLoadingElement from "@/src/components/AdjustableLoadingElement";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
 import ChevronDown from "@/src/icons/ChevronDown";
@@ -62,6 +75,41 @@ const App = () => {
   const [deletionConfirmationShowing, setDeletionConfirmationShowing] = useState<boolean>(false);
   const [ownerConfirmedDeletion, setOwnerConfirmedDeletion] = useState<boolean>(false);
   const [serverSettingsPane, setServerSettingsPane] = useState<boolean>(false);
+  const [requestedConversationID, setRequestedConversationID] = useState<number | null>(null);
+  const [conversations, setConversations] = useState<
+    (Conversation & {
+      conversation_junction: (Conversation_junction & {
+        user: User;
+      })[];
+      directMessage: DirectMessage[];
+    })[]
+  >();
+  const [friendRequests, setFriendRequests] = useState<
+    (Friend_Request & {
+      friendRequest_junction: (Friend_Request_junction & {
+        user: User;
+      })[];
+    })[]
+  >();
+  const [friendshipList, setFriendshipList] = useState<
+    (Friendship & {
+      friendship_junction: (Friendship_junction & {
+        user: User;
+      })[];
+    })[]
+  >();
+  const [selectedConversation, setSelectedConversation] = useState<
+    | (Conversation & {
+        conversation_junction: (Conversation_junction & {
+          user: User;
+        })[];
+        directMessage: (DirectMessage & {
+          reactions: Reaction[];
+        })[];
+      })
+    | null
+  >(null);
+  const [conversedUser, setConversedUser] = useState<User>();
   //refs
   const socketRef = useRef<WebSocket | null>(null);
   const switchRef = useRef<HTMLDivElement>(null);
@@ -83,6 +131,9 @@ const App = () => {
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
   const currentUserReturn = api.users.getCurrentUser.useQuery();
   const currentUserServerPrivilegeMutation = api.server.getUserPrivilegeLevel.useMutation();
+  const dmPageQuery = api.users.getCurrentUserDMPageInfo.useQuery();
+  const getConversationMutation = api.conversation.getConversation.useMutation();
+  const getSpecifiedUserByID = api.users.getUserById.useMutation();
 
   //click outside hooks
   useOnClickOutside([UserProfileModalRef], () => {
@@ -103,6 +154,7 @@ const App = () => {
     setServerModalShowing(false);
   });
   useOnClickOutside([botModalRef, botButtonRef, switchRef], () => setBotModalShowing(false));
+
   useOnClickOutside([deletionServerButtonRef, deleteConfirmationModalRef], () => {
     setDeletionConfirmationShowing(false);
   });
@@ -151,12 +203,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (currentUserReturn.data) {
-      setCurrentUser(currentUserReturn.data);
-    }
-  }, [currentUserReturn]);
-
-  useEffect(() => {
     if (socket && socket.readyState === WebSocket.OPEN && currentUser) {
       if (selectedChannel) {
         socketChannelUpdate();
@@ -172,13 +218,39 @@ const App = () => {
 
   //other useEffects
   useEffect(() => {
-    if (scrollableRef.current) {
-      scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
-    }
+    document.getElementById("html")?.classList.add("scrollDisabled");
   }, []);
 
   useEffect(() => {
-    document.getElementById("html")?.classList.add("scrollDisabled");
+    if (dmPageQuery.data) {
+      setConversations(
+        dmPageQuery.data.conversation_junction.map((conversation_junction) => {
+          return conversation_junction.conversation;
+        })
+      );
+      setFriendRequests(
+        dmPageQuery.data.friendRequest_junction.map((friendRequest_junction) => {
+          return friendRequest_junction.friendRequest;
+        })
+      );
+      setFriendshipList(
+        dmPageQuery.data.friendship_junction.map((friendship_junction) => {
+          return friendship_junction.friendship;
+        })
+      );
+    }
+  }, [dmPageQuery.data]);
+
+  useEffect(() => {
+    if (currentUserReturn.data) {
+      setCurrentUser(currentUserReturn.data);
+    }
+  }, [currentUserReturn]);
+
+  useEffect(() => {
+    if (scrollableRef.current) {
+      scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
@@ -198,6 +270,10 @@ const App = () => {
   useEffect(() => {
     privilegeSetter();
   }, [selectedServer]);
+
+  useEffect(() => {
+    conversationSetter();
+  }, [requestedConversationID]);
 
   //refreshers
   const refreshUserServers = async () => {
@@ -253,6 +329,7 @@ const App = () => {
   };
   const innerTabSetter = (input: string) => {
     setSelectedInnerTab(input);
+    setRequestedConversationID(null);
   };
   const privilegeSetter = async () => {
     if (selectedServer) {
@@ -263,12 +340,45 @@ const App = () => {
   const userSelect = (user: MongoUser) => {
     setSearchedUser(user);
   };
-  function currentTabSetter(id: string) {
+  const currentTabSetter = (id: string) => {
     setCurrentTab(id);
-  }
+  };
   const loadingOverlaySetter = (boolean: boolean) => {
     setLoadingOverlayShowing(boolean);
   };
+  const setConversationPage = (conversationID: number | null) => {
+    setSelectedInnerTab("conversation");
+    setRequestedConversationID(conversationID);
+  };
+  const conversationSetter = async () => {
+    if (requestedConversationID) {
+      const requestedConversation = await getConversationMutation.mutateAsync(requestedConversationID);
+      setSelectedConversation(requestedConversation);
+    } else {
+      setSelectedConversation(null);
+    }
+  };
+  const triggerDMRefetch = () => {
+    dmPageQuery.refetch();
+  };
+  useEffect(() => {
+    conversedUserSetter();
+  }, [selectedConversation]);
+
+  const conversedUserSetter = async () => {
+    if (selectedConversation && currentUser) {
+      const userID = selectedConversation.conversation_junction.find(
+        (conversation_junction) => conversation_junction.userID !== currentUser.id
+      )?.userID;
+      if (userID) {
+        const user = await getSpecifiedUserByID.mutateAsync(userID);
+        if (user) {
+          setConversedUser(user);
+        }
+      }
+    }
+  };
+
   //cron triggers
   // const startDeletionCountdown = async () => {};
   //auth check
@@ -278,7 +388,11 @@ const App = () => {
         router.push("/login/redirect");
       }
     }, 1000);
-    return <LoadingElement isDarkTheme={isDarkTheme} />;
+    return (
+      <div className="h-screen w-screen bg-zinc-100 dark:bg-zinc-800">
+        <AdjustableLoadingElement />
+      </div>
+    );
   }
 
   return (
@@ -342,12 +456,14 @@ const App = () => {
               audioState={audioState}
               audioToggle={audioToggle}
               setServerSettingsPane={setServerSettingsPane}
+              requestedConversationID={requestedConversationID}
+              setConversationPage={setConversationPage}
             />
           </div>
         </div>
         <div
           className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out ${
-            selectedChannel?.type === "video" ? "" : "md:hidden"
+            selectedChannel?.type === "video" || selectedInnerTab === "conversation" ? "" : "md:hidden"
           } ${fullscreen ? "-ml-2" : "ml-40 pl-2 md:ml-64 md:pl-6"}`}
         >
           <button onClick={fullscreenToggle}>
@@ -382,7 +498,20 @@ const App = () => {
 
           {currentTab == "DMS" && selectedInnerTab !== "AccountOverview" ? (
             <div className="">
-              <DMPages selectedInnerTab={selectedInnerTab} />
+              <DMPages
+                selectedInnerTab={selectedInnerTab}
+                currentUser={currentUser}
+                setConversationPage={setConversationPage}
+                requestedConversationID={requestedConversationID}
+                fullscreen={fullscreen}
+                triggerDMRefetch={triggerDMRefetch}
+                conversations={conversations}
+                friendRequests={friendRequests}
+                friendshipList={friendshipList}
+                selectedConversation={selectedConversation}
+                conversedUser={conversedUser}
+                socket={socket}
+              />
             </div>
           ) : null}
           {currentTab === "PublicServers" &&
@@ -453,7 +582,7 @@ const App = () => {
             )
           ) : null}
         </div>
-        {loadingOverlayShowing ? <LoadingOverlay isDarkTheme={isDarkTheme} /> : null}
+        {loadingOverlayShowing ? <AdjustableLoadingElement /> : null}
       </div>
       <div>
         {serverModalShowing ? (
@@ -464,7 +593,9 @@ const App = () => {
           />
         ) : null}
         {botModalShowing ? <BotServiceModal botModalRef={botModalRef} botModalToggle={botModalToggle} /> : null}
-        {directMessageModalShowing ? <DirectMessageModal directMessageModalRef={directMessageModalRef} /> : null}
+        {directMessageModalShowing ? (
+          <DirectMessageModal directMessageModalRef={directMessageModalRef} userSelect={userSelect} />
+        ) : null}
         {inviteModalShowing ? (
           <InviteModal
             isDarkTheme={isDarkTheme}
@@ -486,7 +617,8 @@ const App = () => {
         {searchedUser ? (
           <UserProfileModal
             userProfileModalToggle={userProfileModalToggle}
-            user={searchedUser}
+            viewedUser={searchedUser}
+            currentUser={currentUser}
             UserProfileModalRef={UserProfileModalRef}
           />
         ) : null}

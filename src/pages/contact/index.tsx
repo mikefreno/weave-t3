@@ -1,4 +1,4 @@
-import LoadingElement from "@/src/components/loading";
+import AdjustableLoadingElement from "@/src/components/AdjustableLoadingElement";
 import Navbar from "@/src/components/Navbar";
 import ThemeContext from "@/src/components/ThemeContextProvider";
 import { api } from "@/src/utils/api";
@@ -41,9 +41,9 @@ export default function PrivacyPolicy() {
 
   if (status === "loading") {
     return (
-      <>
-        <LoadingElement isDarkTheme={isDarkTheme} />
-      </>
+      <div className="h-screen w-screen bg-zinc-50 dark:bg-zinc-800">
+        <AdjustableLoadingElement />
+      </div>
     );
   } else {
     return (
