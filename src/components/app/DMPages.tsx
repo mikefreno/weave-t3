@@ -328,7 +328,6 @@ export default function DMPages(props: DMPagesProps) {
               type: "friend",
             }}
             fullscreen={fullscreen}
-            isFriend={false}
           />
           <ul className={`${fullscreen ? "w-screen" : "w-full"} overflow-y-scroll px-4 pb-24 pt-14`}>
             {directMessages.map((message) => (

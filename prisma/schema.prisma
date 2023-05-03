@@ -215,12 +215,14 @@ model Friendship {
   id                  Int                   @id @default(autoincrement())
   start               DateTime              @default(now())
   friendship_junction Friendship_junction[]
+
 }
 
 model Friendship_junction {
   id           Int        @id @default(autoincrement())
   user         User       @relation(fields: [userID], references: [id], onDelete: Cascade)
   userID       String
+  friendID     String
   friendship   Friendship @relation(fields: [friendshipID], references: [id], onDelete: Cascade)
   friendshipID Int
 
@@ -233,6 +235,7 @@ model Friend_Request {
   sentAt                 DateTime                  @default(now())
   friendRequest_junction Friend_Request_junction[]
   senderID               String
+  targetID String 
   ignored                Boolean                   @default(false)
 }
 

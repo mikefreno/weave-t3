@@ -9,14 +9,30 @@ import { Button, Tooltip } from "@nextui-org/react";
 import AddFriendIcon from "@/src/icons/AddFriendIcon";
 import { api } from "@/src/utils/api";
 
-export default function TopBanner(props: { selectedChannel: Server_Channel; fullscreen: boolean; isFriend?: boolean }) {
+export default function TopBanner(props: { selectedChannel: Server_Channel; fullscreen: boolean }) {
   const { selectedChannel, fullscreen } = props;
 
   const { isDarkTheme } = useContext(ThemeContext);
 
   const [channelName, setChannelName] = useState(selectedChannel.name);
-
+  const [isFriend, setIsFriend] = useState<boolean>(true);
+  const [friendRequestExists, setFriendRequestExists] = useState<boolean>(false);
   const sendFriendRequestMutation = api.friends.sendFriendRequest.useMutation();
+  const getFriendStateMutation = api.friends.checkFriendState.useMutation();
+  const getFriendRequestStateMutation = api.friends.checkFriendRequestState.useMutation();
+
+  useEffect(() => {
+    friendStateSetter();
+  }, [selectedChannel]);
+
+  const friendStateSetter = async () => {
+    if (selectedChannel.type === "friend" && selectedChannel.description) {
+      const res = await getFriendStateMutation.mutateAsync(selectedChannel.description);
+      const res2 = await getFriendRequestStateMutation.mutateAsync(selectedChannel.description);
+      setIsFriend(res);
+      setFriendRequestExists(res2);
+    }
+  };
 
   useEffect(() => {
     setChannelName(selectedChannel.name);
@@ -24,6 +40,7 @@ export default function TopBanner(props: { selectedChannel: Server_Channel; full
 
   const sendFriendRequest = async () => {
     await sendFriendRequestMutation.mutateAsync(selectedChannel.description as string);
+    friendStateSetter();
   };
 
   return (
@@ -41,12 +58,20 @@ export default function TopBanner(props: { selectedChannel: Server_Channel; full
           <UserCircle height={24} width={24} strokeWidth={0.5} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} />
         )}
         <div className="z-[1000] mx-6">{channelName}</div>
-        {props.isFriend === false ? (
-          <Tooltip content={"Add as friend?"} placement="bottom">
-            <Button color={"secondary"} auto onClick={sendFriendRequest}>
-              <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
-            </Button>
-          </Tooltip>
+        {isFriend === false ? (
+          friendRequestExists ? (
+            <Tooltip content={"Friend Request already exists"} placement="bottom">
+              <Button color={"secondary"} auto disabled>
+                <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
+              </Button>
+            </Tooltip>
+          ) : (
+            <Tooltip content={"Add as friend?"} placement="bottom">
+              <Button color={"secondary"} auto onClick={sendFriendRequest}>
+                <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
+              </Button>
+            </Tooltip>
+          )
         ) : null}
       </div>
     </div>

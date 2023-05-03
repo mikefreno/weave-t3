@@ -7,6 +7,7 @@ export const friendsRouter = createTRPCRouter({
       const newFriendRequest = await ctx.prisma.friend_Request.create({
         data: {
           senderID: ctx.session.user.id,
+          targetID: input,
         },
       });
       await ctx.prisma.friend_Request_junction.create({
@@ -56,6 +57,7 @@ export const friendsRouter = createTRPCRouter({
               id: input.senderID,
             },
           },
+          friendID: ctx.session.user.id,
           friendship: {
             connect: {
               id: newFriendship.id,
@@ -70,6 +72,7 @@ export const friendsRouter = createTRPCRouter({
               id: ctx.session.user.id,
             },
           },
+          friendID: input.senderID,
           friendship: {
             connect: {
               id: newFriendship.id,
@@ -114,4 +117,38 @@ export const friendsRouter = createTRPCRouter({
         return "error";
       }
     }),
+  checkFriendState: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    const check = await ctx.prisma.friendship_junction.findFirst({
+      where: {
+        userID: input,
+        friendID: ctx.session.user.id,
+      },
+    });
+    if (check) {
+      return true;
+    }
+    return false;
+  }),
+  checkFriendRequestState: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    const check = await ctx.prisma.friend_Request.findFirst({
+      where: {
+        senderID: input,
+        targetID: ctx.session.user.id,
+      },
+    });
+    if (check) {
+      return true;
+    } else {
+      const check2 = await ctx.prisma.friend_Request.findFirst({
+        where: {
+          targetID: input,
+          senderID: ctx.session.user.id,
+        },
+      });
+      if (check2) {
+        return true;
+      }
+      return false;
+    }
+  }),
 });
