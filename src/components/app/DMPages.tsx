@@ -344,7 +344,7 @@ export default function DMPages(props: DMPagesProps) {
                   </div>
                   {messageClickedMap.get(message.id) && currentUser.id !== message.senderID ? (
                     <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg ">
-                      <div className="flex justify-between">
+                      <div className="flex">
                         {usersEmojiArray.map((emojiName: string, index) => (
                           <div className="flex p-1" key={index}>
                             <button onClick={() => giveReaction(emojiName, message.id)}>
@@ -356,7 +356,7 @@ export default function DMPages(props: DMPagesProps) {
                     </div>
                   ) : (
                     <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg">
-                      <div className="flex justify-between">
+                      <div className="flex">
                         {message.reactions.map((reaction) => (
                           <div className="flex px-2" key={reaction.id}>
                             <div className="h-7 w-7">{returnEmoji(reaction.type)}</div>
