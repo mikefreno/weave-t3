@@ -256,7 +256,7 @@ const SideNavSmallScreen = (props: {
             </div>
           </div>
         ) : null}
-        <div className="absolute bottom-2 z-40 flex w-full justify-evenly pr-4">
+        <div className="absolute bottom-8 z-40 flex w-full justify-evenly pr-4">
           <div>
             <button onClick={toggleMenu} className="">
               <div className={`${menuShowing ? "rotate-90" : "-rotate-90"} transition-all duration-500 ease-in-out`}>
@@ -278,7 +278,7 @@ const SideNavSmallScreen = (props: {
           </div>
         </div>
         <div
-          className={`absolute bottom-0 z-30 transition-all duration-500 ${menuShowing ? "" : "-translate-x-[120%]"} `}
+          className={`absolute bottom-8 z-30 transition-all duration-500 ${menuShowing ? "" : "-translate-x-[120%]"} `}
         >
           <div
             className={`${nunito_200} -ml-6 rounded-r-2xl border border-zinc-400 bg-zinc-50 shadow-xl dark:border-zinc-500 dark:bg-zinc-900`}
