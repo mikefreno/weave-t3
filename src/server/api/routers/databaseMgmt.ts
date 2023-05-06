@@ -9,7 +9,9 @@ interface MongoUser {
 }
 interface MongoServer {
   id: number;
-  name: string | null;
+  name: string;
+  public: boolean;
+  category: string;
 }
 
 export const databaseMgmtRouter = createTRPCRouter({
@@ -71,7 +73,9 @@ export const databaseMgmtRouter = createTRPCRouter({
       userID === "clgzqfm7l0000of4z4fragl8f"
     ) {
       try {
-        const all_servers = await ctx.prisma.server.findMany();
+        const all_servers = await ctx.prisma.server.findMany({
+          where: { unlisted: false },
+        });
         const mongoServers: MongoServer[] = await ctx.prismaMongo.server.findMany();
         const mongoServerMap = new Map(mongoServers.map((server) => [server.id, server]));
         const serversNotInMongo = all_servers.filter((server) => !mongoServerMap.has(server.id));
@@ -82,6 +86,8 @@ export const databaseMgmtRouter = createTRPCRouter({
                 data: {
                   id: server.id,
                   name: server.name,
+                  category: server.category,
+                  public: server.public,
                 },
               })
           )

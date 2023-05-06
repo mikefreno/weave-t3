@@ -1,12 +1,13 @@
 import PencilIcon from "@/src/icons/PencilIcon";
 import React, { useState, useRef, useContext, Dispatch } from "react";
-import { Button, Input, Loading, Radio, Tooltip } from "@nextui-org/react";
+import { Button, Input, Radio, Tooltip } from "@nextui-org/react";
 import { api } from "../../utils/api";
 import { Server, Server_Admin, Server_Member, User } from "@prisma/client";
 import Resizer from "react-image-file-resizer";
 import ThemeContext from "../ThemeContextProvider";
 import useOnClickOutside from "@/src/components/ClickOutsideHook";
 import ChevronDown from "@/src/icons/ChevronDown";
+import AdjustableLoadingElement from "../AdjustableLoadingElement";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -33,6 +34,7 @@ const AccountPage = (props: {
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
+  fullscreen: boolean;
 }) => {
   const { triggerUserRefresh, currentUser, timestamp, setTimestamp } = props;
   const { isDarkTheme } = useContext(ThemeContext);
@@ -207,7 +209,7 @@ const AccountPage = (props: {
                 <div className="-mx-6 flex justify-around py-4">
                   {imageConfirmLoading ? (
                     <Button disabled auto bordered>
-                      <Loading type="points" size="sm" />
+                      <AdjustableLoadingElement specifiedHeight={25} specifiedWidth={25} specifiedSpinnerSize="md" />
                     </Button>
                   ) : (
                     <Button
@@ -273,7 +275,11 @@ const AccountPage = (props: {
                       <div className="w-4">
                         {realNameSetLoading ? (
                           <Button disabled auto bordered>
-                            <Loading type="points" size="sm" />
+                            <AdjustableLoadingElement
+                              specifiedHeight={25}
+                              specifiedWidth={25}
+                              specifiedSpinnerSize="md"
+                            />
                           </Button>
                         ) : (
                           <Button shadow auto type="submit" color={"secondary"}>
@@ -334,7 +340,11 @@ const AccountPage = (props: {
                       <div className="w-4">
                         {pseudonymSetLoading ? (
                           <Button disabled auto bordered>
-                            <Loading type="points" size="sm" />
+                            <AdjustableLoadingElement
+                              specifiedHeight={25}
+                              specifiedWidth={25}
+                              specifiedSpinnerSize="md"
+                            />
                           </Button>
                         ) : (
                           <Button shadow auto type="submit" color={"secondary"}>
@@ -433,8 +443,8 @@ const AccountPage = (props: {
   return (
     <div className="h-screen w-full overflow-y-scroll bg-zinc-100 dark:bg-zinc-700 md:flex">
       <div id="settings-tabs flex" ref={settingMenuRef}>
-        <div className="fixed z-[10000] flex w-full flex-row px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit">
-          <div className="flex">
+        <div className="fixed z-50 flex w-full flex-row justify-end px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit md:justify-start">
+          <div className={`${props.fullscreen ? "pl-8" : ""} flex`}>
             <button className="z-50 flex md:cursor-default" onClick={toggleSettingsMenu}>
               <div className="flex">Settings Menu</div>
               <div
@@ -448,7 +458,7 @@ const AccountPage = (props: {
           </div>
         </div>
         <div
-          className={`fixed z-[1000] rounded-br-2xl bg-purple-200 px-6 py-4 pr-10 transition-all duration-200 ease-in-out dark:bg-zinc-800 md:relative ${
+          className={`fixed right-0 z-40 rounded-bl-2xl bg-purple-200 px-6 py-4 pr-10 transition-all duration-200 ease-in-out dark:bg-zinc-800 md:relative md:left-0 md:rounded-bl-none md:rounded-br-2xl ${
             showingSettingsMenu ? "" : "-translate-y-full md:translate-y-0"
           }`}
         >

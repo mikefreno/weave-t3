@@ -15,11 +15,11 @@ interface PublicServersPagesProps {
 export default function PublicServersPages(props: PublicServersPagesProps) {
   const { selectedInnerTab, refreshUserServers, fullscreen } = props;
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const { isDarkTheme } = useContext(ThemeContext);
   const [servers, setServers] = useState<Server[]>();
 
-  const serverMutation = api.server.getAllPublicServers.useMutation();
+  const serverMutation = api.server.getPublicServersByCategory.useMutation();
 
   const getServers = async () => {
     const serverRes = await serverMutation.mutateAsync(selectedInnerTab);
@@ -66,26 +66,24 @@ export default function PublicServersPages(props: PublicServersPagesProps) {
           </div>
           <div className="z-0 px-4 py-24">
             <div className="grid grid-flow-row grid-cols-1 gap-8 overflow-y-scroll  sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-              {servers ? (
-                servers.map((child, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className="rounded-lg shadow-lg">
-                      <ServerCard
-                        logo={child.logo_url ? child.logo_url : ""}
-                        banner={child.banner_url ? child.banner_url : ""}
-                        name={child.name}
-                        blurb={child.blurb ? child.blurb : ""}
-                        members={0}
-                        membersOnline={0}
-                        serverID={child.id}
-                        refreshUserServers={refreshUserServers}
-                      />
+              {servers
+                ? servers.map((child, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <div className="rounded-lg shadow-lg">
+                        <ServerCard
+                          logo={child.logo_url ? child.logo_url : ""}
+                          banner={child.banner_url ? child.banner_url : ""}
+                          name={child.name}
+                          blurb={child.blurb ? child.blurb : ""}
+                          members={0}
+                          membersOnline={0}
+                          serverID={child.id}
+                          refreshUserServers={refreshUserServers}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center text-xl">No public servers in this category yet!</div>
-              )}
+                  ))
+                : null}
             </div>
           </div>
         </div>

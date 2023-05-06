@@ -18,7 +18,11 @@ export const searchRouter = createTRPCRouter({
       return null;
     }
   }),
-  getMongoServer: protectedProcedure.mutation(async ({ ctx }) => {
-    return await ctx.prismaMongo.user.findMany();
+  getPublicMongoServer: protectedProcedure.mutation(async ({ ctx }) => {
+    return await ctx.prismaMongo.server.findMany({
+      where: {
+        public: true,
+      },
+    });
   }),
 });

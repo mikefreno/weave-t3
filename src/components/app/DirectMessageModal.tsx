@@ -46,7 +46,7 @@ const DirectMessageModal = (props: {
 
   return (
     <div id="modal" className="fixed">
-      <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
+      <div className="absolute flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={props.directMessageModalRef}
           id="serverModalContent"

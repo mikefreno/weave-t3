@@ -40,6 +40,10 @@ body {
   transition: all 0.5s ease;
   z-index: -1;
 }
+#LineAMobile,
+#LineBMobile {
+  transition: all 0.5s ease;
+}
 .LineA {
   transform: translate(20px, -14px) rotate(45deg);
 }
@@ -254,10 +258,6 @@ ul.icons li a:active {
 }
 .scrollXDisabled {
   overflow-x: hidden;
-}
-.modal-open {
-  filter: blur(3px);
-  transition: filter 0.3s ease-in-out;
 }
 .modal-offset {
   margin-top: -100vh;

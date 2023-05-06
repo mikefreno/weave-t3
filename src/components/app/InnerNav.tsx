@@ -56,12 +56,10 @@ interface InnerNavProps {
   selectedInnerTab: string;
   innerTabSetter: (tab: string) => void;
   usersServers: ServerIncludingChannel[];
-  selectedInnerTabID: number;
   selectedChannel: Server_Channel | null;
   channelSetter: (input: Server_Channel | null) => void;
   refreshUserServers: any;
   botModalToggle: MouseEventHandler<HTMLButtonElement>;
-  setSelectedInnerTabID: (id: number) => void;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
@@ -84,6 +82,7 @@ interface InnerNavProps {
   setServerSettingsPane: Dispatch<SetStateAction<boolean>>;
   setConversationPage: (conversationID: number | null) => void;
   requestedConversationID: number | null;
+  serverID: number | undefined;
 }
 
 const InnerNav = (props: InnerNavProps) => {
@@ -94,12 +93,10 @@ const InnerNav = (props: InnerNavProps) => {
     innerTabSetter,
     currentUser,
     selectedChannel,
-    selectedInnerTabID,
     usersServers,
     loadingOverlaySetter,
     serverRefetch,
     timestamp,
-    setSelectedInnerTabID,
     channelSetter,
     socket,
     createChannelToggle,
@@ -130,16 +127,6 @@ const InnerNav = (props: InnerNavProps) => {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-  };
-
-  const leaveServerAlert = async () => {
-    const confirmed = window.confirm("Are you sure you want to leave the server?");
-    if (confirmed) {
-      loadingOverlaySetter(true);
-      await deleteUserFromServer.mutateAsync(selectedInnerTabID);
-      await serverRefetch();
-      loadingOverlaySetter(false);
-    }
   };
 
   const loadUserSearchData = async () => {
@@ -411,7 +398,7 @@ const InnerNav = (props: InnerNavProps) => {
                 <div>
                   {(() => {
                     const filteredChannels = usersServers
-                      .find((server) => server.id === props.selectedInnerTabID)
+                      .find((server) => server.id === props.serverID)
                       ?.channels.filter((channel) => channel.type === "text");
 
                     return filteredChannels && filteredChannels.length === 0 ? null : (
@@ -446,7 +433,7 @@ const InnerNav = (props: InnerNavProps) => {
                 <div>
                   {(() => {
                     const filteredChannels = usersServers
-                      .find((server) => server.id === props.selectedInnerTabID)
+                      .find((server) => server.id === props.serverID)
                       ?.channels.filter((channel) => channel.type === "audio");
 
                     return filteredChannels && filteredChannels.length === 0 ? null : (
@@ -481,7 +468,7 @@ const InnerNav = (props: InnerNavProps) => {
                 <div>
                   {(() => {
                     const filteredChannels = usersServers
-                      .find((server) => server.id === props.selectedInnerTabID)
+                      .find((server) => server.id === props.serverID)
                       ?.channels.filter((channel) => channel.type === "video");
 
                     return filteredChannels && filteredChannels.length === 0 ? null : (
@@ -543,24 +530,24 @@ const InnerNav = (props: InnerNavProps) => {
   };
 
   return (
-    <div className="fixed h-screen w-44 transform border-r border-zinc-700 bg-purple-400 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
-      <SideNavSmallScreen
-        isDarkTheme={isDarkTheme}
-        currentTabSetter={currentTabSetter}
-        innerTabSetter={innerTabSetter}
-        currentUser={currentUser}
-        timestamp={timestamp}
-        usersServers={usersServers}
-        setSelectedInnerTabID={setSelectedInnerTabID}
-        channelSetter={channelSetter}
-        serverModalToggle={props.serverModalToggle}
-        botButtonRef={props.botButtonRef}
-        serverButtonRef={props.serverButtonRef}
-        botModalToggle={props.botModalToggle}
-        selectedInnerTabID={props.selectedInnerTabID}
-        currentTab={props.currentTab}
-        serverSetter={serverSetter}
-      />
+    <div className="fixed h-screen w-44 transform overflow-y-scroll border-r border-zinc-700 bg-purple-400 dark:border-zinc-500 dark:bg-zinc-800 md:ml-0 md:w-52">
+      <div className="pb-14 md:pb-0">
+        <SideNavSmallScreen
+          currentTabSetter={currentTabSetter}
+          innerTabSetter={innerTabSetter}
+          currentUser={currentUser}
+          timestamp={timestamp}
+          usersServers={usersServers as any}
+          channelSetter={channelSetter}
+          serverModalToggle={props.serverModalToggle}
+          botButtonRef={props.botButtonRef}
+          serverButtonRef={props.serverButtonRef}
+          botModalToggle={props.botModalToggle}
+          serverID={props.serverID}
+          currentTab={props.currentTab}
+          serverSetter={serverSetter}
+        />
+      </div>
       {currentTabRender()}
       <div className="fixed bottom-0 -ml-20 hidden w-44 border-r border-zinc-700 bg-purple-900 text-zinc-200 dark:border-zinc-500 dark:bg-zinc-900 md:ml-0 md:block md:w-52">
         <div className="flex justify-between">

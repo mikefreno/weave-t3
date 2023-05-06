@@ -8,11 +8,11 @@ import { api } from "@/src/utils/api";
 const InviteModal = (props: {
   isDarkTheme: boolean;
   inviteModalToggle: any;
-  selectedInnerTabID: number;
+  serverID: number;
   selectedInnerTab: string;
   inviteModalRef: RefObject<HTMLDivElement>;
 }) => {
-  const { isDarkTheme, inviteModalToggle, selectedInnerTabID, selectedInnerTab, inviteModalRef } = props;
+  const { isDarkTheme, inviteModalToggle, selectedInnerTab, inviteModalRef } = props;
 
   const [iconClass, setIconClass] = useState("");
   const [emailSendLoading, setEmailSendLoading] = useState(false);
@@ -33,14 +33,14 @@ const InviteModal = (props: {
       const email = invitee.current.value;
       const token = await createJWTInvite.mutateAsync({
         email: email,
-        serverID: selectedInnerTabID,
+        serverID: props.serverID,
       });
       if (email.length >= 3) {
         setIconClass("move-fade");
         setEmailSendLoading(true);
         const res = await userCheck.mutateAsync({
           email: email,
-          serverID: selectedInnerTabID,
+          serverID: props.serverID,
         });
         if (res === false) {
           await sendServerInvite.mutateAsync({
@@ -65,7 +65,7 @@ const InviteModal = (props: {
       if (email.length >= 3) {
         const token = await createJWTInvite.mutateAsync({
           email: email,
-          serverID: selectedInnerTabID,
+          serverID: props.serverID,
         });
         setGenericCodeData(token);
         setShowingGenericCode(true);
@@ -81,7 +81,7 @@ const InviteModal = (props: {
       if (email.length >= 3) {
         const token = await createJWTInvite.mutateAsync({
           email: email,
-          serverID: selectedInnerTabID,
+          serverID: props.serverID,
         });
         setQRCodeValue(`localhost:3000/api/joinServer?token=${token}`);
         setQRCodeShowing(!QRCodeShowing);
@@ -93,7 +93,7 @@ const InviteModal = (props: {
 
   return (
     <div className="fixed">
-      <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
+      <div className="flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={props.inviteModalRef}
           className="fade-in -mt-24 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"

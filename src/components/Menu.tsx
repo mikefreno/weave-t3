@@ -19,10 +19,10 @@ const Menu = (props: {
   status: any;
   isDarkTheme: boolean;
   currentTabSetter?: (tab: string) => void;
-  setSelectedInnerTab?: (innerTab: string) => void;
   setMenuOpen: (open: boolean) => void;
+  innerTabSetter?: (input: string) => void;
 }) => {
-  const { session, status, isDarkTheme, currentTabSetter, setSelectedInnerTab } = props;
+  const { session, status, isDarkTheme, currentTabSetter } = props;
   const pathname = usePathname();
 
   const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
@@ -59,11 +59,11 @@ const Menu = (props: {
             session ? (
               <>
                 <li className="flex justify-center text-lg">
-                  {pathname === "/app" && setSelectedInnerTab && currentTabSetter ? (
+                  {pathname === "/app" && currentTabSetter ? (
                     <button
                       onClick={() => {
                         currentTabSetter("DMS");
-                        setSelectedInnerTab("AccountOverview");
+                        props.innerTabSetter!("AccountOverview");
                         props.setMenuOpen(false);
                       }}
                       className="text-zinc-800hover:bg-purple-400 w-28 rounded-lg px-4 py-2 text-center text-lg hover:bg-purple-400 dark:text-zinc-300 dark:hover:bg-zinc-700"

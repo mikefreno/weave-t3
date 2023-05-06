@@ -2,7 +2,7 @@ import DoubleChevrons from "@/src/icons/DoubleChevrons";
 import PaperClip from "@/src/icons/PaperClip";
 import SendIcon from "@/src/icons/SendIcon";
 import { api } from "@/src/utils/api";
-import { Input, Loading, Tooltip } from "@nextui-org/react";
+import { Input, Tooltip } from "@nextui-org/react";
 import { Server, Server_Admin, Server_Channel, Server_Member, User, Comment, Reaction } from "@prisma/client";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import useOnClickOutside from "../ClickOutsideHook";
@@ -354,10 +354,10 @@ export default function ChatChannel(props: ChannelMainProps) {
                     contentClickable
                     status="secondary"
                     contentRight={
-                      <div className="-ml-6 flex">
+                      <div className="-ml-7 flex">
                         <button
                           ref={attachmentButtonRef}
-                          className="rounded-full px-2"
+                          className="-ml-1 rounded-full pr-3"
                           onClick={attachmentModalToggle}
                           type="button"
                         >
@@ -370,7 +370,11 @@ export default function ChatChannel(props: ChannelMainProps) {
                         </button>
                         <button type="submit">
                           {messageSendLoading ? (
-                            <Loading size="xs" />
+                            <AdjustableLoadingElement
+                              specifiedHeight={18}
+                              specifiedWidth={18}
+                              specifiedSpinnerSize="sm"
+                            />
                           ) : (
                             <div className={iconClass}>
                               <SendIcon

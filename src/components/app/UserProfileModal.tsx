@@ -27,16 +27,29 @@ export default function UserProfileModal(props: {
   const [inputShowing, setInputShowing] = useState<boolean>(false);
   const [messageSendLoading, setMessageSendLoading] = useState<boolean>(false);
   const [messageResponse, setMessageResponse] = useState<string>("");
+  const [friendState, setFriendState] = useState<boolean>(false);
+  const [friendRequestState, setFriendRequestState] = useState<boolean>(false);
+  const [friendButtonLoading, setFriendButtonLoading] = useState<boolean>(false);
   //refs
   const messageInputRef = useRef<HTMLInputElement>(null);
   //trpc (api)
   const getUserByID = api.users.getUserByIdQuery.useQuery(viewedUser.id);
   const sendFriendRequestMutation = api.friends.sendFriendRequest.useMutation();
   const sendConversationRequestMutation = api.conversation.createConversation.useMutation();
+  const friendsStateCheckMutation = api.friends.checkFriendState.useMutation();
+  const friendRequestCheckMutation = api.friends.checkFriendRequestState.useMutation();
 
   useEffect(() => {
     getUserByID.refetch();
+    friendStateSetter();
   }, [viewedUser]);
+
+  const friendStateSetter = async () => {
+    const res = await friendsStateCheckMutation.mutateAsync(viewedUser.id);
+    setFriendState(res);
+    const res2 = await friendRequestCheckMutation.mutateAsync(viewedUser.id);
+    setFriendRequestState(res2);
+  };
 
   useEffect(() => {
     if (getUserByID && getUserByID.data) {
@@ -45,7 +58,10 @@ export default function UserProfileModal(props: {
   }, [getUserByID]);
 
   const sendFriendRequest = async () => {
+    setFriendButtonLoading(true);
     await sendFriendRequestMutation.mutateAsync(viewedUser.id);
+    await friendStateSetter();
+    setFriendButtonLoading(false);
   };
 
   const sendConversationRequest = async (e: any) => {
@@ -110,11 +126,23 @@ export default function UserProfileModal(props: {
                     <PaperPlanes height={20} width={20} color={"white"} />
                   </Button>
                 </Tooltip>
-                <Tooltip content={"Send a friend request"}>
-                  <Button color={"secondary"} auto onClick={sendFriendRequest}>
-                    <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
+                {friendButtonLoading ? (
+                  <Button color={"secondary"} auto disabled>
+                    <Loading />
                   </Button>
-                </Tooltip>
+                ) : friendState ? null : friendRequestState ? (
+                  <Tooltip content={"Friend Request already sent!"}>
+                    <Button color={"secondary"} auto disabled>
+                      <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
+                    </Button>
+                  </Tooltip>
+                ) : (
+                  <Tooltip content={"Send a friend request"}>
+                    <Button color={"secondary"} auto onClick={sendFriendRequest}>
+                      <AddFriendIcon height={20} width={20} stroke={"white"} strokeWidth={1.5} />
+                    </Button>
+                  </Tooltip>
+                )}
               </div>
             ) : null}
           </div>
@@ -145,7 +173,7 @@ export default function UserProfileModal(props: {
 
   return (
     <div className="fixed">
-      <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
+      <div className="flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={UserProfileModalRef}
           className="fade-in -mt-24 w-11/12 rounded-xl bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"

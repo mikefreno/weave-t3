@@ -9,13 +9,13 @@ import { api } from "@/src/utils/api";
 import { Button, Input, Loading, Textarea, Tooltip } from "@nextui-org/react";
 import React, { RefObject, useRef, useState } from "react";
 
-const CreateChannelModal = (props: {
+export default function CreateChannelModal(props: {
   isDarkTheme: boolean;
   createChannelToggle: any;
-  selectedInnerTabID: number;
   createChannelRef: RefObject<HTMLDivElement>;
   refreshUserServers: any;
-}) => {
+  serverID: number;
+}) {
   const { isDarkTheme, createChannelToggle, createChannelRef } = props;
   //state
   const [channelType, setChannelType] = useState("");
@@ -35,13 +35,18 @@ const CreateChannelModal = (props: {
       description: serverDescRef.current?.value,
       name: channelName,
       serverType: channelType,
-      serverID: props.selectedInnerTabID,
+      serverID: props.serverID,
     });
     if (res == true) {
       props.createChannelToggle();
       await props.refreshUserServers();
       setCreateButtonLoading(false);
     }
+  };
+  const toTitleCase = (str: string) => {
+    return str.replace(/\w\S*/g, (word) => {
+      return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+    });
   };
 
   const stepThrough = () => {
@@ -102,7 +107,7 @@ const CreateChannelModal = (props: {
     } else if (step === 1) {
       return (
         <>
-          <div className="pl-8 text-lg">{channelType} Channel</div>
+          <div className="-mt-10 mb-8 pl-12 text-2xl">{toTitleCase(channelType)} Channel</div>
           <div className="text-center text-xl">Give it a name!</div>
           <form
             onSubmit={(e) => {
@@ -181,12 +186,12 @@ const CreateChannelModal = (props: {
   };
 
   return (
-    <div className="fixed">
-      <div className="modal-offset flex h-screen w-screen items-center justify-center backdrop-blur-sm">
+    <div className="absolute h-screen w-screen overflow-y-scroll py-36 backdrop-blur-sm">
+      <div className="flex justify-center">
         <div
           ref={createChannelRef}
           className="fade-in -mt-24 w-11/12 rounded-xl
-          bg-zinc-100 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
+          bg-zinc-100 p-4 shadow-xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
         >
           <div className="">
             <button
@@ -203,6 +208,4 @@ const CreateChannelModal = (props: {
       </div>
     </div>
   );
-};
-
-export default CreateChannelModal;
+}

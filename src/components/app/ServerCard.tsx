@@ -12,7 +12,7 @@ const ServerCard = (props: {
   members: number;
   membersOnline: number;
   serverID: number;
-  refreshUserServers: () => void;
+  refreshUserServers?: () => void;
 }) => {
   const { logo, banner, name, blurb, members, membersOnline, serverID, refreshUserServers } = props;
 
@@ -23,7 +23,9 @@ const ServerCard = (props: {
   const joinPublicServer = async () => {
     setJoinButtonLoading(true);
     await serverJoinMutation.mutateAsync(serverID);
-    refreshUserServers();
+    if (refreshUserServers) {
+      refreshUserServers();
+    }
     setJoinButtonLoading(false);
   };
 

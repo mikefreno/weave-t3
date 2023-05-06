@@ -1,4 +1,4 @@
-import React, { Dispatch, MouseEventHandler, RefObject, useContext } from "react";
+import React, { Dispatch, MouseEventHandler, RefObject, SetStateAction, useContext } from "react";
 import ThemeContext from "../ThemeContextProvider";
 import { Tooltip } from "@nextui-org/react";
 import AddIcon from "@/src/icons/AddIcon";
@@ -18,16 +18,15 @@ const SideNav = (props: {
   botButtonRef: RefObject<HTMLButtonElement>;
   currentTab: string;
   currentTabSetter(id: string): void;
-  setSelectedInnerTab: any;
-  setSelectedInnerTabID: any;
   usersServers: Server[] | undefined;
-  selectedInnerTabID: number;
   currentUser: User & {
     servers: Server[];
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
   serverSetter: (server: Server) => void;
+  serverID: number | undefined;
+  innerTabSetter: (input: string) => void;
 }) => {
   const { isDarkTheme } = useContext(ThemeContext);
   const {
@@ -37,11 +36,8 @@ const SideNav = (props: {
     serverSetter,
     botModalToggle,
     currentTabSetter,
-    setSelectedInnerTab,
     botButtonRef,
     currentTab,
-    selectedInnerTabID,
-    setSelectedInnerTabID,
     channelSetter,
     serverModalToggle,
     serverButtonRef,
@@ -62,7 +58,7 @@ const SideNav = (props: {
               className="z-50"
               onClick={() => {
                 currentTabSetter("DMS");
-                setSelectedInnerTab("AccountOverview");
+                props.innerTabSetter("AccountOverview");
               }}
             >
               <img
@@ -84,7 +80,7 @@ const SideNav = (props: {
             <div className="flex transform flex-col items-center border-b border-zinc-200 py-2 transition-transform duration-500 dark:border-zinc-600">
               {usersServers?.map((server: Server) => (
                 <div className="py-2" key={server.id}>
-                  {selectedInnerTabID == server.id && currentTab == "server" ? (
+                  {props.serverID == server.id && currentTab == "server" ? (
                     <span className="absolute -ml-[1.25rem] mt-5 h-4 w-4 rounded-full bg-zinc-200" />
                   ) : null}
                   <Tooltip
@@ -96,8 +92,7 @@ const SideNav = (props: {
                     <button
                       className=""
                       onClick={() => {
-                        setSelectedInnerTab(server.name);
-                        setSelectedInnerTabID(server.id);
+                        props.innerTabSetter(server.name);
                         serverSetter(server);
                         currentTabSetter("server");
                         channelSetter(null);
@@ -153,7 +148,7 @@ const SideNav = (props: {
                 className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-2 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                 onClick={() => {
                   currentTabSetter("PublicServers");
-                  setSelectedInnerTab("");
+                  props.innerTabSetter("Made By Weave");
                 }}
               >
                 <div className="flex h-[40px] w-[40px] items-center justify-center">

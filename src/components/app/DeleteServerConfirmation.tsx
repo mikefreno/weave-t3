@@ -29,7 +29,7 @@ export default function DeleteServerConfirmation(props: DeleteServerConfirmation
   };
 
   return (
-    <div className="modal-offset fade-in fixed flex h-screen w-screen items-center justify-center backdrop-blur-sm backdrop-brightness-50">
+    <div className="fade-in fixed flex h-screen w-screen items-center justify-center backdrop-blur-sm backdrop-brightness-50">
       <div
         ref={props.deleteConfirmationModalRef}
         className="fade-in -mt-24 w-11/12 rounded-xl bg-zinc-50 px-8 py-4 shadow-2xl dark:bg-zinc-900 sm:w-2/3 md:w-1/2 xl:w-1/3"

@@ -6,9 +6,13 @@ export const conversationRouter = createTRPCRouter({
     .input(z.object({ message: z.string(), targetUserID: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
+        const conversationCheck = await ctx.prisma.conversation.findFirst({
+          where: {},
+        });
         const newConversation = await ctx.prisma.conversation.create({
           data: {
             initiatorID: ctx.session.user.id,
+            receiverID: input.targetUserID,
           },
         });
         await ctx.prisma.directMessage.create({

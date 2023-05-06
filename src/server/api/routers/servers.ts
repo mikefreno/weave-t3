@@ -10,7 +10,7 @@ export const serverRouter = createTRPCRouter({
         name: z.string(),
         blurb: z.string().optional(),
         category: z.string().optional(),
-        type: z.string(),
+        public: z.boolean(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -19,7 +19,7 @@ export const serverRouter = createTRPCRouter({
           name: input.name,
           blurb: input.blurb ? input.blurb : null,
           category: input.category ? input.category : undefined,
-          type: input.type,
+          public: input.public,
           ownerId: ctx.session.user.id,
         },
       });
@@ -169,13 +169,16 @@ export const serverRouter = createTRPCRouter({
         return true;
       }
     }),
-  getAllPublicServers: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
+  getPublicServersByCategory: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
     return ctx.prisma.server.findMany({
       where: {
-        type: "public",
+        public: true,
         category: input,
       },
     });
+  }),
+  getAllPublicServers: publicProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.server.findMany({ where: { public: true } });
   }),
   postComment: protectedProcedure
     .input(

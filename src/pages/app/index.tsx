@@ -34,13 +34,13 @@ import {
 import AdjustableLoadingElement from "@/src/components/AdjustableLoadingElement";
 import CreateChannelModal from "@/src/components/app/CreateChannelModal";
 import InviteModal from "@/src/components/app/InviteModal";
-import ChevronDown from "@/src/icons/ChevronDown";
 import UserProfileModal from "@/src/components/app/UserProfileModal";
 import { type User as MongoUser } from "@prisma/client/mongo";
 import VideoChannel from "@/src/components/app/VideoChannel";
 import VoiceChannel from "@/src/components/app/VoiceChannel";
 import ServerSettings from "@/src/components/app/ServerSettings";
 import DeleteServerConfirmation from "@/src/components/app/DeleteServerConfirmation";
+import MenuBarsMobile from "@/src/icons/MenuBarsMobile";
 
 const App = () => {
   const { isDarkTheme } = useContext(ThemeContext);
@@ -48,11 +48,11 @@ const App = () => {
   //state
   const [serverModalShowing, setServerModalShowing] = useState(false);
   const [botModalShowing, setBotModalShowing] = useState(false);
+  const [width, setWidth] = useState<number | null>(null);
   const [microphoneState, setMicrophoneState] = useState(false);
   const [audioState, setAudioState] = useState(true);
   const [currentTab, setCurrentTab] = useState("DMS");
   const [selectedInnerTab, setSelectedInnerTab] = useState("AccountOverview");
-  const [selectedInnerTabID, setSelectedInnerTabID] = useState<number>(0);
   const [directMessageModalShowing, setDirectMessageModalShowing] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
   const [selectedChannel, setSelectedChannel] = useState<Server_Channel | null>(null);
@@ -61,7 +61,7 @@ const App = () => {
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
   const [createChannelModalShowing, setCreateChannelModalShowing] = useState(false);
-  const [fullscreen, setFullscreen] = useState<boolean>(false);
+  const [fullscreen, setFullscreen] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<
     User & {
       servers: Server[];
@@ -126,7 +126,8 @@ const App = () => {
   const createChannelRef = useRef<HTMLDivElement>(null);
   const deletionServerButtonRef = useRef<HTMLButtonElement>(null);
   const deleteConfirmationModalRef = useRef<HTMLDivElement>(null);
-
+  const smallScreenMenuBarsRef = useRef<HTMLButtonElement>(null);
+  const innerNavRef = useRef<HTMLDivElement>(null);
   //trpc (api) hooks
   const usersServers = api.server.getAllCurrentUserServers.useQuery();
   const currentUserReturn = api.users.getCurrentUser.useQuery();
@@ -158,6 +159,33 @@ const App = () => {
   useOnClickOutside([deletionServerButtonRef, deleteConfirmationModalRef], () => {
     setDeletionConfirmationShowing(false);
   });
+
+  useOnClickOutside([innerNavRef, smallScreenMenuBarsRef], () => {
+    if (width && width < 768) {
+      setFullscreen(true);
+    }
+  });
+
+  useEffect(() => {
+    if (width && width < 768) {
+      setFullscreen(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (width && width > 768) {
+      setFullscreen(false);
+    }
+  }, [width]);
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   //socket management
   useEffect(() => {
@@ -252,14 +280,6 @@ const App = () => {
       scrollableRef.current.scrollTop = scrollableRef.current.scrollHeight;
     }
   }, []);
-
-  useEffect(() => {
-    if (serverModalShowing || botModalShowing || directMessageModalShowing) {
-      document.getElementById("app-body")?.classList.add("modal-open");
-    } else {
-      document.getElementById("app-body")?.classList.remove("modal-open");
-    }
-  }, [serverModalShowing, botModalShowing, directMessageModalShowing]);
 
   useEffect(() => {
     return () => {
@@ -401,7 +421,7 @@ const App = () => {
         <title> Web App | Weave</title>
         <meta name="description" content="Weave's Web App" />
       </Head>
-      <Navbar switchRef={switchRef} currentTabSetter={currentTabSetter} setSelectedInnerTab={setSelectedInnerTab} />
+      <Navbar switchRef={switchRef} currentTabSetter={currentTabSetter} innerTabSetter={innerTabSetter} />
       <div id="app-body" className={`flex h-screen w-screen`}>
         <div className={`${fullscreen ? "-translate-x-72" : ""} transform transition-all duration-500 ease-in-out`}>
           <div id="outer-nav" className="flex">
@@ -413,16 +433,15 @@ const App = () => {
               botButtonRef={botButtonRef}
               currentTab={currentTab}
               currentTabSetter={currentTabSetter}
-              setSelectedInnerTab={setSelectedInnerTab}
               currentUser={currentUser}
-              setSelectedInnerTabID={setSelectedInnerTabID}
               usersServers={usersServers.data}
-              selectedInnerTabID={selectedInnerTabID}
               timestamp={timestamp}
               serverSetter={serverSetter}
+              serverID={selectedServer?.id}
+              innerTabSetter={innerTabSetter}
             />
           </div>
-          <div id="inner-nav" className="md:ml-20">
+          <div id="inner-nav" className="md:ml-20" ref={innerNavRef}>
             <InnerNav
               serverSetter={serverSetter}
               botModalToggle={botModalToggle}
@@ -436,9 +455,7 @@ const App = () => {
               directMessageButtonRef={directMessageButtonRef}
               dmModalToggle={dmModalToggle}
               selectedInnerTab={selectedInnerTab}
-              setSelectedInnerTabID={setSelectedInnerTabID}
               currentUser={currentUser}
-              selectedInnerTabID={selectedInnerTabID}
               channelSetter={channelSetter}
               selectedChannel={selectedChannel}
               loadingOverlaySetter={loadingOverlaySetter}
@@ -458,41 +475,31 @@ const App = () => {
               setServerSettingsPane={setServerSettingsPane}
               requestedConversationID={requestedConversationID}
               setConversationPage={setConversationPage}
+              serverID={selectedServer?.id}
             />
           </div>
-        </div>
-        <div
-          className={`fixed bottom-20 z-[100] transform transition-all duration-700 ease-in-out ${
-            selectedChannel?.type === "video" || selectedInnerTab === "conversation" ? "" : "md:hidden"
-          } ${fullscreen ? "-ml-2" : "ml-40 pl-2 md:ml-64 md:pl-6"}`}
-        >
-          <button onClick={fullscreenToggle}>
-            {fullscreen ? (
-              <div className="-rotate-90 transform transition-all duration-500 ease-in-out">
-                <ChevronDown height={44} width={44} stroke={isDarkTheme ? "#fafafa" : "#18181b"} strokeWidth={1} />
-              </div>
-            ) : (
-              <div className="rotate-90 transform transition-all duration-300 ease-in-out">
-                <ChevronDown height={44} width={44} stroke={isDarkTheme ? "#fafafa" : "#18181b"} strokeWidth={1} />
-              </div>
-            )}
-          </button>
         </div>
         <div
           id="center-page"
           ref={scrollableRef}
           className={
             !fullscreen
-              ? `ml-44 flex-1 transform transition-all duration-500 ease-in-out md:ml-52`
-              : "flex-1 transform transition-all duration-500 ease-in-out md:-ml-20"
+              ? `ml-44 flex-1 transform transition-all duration-700 ease-in-out md:ml-52`
+              : "flex-1 transform transition-all duration-700 ease-in-out md:-ml-20"
           }
         >
+          <div className={`absolute z-[1000] px-2 py-4 md:hidden  ${!fullscreen ? "-ml-10" : null}`}>
+            <button onClick={fullscreenToggle} ref={smallScreenMenuBarsRef}>
+              <MenuBarsMobile stroke={isDarkTheme ? "white" : "black"} fullscreen={fullscreen} />
+            </button>
+          </div>
           {selectedInnerTab === "AccountOverview" ? (
             <AccountPage
               triggerUserRefresh={triggerUserRefresh}
               currentUser={currentUser}
               setTimestamp={setTimestamp}
               timestamp={timestamp}
+              fullscreen={fullscreen}
             />
           ) : null}
 
@@ -574,44 +581,41 @@ const App = () => {
                 currentUser={currentUser}
               />
             ) : (
-              <ServerMainScreen
-                usersServers={usersServers.data}
-                selectedInnerTabID={selectedInnerTabID}
-                selectedServer={selectedServer}
-              />
+              <ServerMainScreen usersServers={usersServers.data} selectedServer={selectedServer} />
             )
           ) : null}
         </div>
         {loadingOverlayShowing ? <AdjustableLoadingElement /> : null}
       </div>
-      <div>
+      <div className="modal-offset">
         {serverModalShowing ? (
           <CreateServerModal
             refreshUserServers={refreshUserServers}
             serverModalToggle={serverModalToggle}
             serverModalRef={serverModalRef}
+            serverSetter={serverSetter}
           />
         ) : null}
         {botModalShowing ? <BotServiceModal botModalRef={botModalRef} botModalToggle={botModalToggle} /> : null}
         {directMessageModalShowing ? (
           <DirectMessageModal directMessageModalRef={directMessageModalRef} userSelect={userSelect} />
         ) : null}
-        {inviteModalShowing ? (
+        {inviteModalShowing && selectedServer ? (
           <InviteModal
             isDarkTheme={isDarkTheme}
             inviteModalToggle={inviteModalToggle}
-            selectedInnerTabID={selectedInnerTabID}
             selectedInnerTab={selectedInnerTab}
             inviteModalRef={inviteModalRef}
+            serverID={selectedServer.id}
           />
         ) : null}
-        {createChannelModalShowing ? (
+        {createChannelModalShowing && selectedServer ? (
           <CreateChannelModal
             refreshUserServers={refreshUserServers}
             isDarkTheme={isDarkTheme}
             createChannelToggle={createChannelToggle}
-            selectedInnerTabID={selectedInnerTabID}
             createChannelRef={createChannelRef}
+            serverID={selectedServer.id}
           />
         ) : null}
         {searchedUser ? (

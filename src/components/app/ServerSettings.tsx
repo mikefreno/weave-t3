@@ -4,7 +4,7 @@ import HandRaiseIcon from "@/src/icons/HandRaiseIcon";
 import { api } from "@/src/utils/api";
 import { Button, Loading, Tooltip } from "@nextui-org/react";
 import { Banned_Member, Server, Server_Admin, Server_Member, Suspended_Member, User } from "@prisma/client";
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useCallback, useEffect, useState } from "react";
 //emojis
 import AngryEmoji from "@/src/icons/emojis/Angry.svg";
 import BlankEmoji from "@/src/icons/emojis/Blank.svg";
@@ -23,6 +23,8 @@ import TongueEmoji from "@/src/icons/emojis/Tongue.svg";
 import UpsideDownEmoji from "@/src/icons/emojis/UpsideDown.svg";
 import WorriedEmoji from "@/src/icons/emojis/Worried.svg";
 import UnlockIcon from "@/src/icons/UnlockIcon";
+import Dropzone from "@/src/components/app/Dropzone";
+import AdjustableLoadingElement from "../AdjustableLoadingElement";
 
 interface ServerSettingsProps {
   privilegeLevel: "admin" | "member" | "owner" | undefined;
@@ -56,7 +58,13 @@ export default function ServerSettings(props: ServerSettingsProps) {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
   const [emojiResponse, setEmojiResponse] = useState<string | null>(null);
   const [emojiSetterLoading, setEmojiSetterLoading] = useState<boolean>(false);
-
+  const [logoImage, setLogoImage] = useState<File | Blob | null>(null);
+  const [bannerImage, setBannerImage] = useState<File | Blob | null>(null);
+  const [logoImageExt, setLogoImageExt] = useState<string | null>(null);
+  const [bannerImageExt, setBannerImageExt] = useState<string | null>(null);
+  const [logoImageHolder, setLogoImageHolder] = useState<string | ArrayBuffer | null>(null);
+  const [bannerImageHolder, setBannerImageHolder] = useState<string | ArrayBuffer | null>(null);
+  const [serverUploadButtonLoading, setServerUploadButtonLoading] = useState<boolean>(false);
   const serverDataQuery = api.server.getPrivilegeBasedServerData.useQuery({
     serverID: props.serverID,
     privilegeLevel: props.privilegeLevel,
@@ -66,6 +74,9 @@ export default function ServerSettings(props: ServerSettingsProps) {
   const emojiMutation = api.server.setServerEmojis.useMutation();
   const banMutation = api.server.banUser.useMutation();
   const unBanMutation = api.server.unBanUser.useMutation();
+  const serverLogoMutation = api.server.updateServerLogo.useMutation({});
+  const serverBannerMutation = api.server.updateServerBanner.useMutation({});
+  const s3TokenMutation = api.misc.returnS3Token.useMutation();
 
   useEffect(() => {
     if (serverDataQuery.data) {
@@ -154,6 +165,84 @@ export default function ServerSettings(props: ServerSettingsProps) {
       setEmojiResponse(res);
     }
   };
+  //image handling
+  const updateServerImages = async () => {
+    if (props.serverID) {
+      setServerUploadButtonLoading(true);
+      if (bannerImage) {
+        const s3TokenReturn = await s3TokenMutation.mutateAsync({
+          id: props.serverID.toString(),
+          type: "banner",
+          ext: bannerImageExt as string,
+          category: "servers",
+        });
+        //update server with image url
+        try {
+          await fetch(s3TokenReturn.uploadURL, {
+            method: "PUT",
+            body: logoImage as File,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+        serverBannerMutation.mutate({
+          serverID: props.serverID,
+          url: s3TokenReturn.key,
+        });
+      }
+      if (logoImage) {
+        const s3TokenReturn = await s3TokenMutation.mutateAsync({
+          id: props.serverID.toString(),
+          type: "logo",
+          ext: logoImageExt as string,
+          category: "servers",
+        });
+        try {
+          await fetch(s3TokenReturn.uploadURL, {
+            method: "PUT",
+            body: logoImage as File,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+        serverLogoMutation.mutate({
+          serverID: props.serverID,
+          url: s3TokenReturn.key,
+        });
+      }
+    }
+    setServerUploadButtonLoading(false);
+  };
+
+  const handleBannerDrop = useCallback((acceptedFiles: Blob[]) => {
+    acceptedFiles.forEach((file: Blob) => {
+      setBannerImage(file);
+      const ext = file.type.split("/")[1];
+      setBannerImageExt(ext!);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const str = reader.result;
+        setBannerImageHolder(str);
+      };
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const handleLogoDrop = useCallback((acceptedFiles: Blob[]) => {
+    acceptedFiles.forEach((file: Blob) => {
+      setLogoImage(file);
+      const ext = file.type.split("/")[1];
+      setLogoImageExt(ext!);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const str = reader.result;
+        setLogoImageHolder(str);
+      };
+      reader.readAsDataURL(file);
+    });
+  }, []);
 
   const userManagementMobileScreenFormat = () => {
     return (
@@ -622,7 +711,45 @@ export default function ServerSettings(props: ServerSettingsProps) {
       </div>
     );
   };
-
+  const serverImages = () => {
+    return (
+      <div className="w-full rounded-lg bg-zinc-50 px-4 py-6 shadow-lg dark:bg-zinc-600 md:w-5/6 md:px-8">
+        <div className="flex justify-evenly">
+          <div className="flex w-min flex-col px-8">
+            <div className="text-center">Server Logo (optional)</div>
+            <Dropzone
+              onDrop={handleLogoDrop}
+              acceptedFiles={"image/jpg, image/jpeg, image/png"}
+              fileHolder={logoImageHolder}
+              preSet={null}
+            />
+          </div>
+          <div className="flex w-min flex-col px-8">
+            <div className="text-center">Server Banner (optional)</div>
+            <Dropzone
+              onDrop={handleBannerDrop}
+              acceptedFiles={"image/jpg, image/jpeg, image/png"}
+              fileHolder={bannerImageHolder}
+              preSet={null}
+            />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          {serverUploadButtonLoading ? (
+            <Button auto shadow ripple disabled>
+              <div>
+                <AdjustableLoadingElement specifiedHeight={25} specifiedWidth={25} specifiedSpinnerSize="md" />
+              </div>
+            </Button>
+          ) : (
+            <Button auto shadow ripple color={"secondary"} onClick={updateServerImages}>
+              Upload
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
   const adminSettingsOptions = () => {
     if (props.privilegeLevel === "owner" || props.privilegeLevel === "admin") {
       return (
@@ -638,7 +765,7 @@ export default function ServerSettings(props: ServerSettingsProps) {
   };
   const ownerSettingsOptions = () => {
     if (props.privilegeLevel === "owner") {
-      return <div></div>;
+      return <div className="flex w-full justify-center">{serverImages()}</div>;
     }
   };
 
@@ -650,6 +777,7 @@ export default function ServerSettings(props: ServerSettingsProps) {
         {adminSettingsOptions()}
         {ownerSettingsOptions()}
       </div>
+
       <div className="flex justify-center">
         <div className="my-8 w-full rounded-lg bg-red-600 px-8 py-6 shadow-lg md:w-5/6">
           <div className="py-2 text-2xl underline underline-offset-2">Danger Zone</div>

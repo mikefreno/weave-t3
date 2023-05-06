@@ -11,6 +11,8 @@ generator client {
 model Server {
   id   Int    @id @map("_id")
   name String
+  public Boolean
+  category String
 }
 
 model User {

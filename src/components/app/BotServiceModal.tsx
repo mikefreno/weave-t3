@@ -5,10 +5,10 @@ import { Input } from "@nextui-org/react";
 import React, { RefObject, useContext, useState } from "react";
 import ThemeContext from "../ThemeContextProvider";
 
-const BotServiceModal = (props: {
+export default function BotServiceModal(props: {
   botModalRef: RefObject<HTMLDivElement>;
   botModalToggle: React.MouseEventHandler<HTMLButtonElement>;
-}) => {
+}) {
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -26,7 +26,7 @@ const BotServiceModal = (props: {
 
   return (
     <div id="modal" className="fixed">
-      <div className="modal-offset absolute flex h-screen w-screen items-center justify-center">
+      <div className="absolute flex h-screen w-screen items-center justify-center backdrop-blur-sm">
         <div
           ref={props.botModalRef}
           className="fade-in -mt-24 h-96 w-3/4 rounded-xl bg-zinc-200 p-4 shadow-2xl dark:bg-zinc-800 sm:w-2/3 md:w-1/2 xl:w-1/3"
@@ -87,6 +87,4 @@ const BotServiceModal = (props: {
       </div>
     </div>
   );
-};
-
-export default BotServiceModal;
+}

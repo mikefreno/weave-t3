@@ -2,16 +2,23 @@ import AddIcon from "@/src/icons/AddIcon";
 import BullhornIcon from "@/src/icons/BullhornIcon";
 import ChevronDown from "@/src/icons/ChevronDown";
 import RobotForApp from "@/src/icons/RobotForApp";
-import { Raleway } from "next/font/google";
-import { Tooltip } from "@nextui-org/react";
+import { Raleway, Nunito } from "next/font/google";
+import { Switch, Tooltip } from "@nextui-org/react";
 import { Server, Server_Admin, Server_Channel, Server_Member, User } from "@prisma/client";
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useContext, useEffect, useRef, useState } from "react";
 import useOnClickOutside from "@/src/components/ClickOutsideHook";
+import { MoonIcon } from "@/src/icons/MoonIcon";
+import { SunIcon } from "@/src/icons/SunIcon";
+import ThemeContext from "../ThemeContextProvider";
+import Link from "next/link";
+import { signOut } from "next-auth/react";
+import BackArrow from "@/src/icons/BackArrow";
+import InfoModalContent from "../InfoModalContent";
 
 const raleway = Raleway({ weight: "400", subsets: ["latin"] });
+const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
 const SideNavSmallScreen = (props: {
-  isDarkTheme: boolean;
   currentTabSetter(id: string): void;
   innerTabSetter: (tab: string) => void;
   currentUser: User & {
@@ -24,36 +31,52 @@ const SideNavSmallScreen = (props: {
   botModalToggle: any;
   usersServers: Server[] | undefined;
   timestamp: number;
-  selectedInnerTabID: number;
+  serverID: number | undefined;
   currentTab: string;
-  setSelectedInnerTabID: (id: number) => void;
   channelSetter: (input: Server_Channel | null) => void;
   serverModalToggle: any;
   serverSetter: (server: Server) => void;
 }) => {
   const {
-    isDarkTheme,
     currentTabSetter,
     innerTabSetter,
     currentUser,
     timestamp,
     currentTab,
-    selectedInnerTabID,
     usersServers,
-    setSelectedInnerTabID,
     channelSetter,
     serverModalToggle,
     botModalToggle,
     serverSetter,
     botButtonRef,
   } = props;
+  const { isDarkTheme, switchDarkTheme } = useContext(ThemeContext);
   const [navDropDownShowing, setNavDropDownShowing] = useState(false);
+  const [infoDropdownShowing, setInfoDropdownShowing] = useState(false);
+  const [showingDocs, setShowingDocs] = useState<boolean>(false);
+  const [menuShowing, setMenuShowing] = useState<boolean>(false);
   const navDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownButton = useRef<HTMLButtonElement>(null);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
 
   useOnClickOutside([navDropdownRef, navDropdownButton], () => {
     setNavDropDownShowing(false);
   });
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+
+    if (!menuShowing) {
+      timer = setTimeout(() => {
+        setInfoDropdownShowing(false);
+        setShowingDocs(false);
+      }, 500);
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [menuShowing]);
 
   const botModalTrigger = () => {
     botModalToggle();
@@ -63,27 +86,37 @@ const SideNavSmallScreen = (props: {
     serverModalToggle();
     setNavDropDownShowing(false);
   };
+  const toggleMenu = () => {
+    setMenuShowing(!menuShowing);
+  };
+
+  const infoDropdownToggle = () => {
+    setInfoDropdownShowing(!infoDropdownShowing);
+  };
+  const docsToggle = () => {
+    setShowingDocs(!showingDocs);
+  };
 
   return (
     <div className="md:hidden">
+      <button
+        ref={navDropdownButton}
+        className="absolute z-[1000] ml-2 mt-3 flex rounded bg-purple-200 px-4 py-2 hover:bg-purple-300 active:bg-purple-400 dark:bg-zinc-900 dark:hover:bg-zinc-700 dark:active:bg-zinc-600"
+        onClick={() => setNavDropDownShowing(!navDropDownShowing)}
+      >
+        <div className="my-auto pr-1">
+          <ChevronDown height={20} width={20} stroke={isDarkTheme ? "#f4f4f5" : "#27272a"} strokeWidth={1} />
+        </div>
+        <div className="my-auto">Navigation</div>
+      </button>
       <div className="flex justify-center">
-        <button
-          ref={navDropdownButton}
-          className="z-[60] mt-2 flex rounded bg-purple-200 px-4 py-2 hover:bg-purple-300 active:bg-purple-400 dark:bg-zinc-900 dark:hover:bg-zinc-700 dark:active:bg-zinc-600"
-          onClick={() => setNavDropDownShowing(!navDropDownShowing)}
-        >
-          <div className="my-auto pr-1">
-            <ChevronDown height={20} width={20} stroke={isDarkTheme ? "#f4f4f5" : "#27272a"} strokeWidth={1} />
-          </div>
-          <div className="my-auto">Navigation</div>
-        </button>
         {navDropDownShowing ? (
-          <div className="stopIT fade-in absolute z-50 h-screen overflow-y-scroll px-8 backdrop-blur">
+          <div className="stopIT fade-in scrollXDisabled absolute z-50 h-screen overflow-y-scroll px-8 backdrop-blur">
             <div
               ref={navDropdownRef}
-              className="z-[100] mb-4 mt-16 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
+              className="mb-4 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
             >
-              <div className="flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
+              <div className="mt-16 flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
                 <Tooltip
                   content={"Direct Messaging"}
                   trigger="hover"
@@ -96,6 +129,7 @@ const SideNavSmallScreen = (props: {
                     onClick={() => {
                       currentTabSetter("DMS");
                       innerTabSetter("AccountOverview");
+                      setNavDropDownShowing(false);
                     }}
                   >
                     <img
@@ -117,7 +151,7 @@ const SideNavSmallScreen = (props: {
                   <div className="flex flex-col items-center border-b border-zinc-200 py-2 dark:border-zinc-600">
                     {usersServers?.map((server: Server) => (
                       <div className="py-2" key={server.id}>
-                        {selectedInnerTabID == server.id && currentTab == "server" ? (
+                        {props.serverID == server.id && currentTab == "server" ? (
                           <span className="absolute -ml-3 -mt-1 h-4 w-4 rounded-full bg-purple-200" />
                         ) : null}
                         <Tooltip
@@ -130,7 +164,6 @@ const SideNavSmallScreen = (props: {
                             className=""
                             onClick={() => {
                               innerTabSetter(server.name);
-                              setSelectedInnerTabID(server.id);
                               serverSetter(server);
                               currentTabSetter("server");
                               channelSetter(null);
@@ -190,7 +223,7 @@ const SideNavSmallScreen = (props: {
                       className="borderRadiusTransform shaker flex justify-center rounded-2xl border border-zinc-600 bg-zinc-300 p-4 hover:bg-zinc-400 active:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-800 dark:active:bg-zinc-900"
                       onClick={() => {
                         currentTabSetter("PublicServers");
-                        innerTabSetter("");
+                        innerTabSetter("Made By Weave");
                         setNavDropDownShowing(false);
                       }}
                     >
@@ -223,6 +256,163 @@ const SideNavSmallScreen = (props: {
             </div>
           </div>
         ) : null}
+        <div className="absolute bottom-2 z-40 flex w-full justify-evenly pr-4">
+          <div>
+            <button onClick={toggleMenu} className="">
+              <div className={`${menuShowing ? "rotate-90" : "-rotate-90"} transition-all duration-500 ease-in-out`}>
+                <ChevronDown height={44} width={44} stroke={isDarkTheme ? "white" : "black"} strokeWidth={1} />
+              </div>
+            </button>
+          </div>
+          <div className="my-auto pr-4">
+            <Switch
+              checked={isDarkTheme}
+              shadow
+              bordered
+              size="md"
+              color="secondary"
+              iconOn={<MoonIcon />}
+              iconOff={<SunIcon />}
+              onChange={switchDarkTheme}
+            />
+          </div>
+        </div>
+        <div
+          className={`absolute bottom-0 z-30 transition-all duration-500 ${menuShowing ? "" : "-translate-x-[120%]"} `}
+        >
+          <div
+            className={`${nunito_200} -ml-6 rounded-r-2xl border border-zinc-400 bg-zinc-50 shadow-xl dark:border-zinc-500 dark:bg-zinc-900`}
+          >
+            <ul className="pb-8 pl-2">
+              {!infoDropdownShowing ? (
+                <>
+                  <li className="pt-2 text-lg">
+                    <Link href="/">
+                      <div className="rounded-lg p-2 px-4 text-center text-lg text-zinc-800 active:bg-purple-400 dark:text-zinc-100 dark:active:bg-zinc-700">
+                        Home
+                      </div>
+                    </Link>
+                  </li>
+                  <li className="flex justify-center text-lg">
+                    <button
+                      className="w-28 rounded-lg p-2 text-center text-lg text-zinc-800 active:bg-purple-400 dark:text-zinc-100 dark:active:bg-zinc-700"
+                      ref={infoButtonRef}
+                      onClick={infoDropdownToggle}
+                    >
+                      Info
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => signOut()}
+                      className="w-28 rounded-lg px-4 py-2 text-center text-lg text-zinc-800 active:bg-purple-400 dark:text-zinc-300 dark:active:bg-zinc-700"
+                    >
+                      Sign out
+                    </button>
+                  </li>
+                </>
+              ) : showingDocs ? (
+                <div className="z-[100]">
+                  <button className="-ml-2 flex rounded-full px-2 py-1 pb-4" onClick={docsToggle}>
+                    <div className="my-auto">
+                      <BackArrow height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
+                    </div>
+                    <div className="pl-2">Back</div>
+                  </button>
+                  <div className="pb-4 pl-4">
+                    <li className="w-[8.5rem]">
+                      <div className="rounded active:bg-purple-400 dark:active:bg-zinc-700">
+                        <div className="text-lg text-zinc-800 dark:text-zinc-100">Roadmap</div>
+                        <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                          See whats coming
+                        </p>
+                      </div>
+                    </li>
+                    <li className="w-[8.5rem]">
+                      <Tooltip content={"Coming Soon!"} trigger="click" color={"secondary"} placement="bottom">
+                        <div className="rounded active:bg-purple-400 dark:active:bg-zinc-700">
+                          <div className="text-lg text-zinc-800 dark:text-zinc-100">API & Bots</div>
+                          <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                            Get more from Weave
+                          </p>
+                        </div>
+                      </Tooltip>
+                    </li>
+                    <li className="w-[8.5rem]">
+                      <Link href="/docs/privacy-policy">
+                        <div className="rounded hover:bg-purple-400 dark:hover:bg-zinc-700">
+                          <div className="text-lg text-zinc-800 dark:text-zinc-100">Privacy Policy</div>
+                          <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                            See how we gather and handle your data
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                    <li className="w-[8.5rem]">
+                      <Link href="/docs/terms-of-service">
+                        <div className="rounded hover:bg-purple-400 dark:hover:bg-zinc-700">
+                          <div className="text-lg text-zinc-800 dark:text-zinc-100">Terms of Service</div>
+                          <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                            Check out the ToS
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  </div>
+                </div>
+              ) : (
+                <div className="z-[100]">
+                  <button className="-ml-2 flex rounded-full px-2 py-1 pb-4" onClick={infoDropdownToggle}>
+                    <div className="my-auto">
+                      <BackArrow height={24} width={24} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
+                    </div>
+                    <div className="pl-2">Back</div>
+                  </button>
+                  <div className="pb-4 pl-4">
+                    <li className="w-[8.5rem]">
+                      <Tooltip content={"Coming Soon!"} trigger="click" color={"secondary"} placement="bottom">
+                        <div className="rounded hover:bg-purple-400 dark:hover:bg-zinc-700">
+                          <div className="text-lg text-zinc-800 dark:text-zinc-100">Downloads</div>
+                          <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                            Coming soon
+                          </p>
+                        </div>
+                      </Tooltip>
+                    </li>
+                    <li className="w-[8.5rem]">
+                      <Link href="/docs/what-is-weave">
+                        <div className="rounded hover:bg-purple-400 dark:hover:bg-zinc-700">
+                          <div className="text-lg text-zinc-800 dark:text-zinc-100">What is Weave?</div>
+                          <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                            An explainer
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                    <li className="w-[8.5rem]">
+                      <Link href="/contact">
+                        <div className="rounded hover:bg-purple-400 dark:hover:bg-zinc-700">
+                          <div className="text-lg text-zinc-800 dark:text-zinc-100">Contact</div>
+                          <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                            Question or comment? Reach out!
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                    <li className="w-[8.5rem]">
+                      <button onClick={docsToggle} className="rounded hover:bg-purple-400 dark:hover:bg-zinc-700">
+                        <div className="text-left text-lg text-zinc-800 dark:text-zinc-100">Docs</div>
+                        <p className="max-w-[7rem] px-0.5 text-center text-sm text-zinc-600 dark:text-zinc-400">
+                          API, Bots, Terms of Service, and more
+                        </p>
+                      </button>
+                    </li>
+                  </div>
+                </div>
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

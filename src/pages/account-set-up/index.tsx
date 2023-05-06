@@ -12,6 +12,12 @@ import Resizer from "react-image-file-resizer";
 import Head from "next/head";
 import { toSvg } from "jdenticon";
 import AdjustableLoadingElement from "@/src/components/AdjustableLoadingElement";
+import { Server } from "@prisma/client";
+import ServerCard from "@/src/components/app/ServerCard";
+import InfoIcon from "@/src/icons/InfoIcon";
+import { type Server as MongoServer, type User as MongoUser } from "@prisma/client/mongo";
+import Search from "@/src/components/app/Search";
+import SearchIcon from "@/src/icons/SearchIcon";
 
 const resizeFile = (file: File, extension: string) =>
   new Promise((resolve) => {
@@ -47,7 +53,14 @@ const UserSetup = () => {
   const [nameError, setNameError] = useState("");
   const [identicon, setIdenticon] = useState<string | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [publicServers, setPublicServers] = useState<Server[]>();
+  const [userSearchData, setUserSearchData] = useState<MongoServer[] | null>(null);
+  const [showSearch, setShowSearch] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
+  //ref
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
   const realName = useRef<HTMLInputElement>(null);
   const pseudonym = useRef<HTMLInputElement>(null);
 
@@ -59,12 +72,20 @@ const UserSetup = () => {
   const identiconImageMutation = api.users.setIdenticonAsImage.useMutation();
   const userQuery = api.users.getCurrentUser.useQuery();
   const s3TokenMutation = api.misc.returnS3Token.useMutation();
+  const serverQuery = api.server.getAllPublicServers.useQuery();
+  const getServerSearchData = api.search.getPublicMongoServer.useMutation();
 
   useEffect(() => {
     if (userQuery.data) {
       setIdenticon(toSvg(userQuery.data.email, 100));
     }
-  }, []);
+  }, [userQuery.data]);
+
+  useEffect(() => {
+    if (serverQuery.data) {
+      setPublicServers(serverQuery.data);
+    }
+  }, [serverQuery]);
 
   const handleRealNamePictureDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file: Blob) => {
@@ -111,6 +132,20 @@ const UserSetup = () => {
       setNameError("One of the above is required!");
       setButtonLoading(false);
     }
+  };
+
+  const loadServerSearchData = async () => {
+    if (!userSearchData) {
+      const res: MongoServer[] | null = await getServerSearchData.mutateAsync();
+      if (res) {
+        setUserSearchData(res);
+      } else {
+        console.log("error retrieving user search data");
+      }
+    }
+  };
+  const showSelectedServer = () => {
+    return <></>;
   };
 
   const setPictures = async () => {
@@ -241,9 +276,9 @@ const UserSetup = () => {
       // Set Pictures
       return (
         <>
-          <div className="text-center">
+          <div className="py-2 text-center">
             <div className="text-3xl">Choose a profile picture, or two - squared images work best</div>
-            <div className="-mt-6">
+            <div className="">
               <Button auto color={"secondary"} onClick={() => setStep(step - 1)}>
                 <BackArrow height={12} width={12} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={3} />
               </Button>
@@ -268,25 +303,26 @@ const UserSetup = () => {
                 Paired with Pseudonym
               </div>
             </div>
-            <div className="flex justify-center pt-1">
-              If one is not chosen, a
-              <Tooltip
-                content={
-                  <div className="p-2">
-                    <div>Your identicon</div>
-                    <div
-                      className="flex justify-center rounded-full pt-2"
-                      dangerouslySetInnerHTML={{ __html: identicon as string }}
-                    ></div>
-                  </div>
-                }
-              >
-                <span className="px-1 text-blue-400 underline underline-offset-4">identicon</span>
-              </Tooltip>
-              will be used in its place.
+            <div className="pt-4 text-center">
+              If one is not chosen, an identicon will be used in its place.
+              <div className="flex justify-center pt-4">
+                <Tooltip
+                  content={
+                    <div className="p-2">
+                      <div>Your identicon</div>
+                      <div
+                        className="flex justify-center rounded-full pt-2"
+                        dangerouslySetInnerHTML={{ __html: identicon as string }}
+                      ></div>
+                    </div>
+                  }
+                >
+                  <InfoIcon height={16} width={16} fill={"#a855f7"} />
+                </Tooltip>
+              </div>
             </div>
             <div className="w-full">
-              <div className="float-right flex justify-end">
+              <div className="flex justify-end">
                 {buttonLoading ? (
                   <Button disabled auto bordered color="gradient" css={{ px: "$13" }}>
                     <Loading type="points" size="sm" />
@@ -306,22 +342,18 @@ const UserSetup = () => {
         <div>
           <div className="mb-4 text-center text-xl">All good for now! Thanks!</div>
           <div className="flex flex-row justify-evenly">
-            <Link
-              href={"/downloads"}
-              className="rounded-md border border-zinc-600 px-4 py-2 text-center text-zinc-600 hover:bg-zinc-500 active:bg-zinc-600 dark:border-zinc-100 dark:text-zinc-100"
-            >
-              Jump to Downloads
-            </Link>
-            <Link
-              href={"/app"}
-              className="rounded-md border border-zinc-600 px-4 py-2 text-center text-zinc-600 hover:bg-zinc-500 active:bg-zinc-600 dark:border-zinc-100 dark:text-zinc-100"
-            >
-              Continue to Web App
-            </Link>
-          </div>
-          <div className="flex justify-center">
-            <div className="my-4 text-lg">Join a few a servers</div>
-            <div></div>
+            <Tooltip content="Coming soon!">
+              <Button auto color={"secondary"} disabled>
+                <Link href={"/downloads"} className="px-4 py-2 text-white">
+                  Jump to Downloads
+                </Link>
+              </Button>
+            </Tooltip>
+            <Button auto color={"gradient"}>
+              <Link href={"/app"} className="px-4 py-2 text-white">
+                Continue to Web App
+              </Link>
+            </Button>
           </div>
         </div>
       );
@@ -334,10 +366,59 @@ const UserSetup = () => {
         <meta name="description" content="Account Set Up" />
       </Head>
       <Navbar switchRef={switchRef} />
-      <div className="flex h-screen flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-800">
-        <div className="-mt-24 mb-12 text-3xl">Lets Get a Few Things Set Up...</div>
-        <div className="fade-in min-h-96 w-5/6 rounded-lg bg-zinc-300 p-4 shadow-xl dark:bg-zinc-700 md:w-2/3 lg:w-1/2 xl:w-2/5">
-          {contextualContentRenderer()}
+      <div className="flex h-screen justify-center overflow-y-scroll bg-zinc-50 pt-24 dark:bg-zinc-800">
+        <div className="w-full">
+          <div className="flex justify-center pb-12 text-3xl">Lets Get a Few Things Set Up...</div>
+          <div className="fade-in min-h-96 mx-auto w-5/6 rounded-lg bg-purple-50 p-4 shadow-xl dark:bg-zinc-700 md:w-2/3 lg:w-1/2 xl:w-2/5">
+            {contextualContentRenderer()}
+          </div>
+          {step == 2 ? (
+            <div className="w-screen pt-8">
+              <div className="flex justify-center px-2 pt-2">
+                <Input
+                  ref={searchInputRef}
+                  aria-label="search input"
+                  type="search"
+                  className="w-24 text-xs"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onFocus={() => {
+                    loadServerSearchData();
+                    setShowSearch(true);
+                  }}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  contentLeft={<SearchIcon height={12} width={12} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} />}
+                />
+                {showSearch && userSearchData && searchTerm.length > 2 ? (
+                  <div className="flex justify-center">
+                    <div className="fixed w-48 " ref={searchResultsRef}>
+                      <Search userInput={searchTerm} select={showSelectedServer} />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <div className="mx-auto text-center text-lg">Join a few a servers</div>
+              <div className="pt-4">
+                <div className="mx-auto flex w-1/2 overflow-x-scroll">
+                  {publicServers?.map((publicServer) => (
+                    <div key={publicServer.id} className="px-4">
+                      <div className="rounded-lg shadow-lg">
+                        <ServerCard
+                          logo={publicServer.logo_url ? publicServer.logo_url : ""}
+                          banner={publicServer.banner_url ? publicServer.banner_url : ""}
+                          name={publicServer.name}
+                          blurb={publicServer.blurb ? publicServer.blurb : ""}
+                          members={0}
+                          membersOnline={0}
+                          serverID={publicServer.id}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </>

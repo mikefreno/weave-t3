@@ -2,11 +2,7 @@ import { Server } from "@prisma/client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-const ServerMainScreen = (props: {
-  usersServers: Server[] | undefined;
-  selectedInnerTabID: number;
-  selectedServer: Server | null;
-}) => {
+const ServerMainScreen = (props: { usersServers: Server[] | undefined; selectedServer: Server | null }) => {
   const { usersServers, selectedServer } = props;
 
   return (
@@ -28,9 +24,11 @@ const ServerMainScreen = (props: {
             Welcome to <span className="tracking-wider underline underline-offset-4">{selectedServer?.name}</span>
           </div>
           <div className="py-4">- {selectedServer?.blurb}</div>
-          <div className="mx-auto py-4">
-            <img src={selectedServer?.logo_url as string} className="h-32 w-32 md:h-64 md:w-64" />
-          </div>
+          {selectedServer?.logo_url ? (
+            <div className="mx-auto py-4">
+              <img src={selectedServer?.logo_url as string} className="h-32 w-32 md:h-64 md:w-64" />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

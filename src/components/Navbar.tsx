@@ -29,9 +29,9 @@ type UserData = User & {
 const Navbar = (props: {
   switchRef?: React.RefObject<HTMLDivElement>;
   currentTabSetter?: (tab: string) => void;
-  setSelectedInnerTab?: (innerTab: string) => void;
+  innerTabSetter?: (input: string) => void;
 }) => {
-  const { setSelectedInnerTab, currentTabSetter } = props;
+  const { currentTabSetter } = props;
 
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -254,7 +254,7 @@ const Navbar = (props: {
             </ul>
           </div>
         </div>
-        <div className={pathname == "/app" ? "my-2" : "my-2 md:hidden"}>
+        <div className={pathname == "/app" ? "my-2 hidden md:block" : "my-2 md:hidden"}>
           <div className="z-10 my-auto flex justify-end px-4 text-lg" ref={props.switchRef}>
             <Switch
               checked={isDarkTheme}
@@ -287,7 +287,7 @@ const Navbar = (props: {
               status={status}
               isDarkTheme={isDarkTheme}
               currentTabSetter={currentTabSetter}
-              setSelectedInnerTab={setSelectedInnerTab}
+              innerTabSetter={props.innerTabSetter}
               setMenuOpen={setMenuOpen}
             />
           ) : null}
