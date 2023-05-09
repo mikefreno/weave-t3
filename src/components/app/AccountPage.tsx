@@ -34,7 +34,6 @@ const AccountPage = (props: {
     memberships: Server_Member[];
     adminships: Server_Admin[];
   };
-  fullscreen: boolean;
 }) => {
   const { triggerUserRefresh, currentUser, timestamp, setTimestamp } = props;
   const { isDarkTheme } = useContext(ThemeContext);
@@ -444,7 +443,7 @@ const AccountPage = (props: {
     <div className="h-screen w-full overflow-y-scroll bg-zinc-100 dark:bg-zinc-700 md:flex">
       <div id="settings-tabs flex" ref={settingMenuRef}>
         <div className="fixed z-50 flex w-full flex-row justify-end px-4 py-4 text-xl tracking-wide underline underline-offset-4 md:w-fit md:justify-start">
-          <div className={`${props.fullscreen ? "pl-8" : ""} flex`}>
+          <div className="flex">
             <button className="z-50 flex md:cursor-default" onClick={toggleSettingsMenu}>
               <div className="flex">Settings Menu</div>
               <div

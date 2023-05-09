@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import jwt from "jsonwebtoken";
 import { User, type Server } from "@prisma/client";
+import * as SibApiV3Sdk from "@sendinblue/client";
 
 export const serverRouter = createTRPCRouter({
   createServer: protectedProcedure
@@ -95,11 +96,11 @@ export const serverRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const apiKey = process.env.SENDINBLUE_KEY as string;
-      const apiUrl = "https://api.sendinblue.com/v3/smtp/email";
+      const apiUrl = "https://api.brevo.com/v3/smtp/email";
 
       const sendinblueData = {
         sender: {
-          name: "Weave Website Contact",
+          name: "Weave Server Invite",
           email: "no_reply@weavechat.net",
         },
         to: [
@@ -115,6 +116,7 @@ export const serverRouter = createTRPCRouter({
         },
         subject: `Invitation to join ${input.serverName}`,
       };
+
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: {

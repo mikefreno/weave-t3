@@ -38,7 +38,6 @@ interface ChannelMainProps {
     adminships: Server_Admin[];
   };
   socket: WebSocket | null;
-  fullscreen: boolean;
   serverReactions: string | null | undefined;
 }
 const UsersCommentClass =
@@ -47,7 +46,7 @@ const OtherCommentsClass =
   "bg-zinc-100 shadow-lg relative dark:bg-zinc-800 dark:shadow-zinc-700 rounded-2xl py-5 pr-6 pl-8 max-w-[75%]";
 
 export default function ChatChannel(props: ChannelMainProps) {
-  const { selectedChannel, currentUser, socket, fullscreen, serverReactions } = props;
+  const { selectedChannel, currentUser, socket, serverReactions } = props;
   const { isDarkTheme } = useContext(ThemeContext);
   //state
   const [height, setHeight] = useState<number>();
@@ -252,16 +251,12 @@ export default function ChatChannel(props: ChannelMainProps) {
   return (
     <>
       <div className="">
-        <div
-          className={`${
-            fullscreen ? "w-screen" : "w-full"
-          } scrollXDisabled h-screen rounded bg-zinc-50 transition-colors duration-300 ease-in-out dark:bg-zinc-900`}
-        >
+        <div className="scrollXDisabled h-screen w-full rounded bg-zinc-50 transition-colors duration-300 ease-in-out dark:bg-zinc-900">
           <div ref={bannerRef}>
-            <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} fullscreen={fullscreen} />
+            <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} />
           </div>
           <div className="flex h-screen flex-col justify-end">
-            <ul className={`${fullscreen ? "w-screen" : "w-full"} overflow-y-scroll px-4 pb-24 pt-14`}>
+            <ul className="w-full overflow-y-scroll px-4 pb-24 pt-14">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -343,7 +338,7 @@ export default function ChatChannel(props: ChannelMainProps) {
               <div ref={bottomRef} />
             </ul>
           </div>
-          <div ref={inputDivRef} className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}>
+          <div ref={inputDivRef} className="fixed bottom-0 w-full">
             <div className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>

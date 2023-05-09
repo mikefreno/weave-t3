@@ -9,8 +9,8 @@ import { Button, Tooltip } from "@nextui-org/react";
 import AddFriendIcon from "@/src/icons/AddFriendIcon";
 import { api } from "@/src/utils/api";
 
-export default function TopBanner(props: { selectedChannel: Server_Channel; fullscreen: boolean }) {
-  const { selectedChannel, fullscreen } = props;
+export default function TopBanner(props: { selectedChannel: Server_Channel }) {
+  const { selectedChannel } = props;
 
   const { isDarkTheme } = useContext(ThemeContext);
 
@@ -44,14 +44,8 @@ export default function TopBanner(props: { selectedChannel: Server_Channel; full
   };
 
   return (
-    <div
-      className={`fixed top-0 z-10 my-auto h-14 ${fullscreen ? "w-screen" : "w-full"} bg-purple-400 dark:bg-zinc-700`}
-    >
-      <div
-        className={`${
-          fullscreen ? "pl-16" : "pl-6"
-        } flex items-center pt-3 text-xl underline underline-offset-8 md:pl-6`}
-      >
+    <div className="fixed top-0 z-10 my-auto h-14 w-full bg-purple-400 dark:bg-zinc-700">
+      <div className="flex items-center pl-12 pt-3 text-xl underline underline-offset-8 md:pl-6">
         {selectedChannel.type == "audio" ? (
           <SpeakerOn height={36} width={36} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
         ) : selectedChannel.type == "text" ? (

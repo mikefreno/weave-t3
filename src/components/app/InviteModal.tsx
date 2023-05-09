@@ -28,7 +28,8 @@ const InviteModal = (props: {
   const sendServerInvite = api.server.sendServerInvite.useMutation({});
   const userCheck = api.server.checkForMemberEmail.useMutation({});
 
-  const sendEmail = async () => {
+  const sendEmail = async (e: any) => {
+    e.preventDefault();
     if (invitee.current) {
       const email = invitee.current.value;
       const token = await createJWTInvite.mutateAsync({
@@ -43,6 +44,7 @@ const InviteModal = (props: {
           serverID: props.serverID,
         });
         if (res === false) {
+          console.log(token);
           await sendServerInvite.mutateAsync({
             invitee: invitee.current.value,
             token: token as string,
@@ -108,36 +110,38 @@ const InviteModal = (props: {
               <Xmark className="text-zinc-800 dark:text-zinc-200" />
             </button>
             <div className="-mt-6 pb-4 text-center text-2xl">Send an Invite</div>
-            <div className="mt-6 flex justify-center">
-              <div className="mx-4 my-auto">Send by email</div>
-              <Input
-                id="invitee-input"
-                ref={invitee}
-                labelPlaceholder="Enter an email..."
-                contentClickable
-                underlined
-                type={"email"}
-                contentRight={
-                  <button
-                    className="absolute cursor-pointer rounded-full"
-                    onClick={() => {
-                      sendEmail();
-                    }}
-                  >
-                    {emailSendLoading ? (
-                      <Loading size="xs" />
-                    ) : (
-                      <div className={iconClass}>
-                        <SendIcon height={12} strokeWidth={1} width={12} color={isDarkTheme ? "#e4e4e7" : "#27272a"} />
-                      </div>
-                    )}
-                  </button>
-                }
-              />
-            </div>
+            <form onSubmit={sendEmail}>
+              <div className="mt-6 flex justify-center">
+                <div className="mx-4 my-auto">Send by email</div>
+                <Input
+                  id="invitee-input"
+                  ref={invitee}
+                  labelPlaceholder="Enter an email..."
+                  contentClickable
+                  underlined
+                  type={"email"}
+                  contentRight={
+                    <button className="absolute cursor-pointer rounded-full" type="submit">
+                      {emailSendLoading ? (
+                        <Loading size="xs" />
+                      ) : (
+                        <div className={iconClass}>
+                          <SendIcon
+                            height={12}
+                            strokeWidth={1}
+                            width={12}
+                            color={isDarkTheme ? "#e4e4e7" : "#27272a"}
+                          />
+                        </div>
+                      )}
+                    </button>
+                  }
+                />
+              </div>
+            </form>
             <div className="mb-6 pt-1 text-center text-sm">
               {emailSendReport === "Email Sent!" ? (
-                <div>
+                <div className="pl-24">
                   {emailSendReport}{" "}
                   <button
                     className="hover:underline"
@@ -151,7 +155,6 @@ const InviteModal = (props: {
                 </div>
               ) : emailSendReport === "User Exists!" ? (
                 <div>
-                  {" "}
                   <div>
                     {emailSendReport}{" "}
                     <button

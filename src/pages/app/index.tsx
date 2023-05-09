@@ -61,7 +61,7 @@ const App = () => {
   const [loadingOverlayShowing, setLoadingOverlayShowing] = useState(false);
   const [inviteModalShowing, setInviteModalShowing] = useState(false);
   const [createChannelModalShowing, setCreateChannelModalShowing] = useState(false);
-  const [fullscreen, setFullscreen] = useState<boolean>(true);
+  const [showingNav, setShowingNav] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<
     User & {
       servers: Server[];
@@ -162,19 +162,19 @@ const App = () => {
 
   useOnClickOutside([innerNavRef, smallScreenMenuBarsRef], () => {
     if (width && width < 768) {
-      setFullscreen(true);
+      setShowingNav(false);
     }
   });
 
   useEffect(() => {
     if (width && width < 768) {
-      setFullscreen(true);
+      setShowingNav(false);
     }
-  }, []);
+  }, [width]);
 
   useEffect(() => {
     if (width && width > 768) {
-      setFullscreen(false);
+      setShowingNav(true);
     }
   }, [width]);
 
@@ -307,8 +307,8 @@ const App = () => {
   };
 
   //toggles
-  const fullscreenToggle = () => {
-    setFullscreen(!fullscreen);
+  const navToggle = () => {
+    setShowingNav(!showingNav);
   };
   const userProfileModalToggle = () => {
     setSearchedUser(null);
@@ -423,7 +423,20 @@ const App = () => {
       </Head>
       <Navbar switchRef={switchRef} currentTabSetter={currentTabSetter} innerTabSetter={innerTabSetter} />
       <div id="app-body" className={`flex h-screen w-screen`}>
-        <div className={`${fullscreen ? "-translate-x-72" : ""} transform transition-all duration-500 ease-in-out`}>
+        <div
+          className={`${
+            showingNav ? "translate-x-44" : ""
+          } absolute z-[1000] transform px-2 py-4 transition-all duration-700 ease-in-out md:hidden`}
+        >
+          <button onClick={navToggle} ref={smallScreenMenuBarsRef}>
+            <MenuBarsMobile stroke={isDarkTheme ? "white" : "black"} showingNav={showingNav} />
+          </button>
+        </div>
+        <div
+          className={`${
+            showingNav ? "" : "-translate-x-96"
+          } z-50 flex transform transition-all duration-500 ease-in-out`}
+        >
           <div id="outer-nav" className="flex">
             <SideNav
               channelSetter={channelSetter}
@@ -441,7 +454,7 @@ const App = () => {
               innerTabSetter={innerTabSetter}
             />
           </div>
-          <div id="inner-nav" className="md:ml-20" ref={innerNavRef}>
+          <div id="inner-nav" className="flex md:ml-20" ref={innerNavRef}>
             <InnerNav
               serverSetter={serverSetter}
               botModalToggle={botModalToggle}
@@ -476,30 +489,23 @@ const App = () => {
               requestedConversationID={requestedConversationID}
               setConversationPage={setConversationPage}
               serverID={selectedServer?.id}
+              navToggle={navToggle}
             />
           </div>
         </div>
         <div
           id="center-page"
           ref={scrollableRef}
-          className={
-            !fullscreen
-              ? `ml-44 flex-1 transform transition-all duration-700 ease-in-out md:ml-52`
-              : "flex-1 transform transition-all duration-700 ease-in-out md:-ml-20"
-          }
+          className={`flex-1 transform transition-all duration-700 ease-in-out md:ml-52 ${
+            showingNav && width && width < 768 ? "blur-[2px] brightness-75" : ""
+          }`}
         >
-          <div className={`absolute z-[1000] px-2 py-4 md:hidden  ${!fullscreen ? "-ml-10" : null}`}>
-            <button onClick={fullscreenToggle} ref={smallScreenMenuBarsRef}>
-              <MenuBarsMobile stroke={isDarkTheme ? "white" : "black"} fullscreen={fullscreen} />
-            </button>
-          </div>
           {selectedInnerTab === "AccountOverview" ? (
             <AccountPage
               triggerUserRefresh={triggerUserRefresh}
               currentUser={currentUser}
               setTimestamp={setTimestamp}
               timestamp={timestamp}
-              fullscreen={fullscreen}
             />
           ) : null}
 
@@ -510,7 +516,6 @@ const App = () => {
                 currentUser={currentUser}
                 setConversationPage={setConversationPage}
                 requestedConversationID={requestedConversationID}
-                fullscreen={fullscreen}
                 triggerDMRefetch={triggerDMRefetch}
                 conversations={conversations}
                 friendRequests={friendRequests}
@@ -530,11 +535,7 @@ const App = () => {
             selectedInnerTab === "Science & Technology" ||
             selectedInnerTab === "Made By Weave") ? (
             <div className="">
-              <PublicServersPages
-                selectedInnerTab={selectedInnerTab}
-                refreshUserServers={refreshUserServers}
-                fullscreen={fullscreen}
-              />
+              <PublicServersPages selectedInnerTab={selectedInnerTab} refreshUserServers={refreshUserServers} />
             </div>
           ) : null}
           {currentTab === "server" && usersServers ? (
@@ -544,7 +545,6 @@ const App = () => {
                   selectedChannel={selectedChannel}
                   currentUser={currentUser}
                   socket={socket}
-                  fullscreen={fullscreen}
                   serverReactions={selectedServer?.emojiReactions}
                 />
               ) : selectedChannel.type === "video" ? (
@@ -556,7 +556,6 @@ const App = () => {
                   audioState={audioState}
                   audioToggle={audioToggle}
                   microphoneToggle={microphoneToggle}
-                  fullscreen={fullscreen}
                   socketChannelUpdate={socketChannelUpdate}
                 />
               ) : selectedChannel.type === "audio" ? (
@@ -568,7 +567,6 @@ const App = () => {
                   audioState={audioState}
                   audioToggle={audioToggle}
                   microphoneToggle={microphoneToggle}
-                  fullscreen={fullscreen}
                   socketChannelUpdate={socketChannelUpdate}
                 />
               ) : null

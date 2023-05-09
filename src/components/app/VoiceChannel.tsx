@@ -17,7 +17,6 @@ interface VoiceChannelProps {
   audioState: boolean;
   audioToggle: () => void;
   microphoneToggle: () => void;
-  fullscreen: boolean;
   socketChannelUpdate: () => Promise<void>;
 }
 
@@ -26,7 +25,7 @@ const constraints = {
 };
 
 export default function VoiceChannel(props: VoiceChannelProps) {
-  const { selectedChannel, currentUser, socket, microphoneState, audioState, fullscreen, socketChannelUpdate } = props;
+  const { selectedChannel, currentUser, socket, microphoneState, audioState, socketChannelUpdate } = props;
   //state
   const [userJoined, setUserJoined] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
@@ -336,10 +335,10 @@ export default function VoiceChannel(props: VoiceChannelProps) {
 
   return (
     <div className="">
-      <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} fullscreen={fullscreen} />
+      <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} />
       <div
         className={`scrollXDisabled h-screen overflow-y-hidden rounded bg-zinc-50 pt-14 dark:bg-zinc-900`}
-        style={{ width: fullscreen ? "100vw" : bodySizing }}
+        style={{ width: bodySizing }}
       >
         <div className="pt-8 text-center text-lg">
           {webSocketsInCall && webSocketsInCall?.length !== 0 ? "Currently in Channel:" : "No one's here... yet"}

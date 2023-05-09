@@ -36,6 +36,7 @@ const SideNavSmallScreen = (props: {
   channelSetter: (input: Server_Channel | null) => void;
   serverModalToggle: any;
   serverSetter: (server: Server) => void;
+  navToggle: () => void;
 }) => {
   const {
     currentTabSetter,
@@ -81,10 +82,12 @@ const SideNavSmallScreen = (props: {
   const botModalTrigger = () => {
     botModalToggle();
     setNavDropDownShowing(false);
+    props.navToggle();
   };
   const serverModalTrigger = () => {
     serverModalToggle();
     setNavDropDownShowing(false);
+    props.navToggle();
   };
   const toggleMenu = () => {
     setMenuShowing(!menuShowing);
@@ -98,7 +101,7 @@ const SideNavSmallScreen = (props: {
   };
 
   return (
-    <div className="md:hidden">
+    <div className="z-[1000] md:hidden">
       <button
         ref={navDropdownButton}
         className="absolute z-[1000] ml-2 mt-3 flex rounded bg-purple-200 px-4 py-2 hover:bg-purple-300 active:bg-purple-400 dark:bg-zinc-900 dark:hover:bg-zinc-700 dark:active:bg-zinc-600"
@@ -111,10 +114,10 @@ const SideNavSmallScreen = (props: {
       </button>
       <div className="flex justify-center">
         {navDropDownShowing ? (
-          <div className="stopIT fade-in scrollXDisabled absolute z-50 h-screen overflow-y-scroll px-8 backdrop-blur">
+          <div className="stopIT fade-in scrollXDisabled absolute z-50 h-screen overflow-y-scroll px-10 backdrop-blur">
             <div
               ref={navDropdownRef}
-              className="mb-4 w-28 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
+              className="mb-4 w-32 rounded-lg bg-purple-700 shadow-2xl dark:bg-zinc-900 md:hidden"
             >
               <div className="mt-16 flex justify-center border-b border-zinc-200 py-4 dark:border-zinc-600">
                 <Tooltip
@@ -256,7 +259,7 @@ const SideNavSmallScreen = (props: {
             </div>
           </div>
         ) : null}
-        <div className="absolute bottom-12 z-40 flex w-full justify-evenly pr-4">
+        <div className="absolute bottom-2 z-40 -ml-14 flex w-full justify-evenly">
           <div>
             <button onClick={toggleMenu} className="">
               <div className={`${menuShowing ? "rotate-90" : "-rotate-90"} transition-all duration-500 ease-in-out`}>
@@ -264,7 +267,7 @@ const SideNavSmallScreen = (props: {
               </div>
             </button>
           </div>
-          <div className="my-auto pr-4">
+          <div className="my-auto pr-8">
             <Switch
               checked={isDarkTheme}
               shadow
@@ -278,7 +281,9 @@ const SideNavSmallScreen = (props: {
           </div>
         </div>
         <div
-          className={`absolute bottom-12 z-30 transition-all duration-500 ${menuShowing ? "" : "-translate-x-[120%]"} `}
+          className={`absolute bottom-2 z-30 -ml-14 transition-all duration-500 ${
+            menuShowing ? "" : "-translate-x-[120%]"
+          } `}
         >
           <div
             className={`${nunito_200} -ml-6 rounded-r-2xl border border-zinc-400 bg-zinc-50 shadow-xl dark:border-zinc-500 dark:bg-zinc-900`}

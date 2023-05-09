@@ -9,11 +9,10 @@ import ServerCard from "./ServerCard";
 interface PublicServersPagesProps {
   selectedInnerTab: string;
   refreshUserServers: () => void;
-  fullscreen: boolean;
 }
 
 export default function PublicServersPages(props: PublicServersPagesProps) {
-  const { selectedInnerTab, refreshUserServers, fullscreen } = props;
+  const { selectedInnerTab, refreshUserServers } = props;
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { isDarkTheme } = useContext(ThemeContext);
@@ -34,7 +33,7 @@ export default function PublicServersPages(props: PublicServersPagesProps) {
     <>
       <div className="">
         <div className="scrollXDisabled h-screen rounded bg-zinc-50 dark:bg-zinc-900">
-          <div className={`fixed z-20 ${fullscreen ? "w-screen" : "w-full"}`}>
+          <div className={`fixed z-20 w-full`}>
             <div className="mx-auto -mt-24 h-64 rounded-md bg-[url('/Forest-painting.png')] bg-cover bg-center bg-no-repeat pt-24 md:h-96"></div>
           </div>
           <div id="spacer" className="mt-52 pt-6 md:mt-72"></div>

@@ -49,7 +49,6 @@ interface DMPagesProps {
   };
   setConversationPage: (conversationID: number) => void;
   requestedConversationID: number | null;
-  fullscreen: boolean;
   triggerDMRefetch: () => void;
   conversations:
     | (Conversation & {
@@ -98,7 +97,6 @@ export default function DMPages(props: DMPagesProps) {
     selectedInnerTab,
     currentUser,
     setConversationPage,
-    fullscreen,
     triggerDMRefetch,
     selectedConversation,
     friendshipList,
@@ -327,9 +325,8 @@ export default function DMPages(props: DMPagesProps) {
               description: conversedUser.id,
               type: "friend",
             }}
-            fullscreen={fullscreen}
           />
-          <ul className={`${fullscreen ? "w-screen" : "w-full"} overflow-y-scroll px-4 pb-24 pt-14`}>
+          <ul className="w-full overflow-y-scroll px-4 pb-24 pt-14">
             {directMessages.map((message) => (
               <div
                 key={message.id}
@@ -370,7 +367,7 @@ export default function DMPages(props: DMPagesProps) {
             ))}
             <div ref={bottomRef} />
           </ul>
-          <div className={`fixed bottom-0 ${fullscreen ? "w-screen" : "w-full"}`}>
+          <div className="fixed bottom-0 w-full">
             <div className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
               <div className="mx-auto p-4">
                 <form onSubmit={sendMessage}>

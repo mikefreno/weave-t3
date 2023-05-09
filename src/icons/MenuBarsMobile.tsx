@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function MenuBarsMobile(props: { stroke: string | undefined; fullscreen: boolean }) {
+export default function MenuBarsMobile(props: { stroke: string | undefined; showingNav: boolean }) {
   return (
     <div>
       <svg width="36" height="30" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,7 +16,7 @@ export default function MenuBarsMobile(props: { stroke: string | undefined; full
               stroke={props.stroke}
               strokeWidth="6"
               strokeLinecap="round"
-              className={props.fullscreen ? "" : "LineA"}
+              className={props.showingNav ? "LineA" : ""}
             />
             <line
               id="LineBMobile"
@@ -27,7 +27,7 @@ export default function MenuBarsMobile(props: { stroke: string | undefined; full
               stroke={props.stroke}
               strokeWidth="6"
               strokeLinecap="round"
-              className={props.fullscreen ? "" : "LineB"}
+              className={props.showingNav ? "LineB" : ""}
             />
           </g>
         </g>
