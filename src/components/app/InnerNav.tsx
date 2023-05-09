@@ -459,7 +459,9 @@ const InnerNav = (props: InnerNavProps) => {
                                   strokeWidth={0.5}
                                 />
                               </span>
-                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis text-left">{channel.name}</div>
+                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis whitespace-nowrap text-left">
+                                {channel.name}
+                              </div>
                             </button>
                           </div>
                         ))}
@@ -494,7 +496,9 @@ const InnerNav = (props: InnerNavProps) => {
                                   color={isDarkTheme ? "#e4e4e7" : "#27272a"}
                                 />
                               </span>
-                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis text-left">{channel.name}</div>
+                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis whitespace-nowrap text-left">
+                                {channel.name}
+                              </div>
                             </button>
                           </div>
                         ))}
