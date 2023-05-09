@@ -405,7 +405,7 @@ const InnerNav = (props: InnerNavProps) => {
                       <div className="pb-4">
                         <div className="rule-around -mx-4 text-center text-sm">Text Channels</div>
                         {filteredChannels?.map((channel) => (
-                          <div className="my-2" key={channel.id}>
+                          <div className="my-2 w-full" key={channel.id}>
                             <button
                               onClick={() => channelSetter(channel)}
                               className={`flex h-10 w-full rounded-md border border-zinc-300 bg-zinc-100 px-2 hover:bg-zinc-200 active:bg-zinc-300 ${
@@ -422,7 +422,9 @@ const InnerNav = (props: InnerNavProps) => {
                                   color={isDarkTheme ? "#e4e4e7" : "#27272a"}
                                 />
                               </span>
-                              <div className="my-auto ml-4 text-left">{channel.name}</div>
+                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis whitespace-nowrap text-left">
+                                {channel.name}
+                              </div>
                             </button>
                           </div>
                         ))}
@@ -457,7 +459,7 @@ const InnerNav = (props: InnerNavProps) => {
                                   strokeWidth={0.5}
                                 />
                               </span>
-                              <div className="my-auto ml-4 text-left">{channel.name}</div>
+                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis text-left">{channel.name}</div>
                             </button>
                           </div>
                         ))}
@@ -492,7 +494,7 @@ const InnerNav = (props: InnerNavProps) => {
                                   color={isDarkTheme ? "#e4e4e7" : "#27272a"}
                                 />
                               </span>
-                              <div className="my-auto ml-4 text-left">{channel.name}</div>
+                              <div className="my-auto ml-3 w-4/5 overflow-ellipsis text-left">{channel.name}</div>
                             </button>
                           </div>
                         ))}
