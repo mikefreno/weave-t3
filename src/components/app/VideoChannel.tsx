@@ -4,6 +4,7 @@ import { Server_Channel, Server, Server_Member, Server_Admin, User, WSConnection
 import { useEffect, useRef, useState } from "react";
 import TopBanner from "./TopBanner";
 import VideoElement from "./VideoElement";
+import { message } from "@/src/types/types";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
@@ -82,65 +83,66 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const socketOnMessage = () => {
     if (socket) {
       socket.onmessage = async (event) => {
-        const data = JSON.parse(event.data);
-        console.log(data);
-        const senderID = data.userID as string;
-        const sendingConnection = peerConnections.current?.get(senderID);
+        const data = JSON.parse(event.data) as message | null;
+        if (data && data.userID && data.type) {
+          const senderID = data.userID;
+          const sendingConnection = peerConnections.current?.get(senderID);
 
-        switch (data.type) {
-          case "join":
-            await connectedWSQuery.refetch();
-            break;
+          switch (data.type) {
+            case "join":
+              await connectedWSQuery.refetch();
+              break;
 
-          case "offer":
-            console.log("receive offer");
-            await addPeer(senderID, false);
-            const newPeer = peerConnections.current.get(senderID);
-            if (newPeer) {
-              await newPeer.setRemoteDescription(new RTCSessionDescription(data.offer));
-              const answer = await newPeer.createAnswer();
-              await newPeer.setLocalDescription(answer);
-              console.log("Sending answer");
-              socket.send(
-                JSON.stringify({
-                  action: "audio",
-                  type: "answer",
-                  userID: currentUser.id,
-                  targetUserID: senderID,
-                  answer: newPeer.localDescription,
-                })
-              );
-            } else {
-              console.error("Peer Creation Failed!");
-              console.log(peerConnections.current);
-            }
-
-            break;
-          case "answer":
-            console.log("receive answer");
-            if (sendingConnection) {
-              await sendingConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-            } else {
-              console.error("Peer Creation Failed!");
-              console.log(peerConnections.current);
-            }
-            break;
-
-          case "ice-candidate":
-            console.log("received ice candidate");
-            if (sendingConnection) {
-              if (sendingConnection.remoteDescription) {
-                await sendingConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            case "offer":
+              console.log("receive offer");
+              await addPeer(senderID, false);
+              const newPeer = peerConnections.current.get(senderID);
+              if (newPeer && data.offer) {
+                await newPeer.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const answer = await newPeer.createAnswer();
+                await newPeer.setLocalDescription(answer);
+                console.log("Sending answer");
+                socket.send(
+                  JSON.stringify({
+                    action: "audio",
+                    type: "answer",
+                    userID: currentUser.id,
+                    targetUserID: senderID,
+                    answer: newPeer.localDescription,
+                  })
+                );
               } else {
-                console.error("Remote description is not set yet. Ignoring ICE candidate.");
+                console.error("Peer Creation Failed!");
+                console.log(peerConnections.current);
               }
-            }
-            break;
 
-          case "leave":
-            removePeer(senderID);
-            await connectedWSQuery.refetch();
-            break;
+              break;
+            case "answer":
+              console.log("receive answer");
+              if (sendingConnection && data.answer) {
+                await sendingConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+              } else {
+                console.error("Peer Creation Failed!");
+                console.log(peerConnections.current);
+              }
+              break;
+
+            case "ice-candidate":
+              console.log("received ice candidate");
+              if (sendingConnection) {
+                if (sendingConnection.remoteDescription && data.candidate) {
+                  await sendingConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                } else {
+                  console.error("Remote description is not set yet. Ignoring ICE candidate.");
+                }
+              }
+              break;
+
+            case "leave":
+              removePeer(senderID);
+              await connectedWSQuery.refetch();
+              break;
+          }
         }
       };
     }

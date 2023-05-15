@@ -326,47 +326,51 @@ export default function DMPages(props: DMPagesProps) {
               type: "friend",
             }}
           />
-          <ul className="w-full overflow-y-scroll px-4 pb-24 pt-14">
-            {directMessages.map((message) => (
-              <div
-                key={message.id}
-                className={message.senderID === currentUser.id ? "flex justify-end py-4 pr-9" : "flex py-4"}
-              >
+          <div className="flex h-screen flex-col justify-end">
+            <ul className="w-full overflow-y-scroll px-4 pb-24 pt-14">
+              {directMessages.map((message) => (
                 <div
-                  className={message.senderID === currentUser.id ? UsersCommentClass : OtherCommentsClass}
-                  onClick={() => updateClickedMap(message.id)}
+                  key={message.id}
+                  className={message.senderID === currentUser.id ? "flex justify-end py-4 pr-9" : "flex py-4"}
                 >
-                  <div className={`${message.senderID === currentUser.id ? "text-right" : "text-left"} relative w-fit`}>
-                    {message.message}
+                  <div
+                    className={message.senderID === currentUser.id ? UsersCommentClass : OtherCommentsClass}
+                    onClick={() => updateClickedMap(message.id)}
+                  >
+                    <div
+                      className={`${message.senderID === currentUser.id ? "text-right" : "text-left"} relative w-fit`}
+                    >
+                      {message.message}
+                    </div>
+                    {messageClickedMap.get(message.id) && currentUser.id !== message.senderID ? (
+                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg ">
+                        <div className="flex">
+                          {usersEmojiArray.map((emojiName: string, index) => (
+                            <div className="flex p-1" key={index}>
+                              <button onClick={() => giveReaction(emojiName, message.id)}>
+                                <div className="h-7 w-7">{returnEmoji(emojiName)}</div>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg">
+                        <div className="flex">
+                          {message.reactions.map((reaction) => (
+                            <div className="flex px-2" key={reaction.id}>
+                              <div className="h-7 w-7">{returnEmoji(reaction.type)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  {messageClickedMap.get(message.id) && currentUser.id !== message.senderID ? (
-                    <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg ">
-                      <div className="flex">
-                        {usersEmojiArray.map((emojiName: string, index) => (
-                          <div className="flex p-1" key={index}>
-                            <button onClick={() => giveReaction(emojiName, message.id)}>
-                              <div className="h-7 w-7">{returnEmoji(emojiName)}</div>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg">
-                      <div className="flex">
-                        {message.reactions.map((reaction) => (
-                          <div className="flex px-2" key={reaction.id}>
-                            <div className="h-7 w-7">{returnEmoji(reaction.type)}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
-            <div ref={bottomRef} />
-          </ul>
+              ))}
+              <div ref={bottomRef} />
+            </ul>
+          </div>
           <div className="fixed bottom-0 w-full">
             <div className="bg-zinc-100 pb-4 dark:bg-zinc-700 md:pb-0">
               <div className="mx-auto p-4">

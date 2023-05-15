@@ -28,7 +28,6 @@ import TongueEmoji from "@/src/icons/emojis/Tongue.svg";
 import UpsideDownEmoji from "@/src/icons/emojis/UpsideDown.svg";
 import WorriedEmoji from "@/src/icons/emojis/Worried.svg";
 import AdjustableLoadingElement from "../AdjustableLoadingElement";
-import { comment } from "postcss";
 
 interface ChannelMainProps {
   selectedChannel: Server_Channel;
@@ -72,7 +71,7 @@ export default function ChatChannel(props: ChannelMainProps) {
 
   //trpc (api)
   const getMessagesQuery = api.server.getChannelComments.useQuery(selectedChannel.id);
-  const commentReactionGivenMutation = api.server.commentReactionGiven.useMutation();
+
   //hooks
   useOnClickOutside([attachmentModalRef, attachmentButtonRef], () => {
     setAttachmentModalShowing(false);
@@ -364,22 +363,14 @@ export default function ChatChannel(props: ChannelMainProps) {
                           />
                         </button>
                         <button type="submit">
-                          {messageSendLoading ? (
-                            <AdjustableLoadingElement
-                              specifiedHeight={18}
-                              specifiedWidth={18}
-                              specifiedSpinnerSize="sm"
+                          <div className={iconClass}>
+                            <SendIcon
+                              height={16}
+                              strokeWidth={1}
+                              width={16}
+                              color={isDarkTheme ? "#e4e4e7" : "#27272a"}
                             />
-                          ) : (
-                            <div className={iconClass}>
-                              <SendIcon
-                                height={16}
-                                strokeWidth={1}
-                                width={16}
-                                color={isDarkTheme ? "#e4e4e7" : "#27272a"}
-                              />
-                            </div>
-                          )}
+                          </div>
                         </button>
                       </div>
                     }

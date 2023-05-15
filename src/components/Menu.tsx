@@ -1,4 +1,4 @@
-import React, { RefObject, useRef, useState } from "react";
+import React, { type RefObject, useRef, useState } from "react";
 import Link from "next/link";
 import { Nunito } from "next/font/google";
 import { Button, Loading, Tooltip } from "@nextui-org/react";
@@ -12,7 +12,7 @@ import DarkLogo from "@/public/Logo - dark.png";
 
 const nunito_200 = Nunito({ weight: "200", subsets: ["latin"] });
 
-const Menu = (props: {
+export default function Menu(props: {
   openLogin: React.MouseEventHandler<HTMLButtonElement>;
   menuRef: RefObject<HTMLDivElement>;
   session: any;
@@ -21,7 +21,7 @@ const Menu = (props: {
   currentTabSetter?: (tab: string) => void;
   setMenuOpen: (open: boolean) => void;
   innerTabSetter?: (input: string) => void;
-}) => {
+}) {
   const { session, status, isDarkTheme, currentTabSetter } = props;
   const pathname = usePathname();
 
@@ -162,6 +162,4 @@ const Menu = (props: {
       </div>
     </div>
   );
-};
-
-export default Menu;
+}

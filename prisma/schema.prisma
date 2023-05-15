@@ -73,7 +73,7 @@ model Server {
   category         String             @default("other")
   public           Boolean            @default(false)
   searchable       Boolean            @default(true)
-  emojiReactions   String             @default("thumbsUp,thumbDown")
+  emojiReactions   String             @default("thumbsUp,thumbsDown")
   weaveCreated     Boolean            @default(false)
   //unlisted in a queue for deletion
   unlisted         Boolean            @default(false)

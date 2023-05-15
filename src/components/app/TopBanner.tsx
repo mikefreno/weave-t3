@@ -51,9 +51,9 @@ export default function TopBanner(props: { selectedChannel: Server_Channel }) {
         ) : selectedChannel.type == "text" ? (
           <CommentsIcon height={36} width={36} color={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
         ) : selectedChannel.type == "video" ? (
-          <VideoCamIcon height={24} width={24} strokeWidth={0.5} color={isDarkTheme ? "#e4e4e7" : "#27272a"} />
+          <VideoCamIcon height={36} width={36} color={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
         ) : (
-          <UserCircle height={24} width={24} strokeWidth={0.5} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} />
+          <UserCircle height={36} width={36} stroke={isDarkTheme ? "#e4e4e7" : "#27272a"} strokeWidth={1} />
         )}
         <div className="z-[1000] mx-6">{channelName}</div>
         {isFriend === false ? (
