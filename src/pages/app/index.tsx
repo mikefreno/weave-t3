@@ -154,6 +154,7 @@ const App = () => {
   useOnClickOutside([serverModalRef, serverButtonRef], () => {
     setServerModalShowing(false);
   });
+
   useOnClickOutside([botModalRef, botButtonRef, switchRef], () => setBotModalShowing(false));
 
   useOnClickOutside([deletionServerButtonRef, deleteConfirmationModalRef], () => {
@@ -422,7 +423,7 @@ const App = () => {
         <meta name="description" content="Weave's Web App" />
       </Head>
       <Navbar switchRef={switchRef} currentTabSetter={currentTabSetter} innerTabSetter={innerTabSetter} />
-      <div id="app-body" className={`flex h-screen w-screen`}>
+      <div id="app-body" className={`flex h-[100dvh] w-screen`}>
         <div
           className={`${
             showingNav ? "translate-x-44" : ""

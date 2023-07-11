@@ -15,22 +15,6 @@ import axios from "axios";
 import Resizer from "react-image-file-resizer";
 import { Server } from "@prisma/client";
 
-const resizeFile = (file: File, extension: string) =>
-  new Promise((resolve) => {
-    Resizer.imageFileResizer(
-      file,
-      200,
-      200,
-      extension,
-      100,
-      0,
-      (uri) => {
-        resolve(uri);
-      },
-      "file"
-    );
-  });
-
 export default function CreateServerModal(props: {
   serverModalToggle: React.MouseEventHandler<HTMLButtonElement>;
   serverModalRef: RefObject<HTMLDivElement>;
@@ -50,7 +34,6 @@ export default function CreateServerModal(props: {
   const [serverPublic, setServerPublic] = useState(false);
   const [serverType, setServerType] = useState<string | null>(null);
   const [serverDescriptionLength, setServerDescriptionLength] = useState(0);
-  const [serverDescriptionColor, setServerDescriptionColor] = useState("default");
   const [searchable, setSearchable] = useState<boolean>(true);
   const [createButtonLoading, setCreateButtonLoading] = useState(false);
   const [serverImageLoading, setServerImageLoading] = useState(false);
@@ -83,11 +66,6 @@ export default function CreateServerModal(props: {
   };
   const descriptionLengthReport = () => {
     setServerDescriptionLength(serverDescriptionRef.current!.value.length);
-    if (serverDescriptionLength >= 150) {
-      setServerDescriptionColor("danger");
-    } else {
-      setServerDescriptionColor("default");
-    }
   };
 
   const createServerRequest = async (event: { preventDefault: () => void }) => {

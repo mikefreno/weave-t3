@@ -18,7 +18,17 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
-
+  emailExistsCheck: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    const res = await ctx.prisma.user.findFirst({
+      where: {
+        email: input,
+      },
+    });
+    if (res) {
+      return true;
+    }
+    return false;
+  }),
   getUserById: protectedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
     return ctx.prisma.user.findFirst({
       where: {

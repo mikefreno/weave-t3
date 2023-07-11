@@ -5,6 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import TopBanner from "./TopBanner";
 import VideoElement from "./VideoElement";
 import { message } from "@/src/types/types";
+import CameraIcon from "@/src/icons/CameraIcon";
+import MicIcon from "@/src/icons/MicIcon";
+import ChevronDown from "@/src/icons/ChevronDown";
 
 interface VoiceChannelProps {
   selectedChannel: Server_Channel;
@@ -26,6 +29,16 @@ const constraints = {
   video: true,
 };
 
+const gridMap = new Map<number, string>([
+  [0, "col-span-1 row-span-1"],
+  [1, "col-span-2 row-span-1 gap-y-2"],
+  [2, "col-span-2 row-span-2 gap-2"],
+  [3, "col-span-2 row-span-2 gap-2"],
+  [4, "col-span-2 row-span-2 gap-2"],
+  [5, "col-span-3 row-span-2 gap-2"],
+  [6, "col-span-3 row-span-2 gap-2"],
+]);
+
 export default function VoiceChannel(props: VoiceChannelProps) {
   // prettier-ignore
   const {selectedChannel, currentUser, socket, microphoneState, audioState, socketChannelUpdate} = props;
@@ -43,14 +56,15 @@ export default function VoiceChannel(props: VoiceChannelProps) {
   const [peerStreams, setPeerStreams] = useState<Map<string, MediaStream>>(new Map());
   const [videoTrackStates, setVideoTrackStates] = useState<Map<string, boolean>>(new Map());
   const [audioTrackStates, setAudioTrackStates] = useState<Map<string, boolean>>(new Map());
+  const [enumeratedAudioDevices, setEnumeratedAudioDevices] = useState<Map<string, string>>(new Map());
+  const [enumeratedVideoDevices, setEnumeratedVideoDevices] = useState<Map<string, string>>(new Map());
   //ref
   const stream = useRef<MediaStream>(new MediaStream());
   const peerConnections = useRef<Map<string, RTCPeerConnection>>(new Map());
+  const userContainerRef = useRef<HTMLDivElement>(null);
   //trpc (api)
   const connectedWSQuery = api.websocket.wssConnectedToChannel.useQuery(selectedChannel.id);
   const joinOrLeaveCallMutation = api.websocket.joinOrLeaveCall.useMutation();
-
-  const bodySizing = width > 768 ? `${width - 286}px` : `${width - 175}px`;
 
   useEffect(() => {
     if (connectedWSQuery.data) {
@@ -308,22 +322,22 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     setLeaveButtonLoadingState(false);
   };
 
-  useEffect(() => {
-    return () => {
-      joinOrLeaveCallMutation.mutate({
-        newState: false,
-        channelID: selectedChannel.id,
-      });
-      socket?.send(
-        JSON.stringify({
-          action: "audio",
-          type: "leave",
-          userID: currentUser.id,
-        })
-      );
-      stream.current.getTracks().forEach((track) => track.stop());
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     joinOrLeaveCallMutation.mutate({
+  //       newState: false,
+  //       channelID: selectedChannel.id,
+  //     });
+  //     socket?.send(
+  //       JSON.stringify({
+  //         action: "audio",
+  //         type: "leave",
+  //         userID: currentUser.id,
+  //       })
+  //     );
+  //     stream.current.getTracks().forEach((track) => track.stop());
+  //   };
+  // }, []);
 
   // Helper functions to enable/disable tracks
   const setAudioTracksState = (state: boolean) => {
@@ -419,6 +433,42 @@ export default function VoiceChannel(props: VoiceChannelProps) {
       );
     }
   };
+  const getEnumeratedDevices = async () => {
+    if (!navigator.mediaDevices?.enumerateDevices) {
+      console.log("enumerateDevices() not supported.");
+    } else {
+      const newAudioDevicesMap = new Map<string, string>();
+      const newVideoDevicesMap = new Map<string, string>();
+      navigator.mediaDevices
+        .enumerateDevices()
+        .then((devices) => {
+          devices.forEach((device) => {
+            if (device.kind === "audioinput") {
+              newAudioDevicesMap.set(device.label, device.deviceId);
+            } else if (device.kind === "videoinput") {
+              newVideoDevicesMap.set(device.label, device.deviceId);
+            }
+          });
+        })
+        .catch((err) => {
+          console.error(`${err.name}: ${err.message}`);
+        });
+      setEnumeratedAudioDevices(newAudioDevicesMap);
+      setEnumeratedVideoDevices(newVideoDevicesMap);
+    }
+  };
+  const selectAudioDevice = async () => {
+    if (enumeratedAudioDevices.size === 0) {
+      await getEnumeratedDevices();
+    }
+    console.log(enumeratedAudioDevices);
+  };
+  const selectVideoDevice = async () => {
+    if (enumeratedVideoDevices.size === 0) {
+      await getEnumeratedDevices();
+    }
+    console.log(enumeratedVideoDevices);
+  };
 
   const checkCamButton = () => {
     if (checkCamButtonLoading) {
@@ -456,10 +506,13 @@ export default function VoiceChannel(props: VoiceChannelProps) {
     <div className="">
       <TopBanner key={selectedChannel.id} selectedChannel={selectedChannel} />
       <div className={`scrollXDisabled h-screen overflow-y-hidden rounded bg-zinc-50 pt-14 dark:bg-zinc-900`}>
-        <div className="pt-8 text-center text-lg">
-          {webSocketsInCall && webSocketsInCall?.length !== 0 ? "Currently in Channel:" : "No one's here... yet"}
-        </div>
-        <div className="absolute flex w-full justify-center">
+        {!userJoined ? (
+          <div className="pt-8 text-center text-lg">
+            {webSocketsInCall && webSocketsInCall?.length !== 0 ? "Currently in Channel:" : "No one's here... yet"}
+          </div>
+        ) : null}
+
+        <div className="z-[100] flex w-full justify-center pt-1">
           <div className="flex flex-col text-center">
             <div className="text-2xl text-purple-600 dark:text-purple-400">
               {microphoneState ? "" : userJoined ? "You are Muted" : ""}
@@ -469,39 +522,61 @@ export default function VoiceChannel(props: VoiceChannelProps) {
             </div>
           </div>
         </div>
+
+        <div className="flex w-full justify-end pr-8">
+          <button className="mx-1 h-8 w-8 rounded-md bg-zinc-600" onClick={selectVideoDevice}>
+            <div className="flex flex-col items-center">
+              <CameraIcon height={12} width={12} color={"white"} />
+              <ChevronDown height={10} width={10} stroke={"white"} strokeWidth={0.5} />
+            </div>
+          </button>
+          <button className="mx-1 h-8 w-8 rounded-md bg-zinc-600" onClick={selectAudioDevice}>
+            <div className="flex flex-col items-center">
+              <MicIcon height={12} width={12} color={"white"} />
+              <ChevronDown height={10} width={10} stroke={"white"} strokeWidth={0.5} />
+            </div>
+          </button>
+        </div>
         {webSocketsInCall.length === 6 ? (
           <div className="py-4 text-center text-sm italic">Currently voice calls only support up to 6 people.</div>
         ) : null}
         {webSocketsInCall ? (
-          <div className="flex h-[60vh] justify-center px-4 pb-8 pt-12 md:px-6 lg:px-10 xl:px-12">
-            {webSocketsInCall.map((websocket) => (
-              <div className="m-4 h-64 w-5/12 rounded-xl bg-purple-200 dark:bg-zinc-700" key={websocket.user.id}>
-                <VideoElement
-                  peerUserID={websocket.user.id}
-                  stream={peerStreams.get(websocket.user.id) || stream.current}
-                  currentUserID={currentUser.id}
-                  videoTrackState={videoTrackStates.get(websocket.user.id) || cameraState}
-                  isLocal={currentUser.id === websocket.user.id}
-                  deafen={!audioState}
-                />
-                <div className="flex justify-center px-6 py-4">
-                  <button className="flex flex-col content-center justify-center">
-                    <img
-                      src={
-                        websocket.user.image
-                          ? websocket.user.image
-                          : websocket.user.pseudonym_image
-                          ? websocket.user.pseudonym_image
-                          : "/Logo - light.png"
-                      }
-                      alt={"user-logo"}
-                      className="h-24 w-24 rounded-full md:h-36 md:w-36"
+          <div className="h-2/3 pt-2 md:px-6 lg:px-10 xl:px-12">
+            <div className={`${gridMap.get(peerConnections.current.size)} mx-auto w-fit`}>
+              {webSocketsInCall.map((websocket) => (
+                <div
+                  className={`mx-4 h-1/4 w-full justify-center rounded-xl bg-purple-200 dark:bg-zinc-700`}
+                  key={websocket.user.id}
+                  ref={userContainerRef}
+                >
+                  <div className="flex h-full w-full justify-center">
+                    <VideoElement
+                      peerUserID={websocket.user.id}
+                      stream={peerStreams.get(websocket.user.id) || stream.current}
+                      currentUserID={currentUser.id}
+                      videoTrackState={videoTrackStates.get(websocket.user.id) || cameraState}
+                      isLocal={currentUser.id === websocket.user.id}
+                      deafen={!audioState}
+                      peerCount={peerStreams.size}
                     />
-                    <div className="mx-auto pt-4 text-black">{websocket.user.name}</div>
-                  </button>
+                    <div className="absolute pt-12">
+                      <img
+                        src={
+                          websocket.user.image
+                            ? websocket.user.image
+                            : websocket.user.pseudonym_image
+                            ? websocket.user.pseudonym_image
+                            : "/Logo - light.png"
+                        }
+                        alt={"user-logo"}
+                        className="h-24 w-24 rounded-full md:h-36 md:w-36"
+                      />
+                      <div className="pt-4 text-center text-black">{websocket.user.name}</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         ) : null}
         {!userJoined ? (
@@ -520,6 +595,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                       videoTrackState={cameraState}
                       isLocal={!microphoneState}
                       deafen={!audioState}
+                      peerCount={peerStreams.size}
                     />
                   </div>
                 </div>

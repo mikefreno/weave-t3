@@ -463,7 +463,7 @@ const AccountPage = (props: {
         >
           <ul
             className={`${
-              showingSettingsMenu ? "" : "-translate-y-[100%] md:translate-y-0"
+              showingSettingsMenu ? "" : "-translate-y-[200%] md:translate-y-0"
             } transform pt-6 transition-all duration-700 ease-in-out`}
           >
             <li className="hvr-move-right">

@@ -468,6 +468,7 @@ export const serverRouter = createTRPCRouter({
         return "error";
       }
     }),
+
   globalInitReaction: protectedProcedure.query(async ({ ctx }) => {
     const all_servers = await ctx.prisma.server.findMany({
       include: {

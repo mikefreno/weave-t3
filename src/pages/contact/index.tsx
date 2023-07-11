@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useContext, useRef, useState } from "react";
 
-export default function PrivacyPolicy() {
+export default function Contact() {
   const { isDarkTheme } = useContext(ThemeContext);
   const { data: session, status } = useSession();
   //state
@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
         <div className="bg-zinc-100 dark:bg-zinc-900">
           <Head>
             <title>Contact Us | Weave</title>
-            <meta name="description" content="Weave's Privacy Policy" />
+            <meta name="description" content="Weave's Contact Page" />
           </Head>
           <Navbar switchRef={switchRef} />
           <div className="flex min-h-screen justify-center px-12">

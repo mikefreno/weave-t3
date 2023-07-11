@@ -12,6 +12,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import InfoIcon from "../icons/InfoIcon";
 import Link from "next/link";
+import { api } from "../utils/api";
 
 const LoginModal = (props: {
   onClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
@@ -25,6 +26,7 @@ const LoginModal = (props: {
   const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
 
   const emailLoginInputRef = useRef<HTMLInputElement | null>(null);
+  const emailExistsCheckMutation = api.users.emailExistsCheck.useMutation();
 
   useEffect(() => {
     const handleFocus = (event: FocusEvent) => {
@@ -37,18 +39,18 @@ const LoginModal = (props: {
   }, []);
 
   async function emailLogin(event: { preventDefault: () => void }) {
-    loginButtonLoadingToggle();
+    setLoginButtonLoading(true);
     event.preventDefault();
     if (emailLoginInputRef.current) {
       const email = emailLoginInputRef.current.value;
-      const response = await axios.get(`/api/userCheck?email=${email}`);
-      if (response.status == 204) {
+      const emailExists = await emailExistsCheckMutation.mutateAsync(email);
+      if (!emailExists) {
         signIn("email", { email, callbackUrl: "/account-set-up" });
       } else {
         signIn("email", { email });
       }
+      setLoginButtonLoading(false);
     }
-    loginButtonLoadingToggle();
   }
   async function googleLogin() {
     signIn("google", { callbackUrl: "/api/providerUserCreationCheck" }).catch(console.log);
@@ -56,9 +58,9 @@ const LoginModal = (props: {
   async function githubLogin() {
     signIn("github", { callbackUrl: "/api/providerUserCreationCheck" }).catch(console.log);
   }
-  function loginButtonLoadingToggle() {
-    setLoginButtonLoading(!loginButtonLoading);
-  }
+  // function loginButtonLoadingToggle() {
+  //   setLoginButtonLoading(!loginButtonLoading);
+  // }
   function loginSubmitButton() {
     if (loginButtonLoading) {
       return (
@@ -78,7 +80,7 @@ const LoginModal = (props: {
   return (
     <div ref={props.loginRef} className="flex justify-center">
       <div
-        className="fade-in fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-200 p-4 text-zinc-800
+        className="fade-in fixed z-40 mt-32 w-4/5 rounded-lg border-2 border-zinc-400 bg-zinc-50 p-4 text-zinc-800
         shadow-xl dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-200 sm:w-3/4 md:w-3/5 lg:w-2/5"
       >
         <div className="absolute z-50 -mb-6 max-w-[25vw] pl-2 text-2xl">

@@ -1,7 +1,6 @@
 import DownloadIcon from "@/src/icons/DownloadIcon";
 import { Button, Tooltip } from "@nextui-org/react";
-import { userAgent } from "next/server";
-import React, { useEffect, useState } from "react";
+
 import { usePlatform, Platform } from "./getPlatform";
 
 const DownloadButton = () => {
