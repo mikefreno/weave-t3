@@ -403,3 +403,7 @@ select {
 .chatBarSmall {
   width: calc(100vw - 10rem);
 }
+new-h-screen {
+  height: 100vh;
+  height: 100dvh;
+}

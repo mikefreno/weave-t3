@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { api } from "@/src/utils/api";
 import { Button, Loading } from "@nextui-org/react";
 import { Server_Channel, Server, Server_Member, Server_Admin, User, WSConnection } from "@prisma/client";
@@ -366,6 +367,7 @@ export default function VoiceChannel(props: VoiceChannelProps) {
                   videoTrackState={false}
                   isLocal={currentUser.id === websocket.user.id}
                   deafen={!audioState}
+                  peerCount={peerStreams.size}
                 />
                 <div className="flex justify-center px-6 py-4">
                   <button className="flex flex-col content-center justify-center">
