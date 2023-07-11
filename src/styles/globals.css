@@ -403,7 +403,12 @@ select {
 .chatBarSmall {
   width: calc(100vw - 10rem);
 }
+new-h-screen-wrap {
+  height: fill-available;
+  height: -webkit-fill-available;
+}
 new-h-screen {
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: fill-available;
+  min-height: -webkit-fill-available;
 }
