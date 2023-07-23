@@ -404,11 +404,20 @@ select {
   width: calc(100vw - 10rem);
 }
 new-h-screen-wrap {
-  height: fill-available;
-  height: -webkit-fill-available;
+  height: stretch;
+  height: -webkit-stretch;
 }
 new-h-screen {
   min-height: 100vh;
-  min-height: fill-available;
-  min-height: -webkit-fill-available;
+  min-height: stretch;
+  min-height: -webkit-stretch;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+.slow-spin {
+  animation: spin-slow 10s linear infinite;
 }
