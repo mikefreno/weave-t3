@@ -65,7 +65,7 @@ const Home = () => {
               </div>
               <h1 className="relative z-10 mt-44 bg-zinc-100 bg-opacity-30 text-center text-5xl font-semibold tracking-widest text-zinc-800 backdrop-blur-[5px] dark:text-zinc-300">
                 Group Hangouts.
-                <br /> Encrypted
+                <br /> Encrypted.
               </h1>
               <div className="-z-10 flex justify-center pb-4 pt-24">
                 <Button shadow color="gradient" auto size={"lg"} onClick={dependantToggleLogin} className="z-0">
