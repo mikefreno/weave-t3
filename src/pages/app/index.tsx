@@ -497,7 +497,7 @@ const App = () => {
         <div
           id="center-page"
           ref={scrollableRef}
-          className={`flex-1 transform transition-all duration-700 ease-in-out md:ml-52 ${
+          className={`h-full flex-1 transform transition-all duration-700 ease-in-out md:ml-52 ${
             showingNav && width && width < 768 ? "blur-[2px] brightness-75" : ""
           }`}
         >
