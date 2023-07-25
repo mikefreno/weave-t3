@@ -417,13 +417,13 @@ const App = () => {
   }
 
   return (
-    <div className="new-h-screen-wrap select-none bg-zinc-100 dark:bg-zinc-700">
+    <div className="max-h-screen select-none bg-zinc-100 dark:bg-zinc-700">
       <Head>
         <title> Web App | Weave</title>
         <meta name="description" content="Weave's Web App" />
       </Head>
       <Navbar switchRef={switchRef} currentTabSetter={currentTabSetter} innerTabSetter={innerTabSetter} />
-      <div id="app-body" className={`new-h-screen flex w-screen`}>
+      <div id="app-body" className={`flex h-screen w-screen`}>
         <div
           className={`${
             showingNav ? "translate-x-44" : ""
