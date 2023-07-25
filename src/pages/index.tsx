@@ -63,7 +63,7 @@ const Home = () => {
                   <Image src={isDarkTheme ? DarkLogo : LightLogo} alt="logo" width={240} height={240} className="z-0" />
                 </div>
               </div>
-              <h1 className="relative z-10 mt-44 bg-zinc-100 bg-opacity-30 text-center text-5xl font-semibold tracking-widest text-zinc-800 backdrop-blur-[5px] dark:text-zinc-300">
+              <h1 className="relative z-10 mt-44 bg-[#fafafa] bg-opacity-30 text-center text-5xl font-semibold tracking-widest text-zinc-800 backdrop-blur-[5px] dark:bg-[#262626] dark:bg-opacity-30 dark:text-zinc-300">
                 Group Hangouts.
                 <br /> Encrypted.
               </h1>
