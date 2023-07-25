@@ -555,7 +555,7 @@ const InnerNav = (props: InnerNavProps) => {
           navToggle={navToggle}
         />
       </div>
-      <div className="h-5/6 overflow-y-auto md:h-full md:overflow-y-scroll">{currentTabRender()}</div>
+      <div className="h-5/6 overflow-y-scroll md:h-full md:overflow-y-auto">{currentTabRender()}</div>
       <div className="fixed bottom-0 -ml-20 hidden w-44 border-r border-zinc-700 bg-purple-900 text-zinc-200 dark:border-zinc-500 dark:bg-zinc-900 md:ml-0 md:block md:w-52">
         <div className="flex justify-between">
           <div className="flex justify-start">

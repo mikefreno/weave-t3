@@ -70,7 +70,7 @@ export default function DirectMessageConversationList(props: DmListProps) {
   };
 
   return (
-    <div className="overflow-y-scroll px-2">
+    <div className="overflow-y-scroll px-2 md:overflow-auto">
       <div className="flex flex-col">{conversations?.map((conversation) => returnConditional(conversation))}</div>
     </div>
   );
