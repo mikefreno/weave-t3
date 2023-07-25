@@ -289,7 +289,7 @@ export default function ChatChannel(props: ChannelMainProps) {
                       </div>
                     )}
                     {messageClickedMap.get(message.id) && currentUser.id !== message.user.id ? (
-                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg md:overflow-auto ">
+                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg md:overflow-auto">
                         <div className="flex justify-between">
                           {serverEmojiArray.map((emojiName: string, index) => (
                             <div className="flex" key={index}>
@@ -306,7 +306,7 @@ export default function ChatChannel(props: ChannelMainProps) {
                         </div>
                       </div>
                     ) : (
-                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg">
+                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg md:overflow-auto">
                         <div className="flex justify-between">
                           {serverEmojiArray.map((emojiName: string, index) => (
                             <div className="flex" key={index}>

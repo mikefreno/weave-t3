@@ -327,7 +327,7 @@ export default function DMPages(props: DMPagesProps) {
             }}
           />
           <div className="flex h-screen flex-col justify-end">
-            <ul className="w-full overflow-y-scroll px-4 pb-24 pt-14">
+            <ul className="w-full overflow-y-scroll px-4 pb-24 pt-14 md:overflow-y-auto">
               {directMessages.map((message) => (
                 <div
                   key={message.id}
@@ -343,7 +343,7 @@ export default function DMPages(props: DMPagesProps) {
                       {message.message}
                     </div>
                     {messageClickedMap.get(message.id) && currentUser.id !== message.senderID ? (
-                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg ">
+                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg md:overflow-auto ">
                         <div className="flex">
                           {usersEmojiArray.map((emojiName: string, index) => (
                             <div className="flex p-1" key={index}>
@@ -355,7 +355,7 @@ export default function DMPages(props: DMPagesProps) {
                         </div>
                       </div>
                     ) : (
-                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg">
+                      <div className="-mb-3 ml-6 mt-3 max-w-sm overflow-scroll rounded-lg md:overflow-auto">
                         <div className="flex">
                           {message.reactions.map((reaction) => (
                             <div className="flex px-2" key={reaction.id}>
