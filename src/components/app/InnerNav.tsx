@@ -536,7 +536,7 @@ const InnerNav = (props: InnerNavProps) => {
   };
 
   return (
-    <div className="fixed h-screen w-56 transform overflow-y-scroll border-r border-zinc-700 bg-purple-400 pl-4 pr-2 dark:border-zinc-500 dark:bg-zinc-800 md:w-52 md:px-0">
+    <div className="fixed h-screen w-56 transform overflow-y-scroll border-r border-zinc-700 bg-purple-400 pl-4 pr-2 dark:border-zinc-500 dark:bg-zinc-800 md:w-52 md:overflow-y-auto md:px-0">
       <div className="pb-14 md:pb-0">
         <SideNavSmallScreen
           currentTabSetter={currentTabSetter}
@@ -555,7 +555,7 @@ const InnerNav = (props: InnerNavProps) => {
           navToggle={navToggle}
         />
       </div>
-      <div className="h-5/6 overflow-y-scroll md:h-full">{currentTabRender()}</div>
+      <div className="h-5/6 overflow-y-auto md:h-full md:overflow-y-scroll">{currentTabRender()}</div>
       <div className="fixed bottom-0 -ml-20 hidden w-44 border-r border-zinc-700 bg-purple-900 text-zinc-200 dark:border-zinc-500 dark:bg-zinc-900 md:ml-0 md:block md:w-52">
         <div className="flex justify-between">
           <div className="flex justify-start">
