@@ -536,7 +536,7 @@ const InnerNav = (props: InnerNavProps) => {
   };
 
   return (
-    <div className="fixed h-screen w-56 transform overflow-y-scroll border-r border-zinc-700 bg-purple-400 pl-4 pr-2 dark:border-zinc-500 dark:bg-zinc-800 md:w-52 md:overflow-y-auto md:px-0">
+    <div className="fixed h-screen w-56 transform overflow-x-hidden overflow-y-scroll border-r border-zinc-700 bg-purple-400 pl-4 pr-2 dark:border-zinc-500 dark:bg-zinc-800 md:w-52 md:overflow-y-auto md:px-0">
       <div className="pb-14 md:pb-0">
         <SideNavSmallScreen
           currentTabSetter={currentTabSetter}
